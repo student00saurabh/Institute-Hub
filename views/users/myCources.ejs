@@ -1,0 +1,994 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="min-h-[90vh] py-8 px-4 sm:px-6 lg:px-8 bg-gray-50/50 dark:bg-gray-900/50">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- ============================================================ -->
+        <!-- HEADER SECTION                                               -->
+        <!-- ============================================================ -->
+        <div class="mb-8" data-aos="fade-up">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-1">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">My Courses</h1>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Continue your learning journey and track your progress</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Overview -->
+                <div class="mt-4 md:mt-0 flex flex-wrap gap-2">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl px-4 py-2.5 border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</div>
+                        <div class="text-lg font-bold text-gray-900 dark:text-white"><%= enrolledCourses ? enrolledCourses.length : 0 %></div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl px-4 py-2.5 border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">In Progress</div>
+                        <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
+                            <% 
+                                let inProgress = enrolledCourses ? enrolledCourses.filter(c => {
+                                    return true;
+                                }).length : 0;
+                            %>
+                            <%= inProgress %>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl px-4 py-2.5 border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <div class="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wider">Completed</div>
+                        <div class="text-lg font-bold text-green-600 dark:text-green-400">
+                            <% 
+                                let completed = enrolledCourses ? enrolledCourses.filter(c => {
+                                    return false;
+                                }).length : 0;
+                            %>
+                            <%= completed %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="mt-6 flex flex-wrap gap-2">
+                <button class="filter-btn active px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                    All Courses
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                    In Progress
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                    Completed
+                </button>
+                <button class="filter-btn px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                    <svg class="inline w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Recently Added
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- COURSES GRID                                                 -->
+        <!-- ============================================================ -->
+        <% if (enrolledCourses && enrolledCourses.length > 0) { %>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <% enrolledCourses.forEach((course, index) => { 
+                    const studentInfo = course.students?.find(s => s.user?._id?.toString() === currUser._id.toString() || s.user?.toString() === currUser._id.toString());
+                    const userRating = course.ratings?.find(r => r.user?.toString() === currUser._id.toString());
+                    const hasRated = !!userRating;
+                %>
+                    <div class="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 course-card" 
+                         data-course-id="<%= course._id %>"
+                         data-aos="fade-up" 
+                         data-aos-duration="600" 
+                         data-aos-delay="<%= (index % 3) * 100 %>">
+                        
+                        <!-- Course Image -->
+                        <div class="relative h-44 overflow-hidden bg-gray-200 dark:bg-gray-700">
+                            <img src="<%= course.image?.url || 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&auto=format&fit=crop' %>" 
+                                 alt="<%= course.title %>"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                 loading="lazy">
+                            
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                            
+                            <!-- Badges -->
+                            <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                                <span class="px-2.5 py-0.5 text-[10px] font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-lg">
+                                    <%= course.courceType || 'Course' %>
+                                </span>
+                                <% if (course.isPopular) { %>
+                                    <span class="px-2.5 py-0.5 text-[10px] font-semibold text-gray-900 bg-yellow-400 rounded-full shadow-lg">
+                                        <i class="fas fa-fire mr-0.5"></i>Popular
+                                    </span>
+                                <% } %>
+                            </div>
+                            
+                            <!-- Price Badge -->
+                            <div class="absolute bottom-3 right-3">
+                                <span class="px-3 py-1 text-xs font-bold text-white bg-black/50 backdrop-blur-sm rounded-lg shadow-lg">
+                                    ₹<%= studentInfo?.paidPrice || course.price || 0 %>
+                                </span>
+                            </div>
+                            
+                            <!-- Status Badge -->
+                            <div class="absolute bottom-3 left-3">
+                                <span class="px-2.5 py-0.5 text-[10px] font-semibold text-white bg-green-500 rounded-full shadow-lg flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Enrolled
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Course Content -->
+                        <div class="p-4">
+                            <!-- Teacher Info -->
+                            <div class="flex items-center gap-2.5 mb-2.5">
+                                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                                    <span class="text-white text-[10px] font-bold">
+                                        <%= course.teacher?.name?.charAt(0).toUpperCase() || 'T' %>
+                                    </span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-[10px] text-gray-500 dark:text-gray-400">Instructor</p>
+                                    <p class="text-xs font-medium text-gray-900 dark:text-white truncate">
+                                        <%= course.teacher?.name || 'Unknown Teacher' %>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Course Title -->
+                            <h3 class="text-base font-bold text-gray-900 dark:text-white mb-1.5 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                <%= course.title %>
+                            </h3>
+
+                            <!-- Short Description -->
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">
+                                <%= course.shortDescription || course.discription?.substring(0, 80) || '' %>
+                            </p>
+
+                            <!-- Course Rating Display -->
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="rating-stars flex items-center gap-0.5">
+                                    <% for (let i = 1; i <= 5; i++) { %>
+                                        <i class="fas fa-star text-[10px] <%= i <= Math.round(course.rating || 0) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600' %>"></i>
+                                    <% } %>
+                                </div>
+                                <span class="text-[10px] text-gray-500 dark:text-gray-400">
+                                    (<%= course.totalRatings || 0 %> reviews)
+                                </span>
+                            </div>
+
+                            <!-- Your Review (shown only if you've rated this course) -->
+                            <% if (hasRated) { %>
+                                <div class="your-review-section flex items-start gap-1.5 mb-3 px-2.5 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/15 border border-blue-100 dark:border-blue-900/30">
+                                    <i class="fas fa-quote-left text-blue-300 dark:text-blue-700 text-[10px] mt-0.5"></i>
+                                    <p class="text-[11px] text-gray-600 dark:text-gray-300 line-clamp-2 italic">
+                                        <%= userRating.review && userRating.review.trim().length > 0 ? userRating.review : 'You rated this course ' + userRating.rating + '/5 — add a written review anytime.' %>
+                                    </p>
+                                </div>
+                            <% } %>
+
+                            <!-- Course Meta Info -->
+                            <div class="flex items-center gap-3 text-[10px] text-gray-500 dark:text-gray-400 mb-3">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <%= course.duration || 'Self-paced' %>
+                                </span>
+                                <span class="w-px h-3 bg-gray-300 dark:bg-gray-600"></span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <%= course.lounchedDate ? new Date(course.lounchedDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Available' %>
+                                </span>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex gap-2">
+                                <a href="/courses/<%= course._id %>" 
+                                   class="flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg text-center flex items-center justify-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Continue
+                                </a>
+                                
+                                <!-- Rate Button -->
+                                <button class="rate-course-btn w-10 h-10 rounded-xl border <%= hasRated ? 'border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400' %> hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200 flex items-center justify-center"
+                                        data-course-id="<%= course._id %>"
+                                        data-course-title="<%= course.title %>"
+                                        data-has-rated="<%= hasRated %>"
+                                        data-rating="<%= hasRated ? userRating.rating : 0 %>"
+                                        data-review="<%= hasRated ? (userRating.review || '') : '' %>"
+                                        title="<%= hasRated ? 'Edit your rating' : 'Rate this course' %>">
+                                    <svg class="w-4 h-4" fill="<%= hasRated ? 'currentColor' : 'none' %>" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                                    </svg>
+                                </button>
+                                
+                                <a href="/courses/<%= course._id %>" 
+                                   class="w-10 h-10 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 flex items-center justify-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <!-- Empty State -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-12 text-center border border-gray-200 dark:border-gray-700 shadow-sm" data-aos="fade-up" data-aos-duration="600">
+                <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center">
+                    <svg class="w-12 h-12 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">No Courses Enrolled</h3>
+                <p class="text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-6">
+                    You haven't enrolled in any courses yet. Start your learning journey by exploring our course catalog.
+                </p>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <a href="/courses" 
+                       class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg">
+                        <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        Browse Courses
+                    </a>
+                    <a href="/about" 
+                       class="px-6 py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
+                        <svg class="inline w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- ============================================================ -->
+        <!-- EXPLORE MORE COURSES BUTTON                                  -->
+        <!-- ============================================================ -->
+        <div class="mt-12 text-center" data-aos="fade-up" data-aos-duration="600">
+            <a href="/courses" 
+               class="inline-flex items-center gap-2.5 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                Explore More Courses
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+            <p class="text-xs text-gray-400 dark:text-gray-500 mt-3">
+                Discover new courses and continue your learning journey
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PROFESSIONAL RATING MODAL                                    -->
+<!-- ============================================================ -->
+<div id="ratingModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-gray-700 transform transition-all duration-300 scale-95 opacity-0 overflow-hidden" id="ratingModalContent">
+        
+        <!-- Modal Header -->
+        <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white shadow-inner">
+                        <i class="fas fa-star text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold text-lg" id="ratingModalTitle">Rate This Course</h3>
+                        <p class="text-blue-100 text-xs truncate max-w-[180px] sm:max-w-[220px]" id="ratingModalCourseTitle">Course Name</p>
+                    </div>
+                </div>
+                <button id="closeRatingModal" class="text-white/70 hover:text-white transition-colors hover:rotate-90 duration-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="p-6">
+            <!-- Rating Stars -->
+            <div class="text-center mb-5">
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3 font-medium">How would you rate this course?</p>
+                <div class="flex items-center justify-center gap-2" id="modalRatingStars">
+                    <button type="button" class="modal-star text-3xl text-gray-300 hover:text-yellow-400 transition-all hover:scale-110 active:scale-90 focus:outline-none" data-value="1">
+                        <i class="far fa-star"></i>
+                    </button>
+                    <button type="button" class="modal-star text-3xl text-gray-300 hover:text-yellow-400 transition-all hover:scale-110 active:scale-90 focus:outline-none" data-value="2">
+                        <i class="far fa-star"></i>
+                    </button>
+                    <button type="button" class="modal-star text-3xl text-gray-300 hover:text-yellow-400 transition-all hover:scale-110 active:scale-90 focus:outline-none" data-value="3">
+                        <i class="far fa-star"></i>
+                    </button>
+                    <button type="button" class="modal-star text-3xl text-gray-300 hover:text-yellow-400 transition-all hover:scale-110 active:scale-90 focus:outline-none" data-value="4">
+                        <i class="far fa-star"></i>
+                    </button>
+                    <button type="button" class="modal-star text-3xl text-gray-300 hover:text-yellow-400 transition-all hover:scale-110 active:scale-90 focus:outline-none" data-value="5">
+                        <i class="far fa-star"></i>
+                    </button>
+                </div>
+                <div class="mt-2">
+                    <p id="modalRatingLabel" class="text-xs text-gray-400 dark:text-gray-500">Click a star to rate</p>
+                </div>
+                <input type="hidden" id="modalRatingValue" value="0">
+                <input type="hidden" id="modalCourseId" value="">
+            </div>
+            
+            <!-- Divider -->
+            <div class="relative mb-5">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
+                </div>
+                <div class="relative flex justify-center">
+                    <span class="px-3 text-xs text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-900">Optional</span>
+                </div>
+            </div>
+            
+            <!-- Optional Review -->
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Write a Review
+                </label>
+                <textarea id="modalReview" 
+                          rows="3"
+                          placeholder="Share your experience with this course..."
+                          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none text-sm"></textarea>
+                <div class="flex justify-between items-center mt-1.5">
+                    <p class="text-xs text-gray-400 dark:text-gray-500">
+                        <span id="modalReviewCount">0</span>/500 characters
+                    </p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500">
+                        <i class="fas fa-eye mr-0.5"></i> Visible to other learners
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Response Message -->
+            <div id="modalResponse" class="hidden p-3 rounded-xl text-sm mb-4"></div>
+            
+            <!-- Delete Rating Button -->
+            <div id="modalDeleteContainer" class="hidden mb-4">
+                <button id="modalDeleteRating" 
+                        class="w-full py-2.5 px-4 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 font-medium rounded-xl transition-all duration-200 flex items-center justify-center gap-2 border border-red-200 dark:border-red-800">
+                    <i class="fas fa-trash-alt"></i>
+                    Delete My Rating
+                </button>
+            </div>
+            
+            <!-- Submit Button -->
+            <button id="modalSubmitRating" 
+                    class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                <i class="fas fa-paper-plane"></i>
+                Submit Rating
+            </button>
+            
+            <!-- Footer Text -->
+            <p class="text-center text-[10px] text-gray-400 dark:text-gray-500 mt-3">
+                <i class="fas fa-shield-alt mr-0.5"></i> Your rating helps others make informed decisions
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT                                                   -->
+<!-- ============================================================ -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ========== CLEAR FLASH MESSAGES ==========
+    function clearFlashMessages() {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(msg => {
+            msg.classList.add('fade-out');
+            setTimeout(() => {
+                if (msg.parentNode) {
+                    msg.remove();
+                }
+            }, 500);
+        });
+    }
+
+    function removeFlashMessageByType(type) {
+        const messages = document.querySelectorAll('.flash-message');
+        messages.forEach(msg => {
+            const bgColors = {
+                'success': 'bg-green-50',
+                'error': 'bg-red-50',
+                'warning': 'bg-yellow-50',
+                'info': 'bg-blue-50',
+                'primary': 'bg-purple-50'
+            };
+            if (msg.classList.contains(bgColors[type])) {
+                msg.classList.add('fade-out');
+                setTimeout(() => { if (msg.parentNode) msg.remove(); }, 500);
+            }
+        });
+    }
+
+    // ========== FILTER BUTTONS ==========
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active', 'bg-gradient-to-r', 'from-blue-600', 'to-indigo-600', 'text-white', 'border-transparent');
+                btn.classList.add('border-gray-200', 'dark:border-gray-700', 'text-gray-700', 'dark:text-gray-300');
+            });
+            
+            this.classList.add('active', 'bg-gradient-to-r', 'from-blue-600', 'to-indigo-600', 'text-white', 'border-transparent');
+            this.classList.remove('border-gray-200', 'dark:border-gray-700', 'text-gray-700', 'dark:text-gray-300');
+            
+            const filter = this.textContent.trim();
+            const cards = document.querySelectorAll('.course-card');
+            
+            cards.forEach(card => {
+                if (filter === 'All Courses' || filter === 'Recently Added') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'block';
+                }
+            });
+        });
+    });
+
+    // ========== RATING MODAL ==========
+    const modal = document.getElementById('ratingModal');
+    const modalContent = document.getElementById('ratingModalContent');
+    const closeBtn = document.getElementById('closeRatingModal');
+    const modalStars = document.querySelectorAll('.modal-star');
+    const modalRatingValue = document.getElementById('modalRatingValue');
+    const modalRatingLabel = document.getElementById('modalRatingLabel');
+    const modalCourseId = document.getElementById('modalCourseId');
+    const modalCourseTitle = document.getElementById('ratingModalCourseTitle');
+    const modalReview = document.getElementById('modalReview');
+    const modalReviewCount = document.getElementById('modalReviewCount');
+    const modalSubmitBtn = document.getElementById('modalSubmitRating');
+    const modalResponse = document.getElementById('modalResponse');
+    const modalDeleteContainer = document.getElementById('modalDeleteContainer');
+    const modalDeleteBtn = document.getElementById('modalDeleteRating');
+    const modalTitle = document.getElementById('ratingModalTitle');
+    
+    let selectedRating = 0;
+    let currentCourseId = null;
+    let currentHasRated = false;
+
+    // ===== Open Modal =====
+    document.querySelectorAll('.rate-course-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Clear flash messages when modal opens
+            clearFlashMessages();
+            
+            const courseId = this.dataset.courseId;
+            const courseTitle = this.dataset.courseTitle;
+            const hasRated = this.dataset.hasRated === 'true';
+            const rating = parseInt(this.dataset.rating) || 0;
+            const existingReview = this.dataset.review || '';
+            
+            currentCourseId = courseId;
+            currentHasRated = hasRated;
+            
+            modalCourseTitle.textContent = courseTitle;
+            modalCourseId.value = courseId;
+            
+            modalReview.value = existingReview;
+            modalReviewCount.textContent = existingReview.length;
+            modalResponse.className = 'hidden p-3 rounded-xl text-sm mb-4';
+            modalResponse.textContent = '';
+            
+            selectedRating = 0;
+            modalStars.forEach(s => {
+                s.innerHTML = '<i class="far fa-star"></i>';
+                s.classList.remove('text-yellow-400');
+                s.classList.add('text-gray-300');
+            });
+            modalRatingValue.value = 0;
+            modalRatingLabel.textContent = 'Click a star to rate';
+            
+            if (hasRated && rating > 0) {
+                modalTitle.textContent = 'Update Your Rating';
+                modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Update Rating';
+                modalDeleteContainer.classList.remove('hidden');
+                selectedRating = rating;
+                modalStars.forEach(s => {
+                    const val = parseInt(s.dataset.value);
+                    if (val <= rating) {
+                        s.innerHTML = '<i class="fas fa-star"></i>';
+                        s.classList.add('text-yellow-400');
+                        s.classList.remove('text-gray-300');
+                    }
+                });
+                modalRatingValue.value = rating;
+                const labels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+                modalRatingLabel.textContent = labels[rating] || 'Click a star to rate';
+            } else {
+                modalTitle.textContent = 'Rate This Course';
+                modalSubmitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Rating';
+                modalDeleteContainer.classList.add('hidden');
+            }
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        });
+    });
+
+    // ===== Close Modal =====
+    function closeModal() {
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }, 300);
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    // ===== Star Selection =====
+    modalStars.forEach(star => {
+        star.addEventListener('click', function() {
+            const value = parseInt(this.dataset.value);
+            selectedRating = value;
+            modalRatingValue.value = value;
+            
+            modalStars.forEach(s => {
+                const val = parseInt(s.dataset.value);
+                if (val <= value) {
+                    s.innerHTML = '<i class="fas fa-star"></i>';
+                    s.classList.add('text-yellow-400');
+                    s.classList.remove('text-gray-300');
+                } else {
+                    s.innerHTML = '<i class="far fa-star"></i>';
+                    s.classList.remove('text-yellow-400');
+                    s.classList.add('text-gray-300');
+                }
+            });
+            
+            const labels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+            modalRatingLabel.textContent = labels[value] || 'Click a star to rate';
+        });
+
+        star.addEventListener('mouseenter', function() {
+            const value = parseInt(this.dataset.value);
+            modalStars.forEach(s => {
+                const val = parseInt(s.dataset.value);
+                if (val <= value) {
+                    s.innerHTML = '<i class="fas fa-star"></i>';
+                    s.classList.add('text-yellow-400');
+                    s.classList.remove('text-gray-300');
+                } else {
+                    s.innerHTML = '<i class="far fa-star"></i>';
+                    s.classList.remove('text-yellow-400');
+                    s.classList.add('text-gray-300');
+                }
+            });
+        });
+
+        star.addEventListener('mouseleave', function() {
+            modalStars.forEach(s => {
+                const val = parseInt(s.dataset.value);
+                if (selectedRating > 0 && val <= selectedRating) {
+                    s.innerHTML = '<i class="fas fa-star"></i>';
+                    s.classList.add('text-yellow-400');
+                    s.classList.remove('text-gray-300');
+                } else {
+                    s.innerHTML = '<i class="far fa-star"></i>';
+                    s.classList.remove('text-yellow-400');
+                    s.classList.add('text-gray-300');
+                }
+            });
+        });
+    });
+
+    // ===== Review Character Counter =====
+    modalReview.addEventListener('input', function() {
+        const count = this.value.length;
+        modalReviewCount.textContent = count;
+        if (count > 495) modalReviewCount.style.color = '#F59E0B';
+        else modalReviewCount.style.color = '';
+        if (count > 500) {
+            this.value = this.value.substring(0, 500);
+            modalReviewCount.textContent = 500;
+        }
+    });
+
+    // ===== Submit Rating =====
+    modalSubmitBtn.addEventListener('click', async function() {
+        const rating = parseInt(modalRatingValue.value);
+        const review = modalReview.value.trim();
+        const courseId = modalCourseId.value;
+        
+        if (!rating || rating < 1) {
+            showModalResponse('Please select a rating.', 'error');
+            return;
+        }
+        
+        // Remove any existing error flash messages
+        removeFlashMessageByType('error');
+        
+        const originalText = this.innerHTML;
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        modalResponse.className = 'hidden p-3 rounded-xl text-sm mb-4';
+        modalResponse.textContent = '';
+        
+        try {
+            const response = await fetch(`/api/course/${courseId}/rating`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ rating, review })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                // Remove any existing success flash messages
+                removeFlashMessageByType('success');
+                
+                showModalResponse('✅ ' + (data.message || 'Rating submitted successfully!'), 'success');
+                
+                // Update course card
+                const courseCard = document.querySelector(`.course-card[data-course-id="${courseId}"]`);
+                if (courseCard) {
+                    // Update rating stars - use class selector
+                    const ratingStars = courseCard.querySelector('.rating-stars');
+                    if (ratingStars) {
+                        const stars = ratingStars.querySelectorAll('.fa-star');
+                        const roundedRating = Math.round(data.averageRating || rating);
+                        stars.forEach((star, index) => {
+                            if (index < roundedRating) {
+                                star.className = 'fas fa-star text-[10px] text-yellow-400';
+                            } else {
+                                star.className = 'fas fa-star text-[10px] text-gray-300 dark:text-gray-600';
+                            }
+                        });
+                    }
+                    
+                    const reviewSpan = courseCard.querySelector('.text-gray-500.dark\\:text-gray-400');
+                    if (reviewSpan) {
+                        reviewSpan.textContent = `(${data.totalRatings || 0} reviews)`;
+                    }
+                    
+                    const rateBtn = courseCard.querySelector('.rate-course-btn');
+                    if (rateBtn) {
+                        rateBtn.dataset.hasRated = 'true';
+                        rateBtn.dataset.rating = rating;
+                        rateBtn.dataset.review = data.review || '';
+                        rateBtn.title = 'Edit your rating';
+                        rateBtn.classList.add('border-blue-300', 'dark:border-blue-700', 'bg-blue-50', 'dark:bg-blue-900/20', 'text-blue-600', 'dark:text-blue-400');
+                        rateBtn.classList.remove('border-gray-200', 'dark:border-gray-700', 'text-gray-600', 'dark:text-gray-400');
+                    }
+                    
+                    // Update the "Your Review" section
+                    const reviewSection = courseCard.querySelector('.your-review-section');
+                    if (reviewSection) {
+                        const reviewText = reviewSection.querySelector('p');
+                        if (reviewText) {
+                            if (data.review && data.review.trim().length > 0) {
+                                reviewText.textContent = data.review;
+                            } else {
+                                reviewText.textContent = 'You rated this course ' + rating + '/5 — add a written review anytime.';
+                            }
+                        }
+                    } else if (data.review && data.review.trim().length > 0) {
+                        // Create review section if it doesn't exist
+                        const newReviewSection = document.createElement('div');
+                        newReviewSection.className = 'your-review-section flex items-start gap-1.5 mb-3 px-2.5 py-2 rounded-lg bg-blue-50 dark:bg-blue-900/15 border border-blue-100 dark:border-blue-900/30';
+                        newReviewSection.innerHTML = `
+                            <i class="fas fa-quote-left text-blue-300 dark:text-blue-700 text-[10px] mt-0.5"></i>
+                            <p class="text-[11px] text-gray-600 dark:text-gray-300 line-clamp-2 italic">${data.review}</p>
+                        `;
+                        // Insert before course meta info
+                        const metaInfo = courseCard.querySelector('.flex.items-center.gap-3.text-\\[10px\\]');
+                        if (metaInfo) {
+                            metaInfo.parentNode.insertBefore(newReviewSection, metaInfo);
+                        }
+                    }
+                }
+                
+                setTimeout(() => {
+                    closeModal();
+                    setTimeout(() => window.location.reload(), 300);
+                }, 1200);
+                
+            } else {
+                showModalResponse(data.message || 'Failed to submit rating. Please try again.', 'error');
+                this.disabled = false;
+                this.innerHTML = originalText;
+            }
+        } catch (error) {
+            console.error('Rating error:', error);
+            showModalResponse('Unable to submit rating. Please try again.', 'error');
+            this.disabled = false;
+            this.innerHTML = originalText;
+        }
+    });
+
+    // ===== Delete Rating =====
+    modalDeleteBtn.addEventListener('click', async function() {
+        const courseId = modalCourseId.value;
+        
+        if (!confirm('Are you sure you want to delete your rating?')) return;
+        
+        // Remove any existing flash messages
+        removeFlashMessageByType('error');
+        removeFlashMessageByType('success');
+        
+        const originalText = this.innerHTML;
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+        modalResponse.className = 'hidden p-3 rounded-xl text-sm mb-4';
+        modalResponse.textContent = '';
+        
+        try {
+            const response = await fetch(`/api/course/${courseId}/rating`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                showModalResponse('✅ ' + (data.message || 'Rating deleted successfully'), 'success');
+                
+                const courseCard = document.querySelector(`.course-card[data-course-id="${courseId}"]`);
+                if (courseCard) {
+                    // Reset rating stars
+                    const ratingStars = courseCard.querySelector('.rating-stars');
+                    if (ratingStars) {
+                        const stars = ratingStars.querySelectorAll('.fa-star');
+                        stars.forEach((star) => {
+                            star.className = 'fas fa-star text-[10px] text-gray-300 dark:text-gray-600';
+                        });
+                    }
+                    
+                    const reviewSpan = courseCard.querySelector('.text-gray-500.dark\\:text-gray-400');
+                    if (reviewSpan) {
+                        reviewSpan.textContent = `(${data.totalRatings || 0} reviews)`;
+                    }
+                    
+                    const rateBtn = courseCard.querySelector('.rate-course-btn');
+                    if (rateBtn) {
+                        rateBtn.dataset.hasRated = 'false';
+                        rateBtn.dataset.rating = 0;
+                        rateBtn.dataset.review = '';
+                        rateBtn.title = 'Rate this course';
+                        rateBtn.classList.remove('border-blue-300', 'dark:border-blue-700', 'bg-blue-50', 'dark:bg-blue-900/20', 'text-blue-600', 'dark:text-blue-400');
+                        rateBtn.classList.add('border-gray-200', 'dark:border-gray-700', 'text-gray-600', 'dark:text-gray-400');
+                    }
+                    
+                    // Remove the "Your Review" section
+                    const reviewSection = courseCard.querySelector('.your-review-section');
+                    if (reviewSection) {
+                        reviewSection.remove();
+                    }
+                }
+                
+                setTimeout(() => {
+                    closeModal();
+                    setTimeout(() => window.location.reload(), 300);
+                }, 1200);
+                
+            } else {
+                showModalResponse(data.message || 'Failed to delete rating', 'error');
+                this.disabled = false;
+                this.innerHTML = originalText;
+            }
+        } catch (error) {
+            console.error('Delete rating error:', error);
+            showModalResponse('Unable to delete rating. Please try again.', 'error');
+            this.disabled = false;
+            this.innerHTML = originalText;
+        }
+    });
+
+    // ===== Show Modal Response =====
+    function showModalResponse(message, type) {
+        modalResponse.className = 'p-3 rounded-xl text-sm mb-4';
+        modalResponse.textContent = message;
+        
+        if (type === 'success') {
+            modalResponse.classList.add('text-green-700', 'bg-green-50', 'dark:text-green-400', 'dark:bg-green-900/20', 'border', 'border-green-200', 'dark:border-green-800');
+        } else {
+            modalResponse.classList.add('text-red-700', 'bg-red-50', 'dark:text-red-400', 'dark:bg-red-900/20', 'border', 'border-red-200', 'dark:border-red-800');
+        }
+        
+        modalResponse.classList.remove('hidden');
+    }
+
+    // ========== COURSE CARD HOVER ==========
+    document.querySelectorAll('.course-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            const img = this.querySelector('img');
+            if (img) img.style.transform = 'scale(1.05)';
+        });
+        card.addEventListener('mouseleave', function() {
+            const img = this.querySelector('img');
+            if (img) img.style.transform = 'scale(1)';
+        });
+    });
+
+    // ========== AUTO CLEAR FLASH MESSAGES ON PAGE LOAD ==========
+    setTimeout(() => {
+        clearFlashMessages();
+    }, 5000);
+});
+</script>
+
+<!-- ============================================================ -->
+<!-- STYLES                                                       -->
+<!-- ============================================================ -->
+<style>
+    /* Filter button active state */
+    .filter-btn.active {
+        background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+        color: white !important;
+        border-color: transparent !important;
+    }
+    
+    .filter-btn {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .filter-btn:hover:not(.active) {
+        background: rgba(37, 99, 235, 0.05);
+        border-color: #2563eb;
+    }
+    
+    /* Line clamp */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    /* Course card */
+    .course-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Modal */
+    #ratingModal {
+        animation: modalFadeIn 0.3s ease forwards;
+    }
+    
+    @keyframes modalFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* Modal stars */
+    .modal-star {
+        transition: all 0.2s ease;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+        padding: 4px;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+    
+    .modal-star:hover {
+        transform: scale(1.15);
+        background: rgba(250, 204, 21, 0.1);
+    }
+    
+    .modal-star:active {
+        transform: scale(0.9);
+    }
+    
+    .modal-star.text-yellow-400 {
+        text-shadow: 0 0 30px rgba(250, 204, 21, 0.3);
+    }
+    
+    /* Rate button */
+    .rate-course-btn {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .rate-course-btn:hover {
+        transform: scale(1.05);
+    }
+    
+    .rate-course-btn:active {
+        transform: scale(0.95);
+    }
+    
+    /* Modal response */
+    #modalResponse {
+        animation: responseSlideDown 0.3s ease forwards;
+    }
+    
+    @keyframes responseSlideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+        background: #475569;
+    }
+    
+    /* Modal max-height for small screens */
+    @media (max-height: 700px) {
+        #modalReview {
+            min-height: 60px;
+            max-height: 80px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .modal-star {
+            width: 32px;
+            height: 32px;
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Flash message fade out animation */
+    @keyframes fadeOut {
+        0% { opacity: 1; transform: translateY(0) scale(1); }
+        100% { opacity: 0; transform: translateY(-10px) scale(0.95); }
+    }
+    
+    .flash-message.fade-out {
+        animation: fadeOut 0.5s ease-in forwards;
+    }
+</style>

@@ -1,0 +1,208 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="error-page min-h-[80vh] flex flex-col items-center justify-center px-4 py-12">
+    <!-- Error Code -->
+    <div class="error-code-wrapper relative">
+        <div class="text-8xl md:text-9xl font-extrabold 
+                    bg-gradient-to-r from-[#2563EB] to-[#C9A227] 
+                    dark:from-[#3B82F6] dark:to-[#E6C35A] 
+                    bg-clip-text text-transparent
+                    drop-shadow-lg">
+            <%= statusCode %>
+        </div>
+        <!-- Subtle Decorative Circles -->
+        <div class="absolute -top-4 -right-4 w-20 h-20 
+                    bg-[#2563EB]/10 dark:bg-[#2563EB]/20 
+                    rounded-full -z-10 blur-2xl"></div>
+        <div class="absolute -bottom-4 -left-4 w-24 h-24 
+                    bg-[#C9A227]/10 dark:bg-[#C9A227]/20 
+                    rounded-full -z-10 blur-2xl"></div>
+    </div>
+
+    <!-- Error Message -->
+    <h2 class="mt-6 text-xl md:text-2xl font-semibold 
+               text-[#0F172A] dark:text-[#F8FAFC] 
+               text-center max-w-md">
+        <%= message %>
+    </h2>
+
+    <!-- Divider -->
+    <div class="w-16 h-0.5 bg-gradient-to-r from-[#2563EB] to-[#C9A227] 
+                dark:from-[#3B82F6] dark:to-[#E6C35A] 
+                rounded-full mt-6"></div>
+
+    <!-- Action Buttons -->
+    <div class="mt-8 flex flex-col sm:flex-row items-center gap-4">
+        <a href="/" 
+           class="error-btn-primary px-8 py-3 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] 
+                  hover:from-[#3B82F6] hover:to-[#2563EB] 
+                  text-white font-semibold rounded-xl 
+                  shadow-lg shadow-[#2563EB]/30 dark:shadow-[#2563EB]/20
+                  transition-all duration-300 transform hover:scale-105 active:scale-95
+                  flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            Go to Home
+        </a>
+        
+        <button onclick="window.history.back()" 
+                class="error-btn-secondary px-8 py-3 bg-white dark:bg-[#111827] 
+                       hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B] 
+                       text-[#0F172A] dark:text-[#F8FAFC] font-semibold 
+                       rounded-xl border border-[#E2E8F0] dark:border-[#1E293B]
+                       shadow-md hover:shadow-lg
+                       transition-all duration-300 transform hover:scale-105 active:scale-95
+                       flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Go Back
+        </button>
+    </div>
+
+    <!-- Help Text -->
+    <p class="mt-8 text-sm text-[#94A3B8] dark:text-[#64748B] text-center max-w-sm">
+        If you need assistance, please 
+        <a href="/contact" class="text-[#2563EB] dark:text-[#3B82F6] hover:underline font-medium transition-colors">
+            contact our support team
+        </a>
+    </p>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCOPED STYLES — Only affects this page                      -->
+<!-- ============================================================ -->
+<style>
+    /* ===== ERROR PAGE SPECIFIC STYLES ===== */
+    
+    /* Smooth animations */
+    .error-page .transform {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Button primary hover glow */
+    .error-btn-primary {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .error-btn-primary::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -75%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.2), transparent);
+        transform: skewX(-20deg);
+        transition: left 0.6s ease;
+    }
+    
+    .error-btn-primary:hover::after {
+        left: 130%;
+    }
+    
+    /* Button secondary hover effect */
+    .error-btn-secondary {
+        transition: all 0.3s ease;
+    }
+    
+    .error-btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+    
+    .dark .error-btn-secondary:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Error code gradient animation */
+    .error-code-wrapper .text-8xl {
+        animation: errorPulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes errorPulse {
+        0%, 100% { 
+            transform: scale(1);
+            filter: drop-shadow(0 4px 6px rgba(37, 99, 235, 0.1));
+        }
+        50% { 
+            transform: scale(1.02);
+            filter: drop-shadow(0 8px 12px rgba(37, 99, 235, 0.2));
+        }
+    }
+    
+    /* Decorative circles float animation */
+    .error-code-wrapper .absolute {
+        animation: errorFloat 4s ease-in-out infinite;
+    }
+    
+    .error-code-wrapper .absolute:first-of-type {
+        animation-delay: 0s;
+    }
+    
+    .error-code-wrapper .absolute:last-of-type {
+        animation-delay: 2s;
+    }
+    
+    @keyframes errorFloat {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(5px, -10px) scale(1.1); }
+    }
+
+    /* Help text link hover */
+    .error-page a[href="/contact"] {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .error-page a[href="/contact"]::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, #2563EB, #C9A227);
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.3s ease;
+    }
+    
+    .error-page a[href="/contact"]:hover::after {
+        transform: scaleX(1);
+        transform-origin: left;
+    }
+
+    /* Reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+        .error-code-wrapper .text-8xl {
+            animation: none !important;
+        }
+        .error-code-wrapper .absolute {
+            animation: none !important;
+        }
+        .error-btn-primary::after {
+            display: none !important;
+        }
+        .error-page a[href="/contact"]::after {
+            display: none !important;
+        }
+    }
+
+    /* Mobile responsive adjustments */
+    @media (max-width: 640px) {
+        .error-page .text-8xl {
+            font-size: 5rem !important;
+        }
+        .error-page .text-9xl {
+            font-size: 6rem !important;
+        }
+        .error-btn-primary,
+        .error-btn-secondary {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>

@@ -1,0 +1,13 @@
+# robots.txt for thecubicals.online
+
+User-agent: *
+
+# Block admin routes
+Disallow: /admin/
+Disallow: /api/
+
+# Allow all other pages
+Allow: /
+
+# Sitemap
+Sitemap: https://thecubicals.online/sitemap.xml

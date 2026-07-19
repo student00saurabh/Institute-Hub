@@ -1,0 +1,425 @@
+<% layout("/layouts/boilerplate") %>
+
+<!-- ============ HERO ============ -->
+<section class="relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 dark:from-gray-900 dark:via-gray-800/50 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
+  <div class="absolute inset-0 bg-grid-pattern opacity-5 dark:opacity-10"></div>
+  <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-600/5 to-transparent dark:from-blue-500/5"></div>
+  <div class="absolute bottom-0 left-0 w-1/3 h-1/2 bg-gradient-to-r from-indigo-600/5 to-transparent dark:from-indigo-500/5"></div>
+  <div class="absolute top-10 -left-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl"></div>
+  <div class="absolute bottom-0 right-0 w-80 h-80 bg-indigo-400/10 rounded-full blur-3xl"></div>
+
+  <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+
+      <div class="max-w-2xl">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium mb-4" data-aos="fade-up">
+          <span class="w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400 animate-pulse"></span>
+          Your Library
+        </div>
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight" data-aos="fade-up" data-aos-delay="100">
+          Your Reading
+          <span class="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">List</span>
+        </h1>
+        <p class="mt-3 text-lg text-gray-600 dark:text-gray-300 leading-relaxed" data-aos="fade-up" data-aos-delay="150">
+          Every cybersecurity read you've bookmarked, organized in one place.
+        </p>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="flex gap-6 sm:gap-10" data-aos="fade-up" data-aos-delay="200">
+        <div>
+          <div class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <%= savedBlogs ? savedBlogs.length : 0 %>
+          </div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Saved Blogs</div>
+        </div>
+        <div>
+          <%
+            const categoryList = savedBlogs ? [...new Set(savedBlogs.map(b => b.category).filter(Boolean))] : [];
+          %>
+          <div class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <%= categoryList.length %>
+          </div>
+          <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Topics</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex flex-wrap gap-3" data-aos="fade-up" data-aos-delay="250">
+      <a href="/blogs" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-sm">
+        <i class="fas fa-compass"></i> Discover More Blogs
+      </a>
+      <a href="/courses" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 text-sm">
+        <i class="fas fa-graduation-cap"></i> Explore Courses
+      </a>
+    </div>
+  </div>
+</section>
+
+<% if (savedBlogs && savedBlogs.length > 0) { %>
+
+  <!-- ============ CONTROLS BAR ============ -->
+  <section class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex flex-col md:flex-row md:items-center gap-3">
+
+        <!-- Search -->
+        <div class="relative flex-1 max-w-xs">
+          <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 text-xs"></i>
+          <input type="text"
+                 id="searchInput"
+                 placeholder="Search saved blogs..."
+                 class="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 transition-all">
+        </div>
+
+        <!-- Category chips -->
+        <div id="categoryChips" class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 flex-1 scrollbar-hide">
+          <button data-filter="all" class="chip-btn flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium bg-blue-600 dark:bg-blue-500 text-white shadow-sm transition-colors">
+            All
+          </button>
+          <% categoryList.slice(0, 6).forEach(cat => { %>
+            <button data-filter="<%= cat %>" class="chip-btn flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
+              <%= cat %>
+            </button>
+          <% }) %>
+          <% if (categoryList.length > 6) { %>
+            <span class="text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">+<%= categoryList.length - 6 %></span>
+          <% } %>
+        </div>
+
+        <!-- Sort -->
+        <select id="sortSelect" class="flex-shrink-0 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all">
+          <option value="default">Recently Saved</option>
+          <option value="title">Title (A–Z)</option>
+          <option value="views">Most Viewed</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MAIN LIST ============ -->
+  <section class="py-8 bg-gray-50 dark:bg-gray-900/50 min-h-[50vh]">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <%
+        const orderedBlogs = savedBlogs.slice().reverse(); // most recently saved first
+      %>
+
+      <div class="flex items-center justify-between mb-4" data-aos="fade-up">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+          Your List <span class="text-gray-400 dark:text-gray-500 font-normal">(<%= orderedBlogs.length %>)</span>
+        </h3>
+      </div>
+
+      <!-- Single-column row list -->
+      <div id="savedGrid" class="flex flex-col gap-3" data-aos="fade-up" data-aos-delay="100">
+        <% orderedBlogs.forEach((blog, idx) => {
+          const likesCount = blog.likes ? blog.likes.length : 0;
+          const commentsCount = blog.comments ? blog.comments.length : 0;
+          const viewsCount = blog.usersSeen ? blog.usersSeen.length : 0;
+        %>
+          <div class="saved-card group relative flex items-stretch gap-4 bg-white dark:bg-gray-900 rounded-2xl border <%= idx === 0 ? 'border-blue-200 dark:border-blue-800/60 ring-1 ring-blue-100/60 dark:ring-blue-900/30' : 'border-gray-200 dark:border-gray-700' %> p-3 sm:p-4 shadow-sm hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-800/60 transition-all duration-300"
+               data-title="<%= blog.title.toLowerCase() %>"
+               data-category="<%= blog.category || '' %>"
+               data-views="<%= viewsCount %>">
+
+            <% if (idx === 0) { %>
+              <span class="absolute -top-2.5 left-4 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-blue-600 text-white rounded-full shadow">
+                Last Saved
+              </span>
+            <% } %>
+
+            <!-- Thumbnail: compact, full image visible (no cropping) -->
+            <a href="/blogs/<%= blog._id %>"
+               class="flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center">
+              <img src="<%= blog.image?.url || 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=300&auto=format&fit=crop' %>"
+                   alt="<%= blog.title %>"
+                   class="max-w-full max-h-full w-full h-full object-contain">
+            </a>
+
+            <!-- Content -->
+            <div class="flex-1 min-w-0 flex flex-col justify-between">
+
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="inline-flex items-center px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-semibold uppercase tracking-wide rounded-full">
+                    <%= blog.category || 'Blog' %>
+                  </span>
+                  <span class="text-[11px] text-gray-400 dark:text-gray-500 flex items-center gap-1">
+                    <i class="far fa-clock"></i> <%= moment(blog.createdAt).format('DD MMM YYYY') %>
+                  </span>
+                </div>
+
+                <h3 class="text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-1 line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <a href="/blogs/<%= blog._id %>"><%= blog.title %></a>
+                </h3>
+
+                <p class="desc-text text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed"
+                   data-fulltext="<%= (blog.shortdescription || blog.content || '').replace(/<[^>]*>/g, ' ').replace(/"/g, '&quot;') %>">
+                  <%= blog.shortdescription || (blog.content ? blog.content.replace(/<[^>]*>/g, ' ') : '') %>
+                </p>
+              </div>
+
+              <!-- Meta row -->
+              <div class="flex items-center justify-between gap-3 mt-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                <div class="flex items-center gap-3 text-[11px] sm:text-xs text-gray-400 dark:text-gray-500 min-w-0">
+                  <span class="hidden sm:flex items-center gap-1.5 flex-shrink-0">
+                    <span class="w-5 h-5 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-[9px] font-bold">
+                      <%= blog.author?.name?.charAt(0).toUpperCase() || 'A' %>
+                    </span>
+                    <span class="truncate max-w-[70px] text-gray-500 dark:text-gray-400"><%= blog.author?.name || 'Unknown' %></span>
+                  </span>
+                  <span class="flex items-center gap-1 flex-shrink-0"><i class="far fa-eye"></i> <%= viewsCount %></span>
+                  <span class="flex items-center gap-1 flex-shrink-0"><i class="far fa-heart"></i> <%= likesCount %></span>
+                  <span class="flex items-center gap-1 flex-shrink-0"><i class="far fa-comment"></i> <%= commentsCount %></span>
+                </div>
+
+                <div class="flex items-center gap-1 flex-shrink-0">
+                  <a href="/blogs/<%= blog._id %>"
+                     class="px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-[11px] font-semibold rounded-lg transition-colors">
+                    Read
+                  </a>
+
+                  <!-- Remove via bookmark toggle (non-destructive framing) -->
+                  <button onclick="removeSavedBlog('<%= blog._id %>', this)"
+                          title="Remove from saved"
+                          class="bookmark-remove-btn relative w-8 h-8 flex items-center justify-center rounded-lg text-blue-600 dark:text-blue-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:text-rose-500 dark:hover:text-rose-400 transition-colors">
+                    <i class="fas fa-bookmark text-sm icon-default"></i>
+                    <i class="fas fa-bookmark-slash text-sm icon-hover" style="display:none;"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+
+      <!-- No-results -->
+      <div id="noResults" class="hidden text-center py-12">
+        <i class="fas fa-folder-open text-3xl text-gray-300 dark:text-gray-600 mb-3"></i>
+        <p class="text-gray-500 dark:text-gray-400">No saved blogs match your search.</p>
+      </div>
+    </div>
+  </section>
+
+<% } else { %>
+
+  <!-- ============ EMPTY STATE ============ -->
+  <section class="py-16 bg-gray-50 dark:bg-gray-900/50 min-h-[50vh]">
+    <div class="max-w-2xl mx-auto px-4 text-center" data-aos="fade-up">
+      <div class="relative inline-block mb-6">
+        <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center rotate-3">
+          <i class="fas fa-bookmark text-3xl text-blue-600 dark:text-blue-400"></i>
+        </div>
+        <div class="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center justify-center shadow-md">
+          <i class="fas fa-plus text-blue-600 dark:text-blue-400 text-xs"></i>
+        </div>
+      </div>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Your reading list is empty</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-6 leading-relaxed">
+        Tap the bookmark icon on any blog to save it here. Build your own cybersecurity reading list and revisit it anytime.
+      </p>
+      <a href="/blogs"
+         class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 hover:from-blue-700 hover:to-indigo-700 dark:hover:from-blue-600 dark:hover:to-indigo-600 text-white font-semibold rounded-xl transition-all duration-300 shadow-md hover:shadow-lg text-sm">
+        <i class="fas fa-book-open"></i> Browse Blogs
+      </a>
+    </div>
+  </section>
+
+<% } %>
+
+<!-- ============ CTA ============ -->
+<section class="relative bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 dark:from-blue-900 dark:via-indigo-900 dark:to-blue-900 py-12 overflow-hidden">
+  <div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
+  <div class="absolute top-0 left-0 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+  <div class="absolute bottom-0 right-0 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+
+  <div class="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+    <h2 class="text-2xl font-bold text-white" data-aos="fade-up">Want to learn it hands-on?</h2>
+    <p class="text-blue-100 dark:text-blue-200 mt-2 text-base max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+      Turn what you read into real skills with our cybersecurity certification courses.
+    </p>
+    <div class="flex flex-wrap justify-center gap-3 mt-5" data-aos="fade-up" data-aos-delay="200">
+      <a href="/courses" class="inline-flex items-center gap-2 px-6 py-2.5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 text-sm">
+        <i class="fas fa-graduation-cap"></i> Explore Courses
+      </a>
+      <a href="/blogs" class="inline-flex items-center gap-2 px-6 py-2.5 bg-transparent border-2 border-white text-white hover:bg-white/10 font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 text-sm">
+        <i class="fas fa-book-open"></i> Browse Blogs
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+// ---------------- Word-limit truncation (keeps every card the same height) ----------------
+(function () {
+  const WORD_LIMIT = 18;
+  document.querySelectorAll('.desc-text').forEach(el => {
+    const full = (el.dataset.fulltext || el.textContent || '').trim().replace(/\s+/g, ' ');
+    const words = full.split(' ');
+    el.textContent = words.length > WORD_LIMIT
+      ? words.slice(0, WORD_LIMIT).join(' ') + '…'
+      : full;
+  });
+})();
+
+// ---------------- Bookmark-remove hover icon swap ----------------
+document.querySelectorAll('.bookmark-remove-btn').forEach(btn => {
+  const defaultIcon = btn.querySelector('.icon-default');
+  const hoverIcon = btn.querySelector('.icon-hover');
+
+  btn.addEventListener('mouseenter', () => {
+    defaultIcon.style.display = 'none';
+    hoverIcon.style.display = 'block';
+  });
+  btn.addEventListener('mouseleave', () => {
+    defaultIcon.style.display = 'block';
+    hoverIcon.style.display = 'none';
+  });
+});
+
+// ---------------- Search + Filter + Sort ----------------
+(function () {
+  const searchInput = document.getElementById('searchInput');
+  const sortSelect = document.getElementById('sortSelect');
+  const chips = document.querySelectorAll('.chip-btn');
+  const grid = document.getElementById('savedGrid');
+  const noResults = document.getElementById('noResults');
+
+  if (!grid) return;
+
+  let activeFilter = 'all';
+
+  function applyFilters() {
+    const query = (searchInput?.value || '').toLowerCase().trim();
+    const cards = Array.from(grid.querySelectorAll('.saved-card'));
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const matchesSearch = !query || card.dataset.title.includes(query);
+      const matchesFilter = activeFilter === 'all' || card.dataset.category === activeFilter;
+      const show = matchesSearch && matchesFilter;
+      card.style.display = show ? '' : 'none';
+      if (show) visibleCount++;
+    });
+
+    if (noResults) noResults.classList.toggle('hidden', visibleCount !== 0);
+  }
+
+  function applySort() {
+    const cards = Array.from(grid.querySelectorAll('.saved-card'));
+    const mode = sortSelect.value;
+
+    if (mode === 'default') return;
+
+    cards.sort((a, b) => {
+      if (mode === 'title') return a.dataset.title.localeCompare(b.dataset.title);
+      if (mode === 'views') return Number(b.dataset.views) - Number(a.dataset.views);
+      return 0;
+    });
+
+    cards.forEach(card => grid.appendChild(card));
+  }
+
+  searchInput?.addEventListener('input', applyFilters);
+  sortSelect?.addEventListener('change', applySort);
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      activeFilter = chip.dataset.filter;
+      chips.forEach(c => {
+        const isActive = c === chip;
+        c.classList.toggle('bg-blue-600', isActive);
+        c.classList.toggle('text-white', isActive);
+        c.classList.toggle('bg-gray-100', !isActive);
+        c.classList.toggle('dark:bg-gray-700', !isActive);
+        c.classList.toggle('text-gray-600', !isActive);
+        c.classList.toggle('dark:text-gray-300', !isActive);
+      });
+      applyFilters();
+    });
+  });
+})();
+
+// ---------------- Remove from saved (bookmark toggle, with Undo) ----------------
+function removeSavedBlog(blogId, triggerEl) {
+  const card = triggerEl.closest('.saved-card');
+  if (!card) return;
+
+  card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+  card.style.opacity = '0';
+  card.style.transform = 'scale(0.97)';
+
+  let undone = false;
+
+  const timeoutId = setTimeout(() => {
+    if (undone) return;
+    fetch('/blogs/' + blogId + '/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .catch(() => {})
+      .finally(() => {
+        card.style.display = 'none';
+      });
+  }, 4500);
+
+  showUndoToast('Removed from your reading list', () => {
+    undone = true;
+    clearTimeout(timeoutId);
+    card.style.opacity = '1';
+    card.style.transform = 'scale(1)';
+  });
+}
+
+function showUndoToast(message, onUndo) {
+  const existing = document.querySelector('.undo-toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.className = 'undo-toast fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 px-4 py-3 rounded-xl shadow-xl bg-gray-900 dark:bg-gray-800 text-white border border-gray-700 max-w-[90%]';
+  toast.innerHTML = `
+    <span class="text-sm">${message}</span>
+    <button class="text-blue-400 hover:text-blue-300 text-sm font-semibold">Undo</button>
+  `;
+  toast.querySelector('button').addEventListener('click', () => {
+    onUndo();
+    toast.remove();
+  });
+
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 4500);
+}
+</script>
+
+<style>
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .bg-grid-pattern {
+    background-image:
+      linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .undo-toast { animation: toastIn 0.25s ease forwards; }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translate(-50%, 12px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+</style>

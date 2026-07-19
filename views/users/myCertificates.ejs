@@ -1,0 +1,769 @@
+<% layout("/layouts/boilerplate", {
+    title: 'My Certificates - RootShield',
+    description: 'View and download your achievement certificates from RootShield.',
+    pageStyles: `
+        .certificate-gradient {
+            background: linear-gradient(135deg, rgba(0, 100, 0, 0.05) 0%, rgba(0, 150, 0, 0.05) 100%);
+        }
+        
+        .certificate-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .certificate-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: #10B981;
+        }
+        
+        .admin-badge {
+            background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 50;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #9CA3AF;
+            transition: color 0.2s;
+        }
+        
+        .close:hover {
+            color: #1F2937;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            color: #9CA3AF;
+        }
+        
+        .search-box input {
+            padding-left: 35px;
+        }
+        
+        .student-item {
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #F3F4F6;
+        }
+        
+        .student-item:hover {
+            background: #F9FAFB;
+        }
+        
+        .student-item.selected {
+            background: #D1FAE5;
+            border-left: 4px solid #10B981;
+        }
+        
+        .type-option {
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .type-option.selected {
+            border-color: #10B981;
+            background-color: #D1FAE5;
+        }
+        
+        .type-option input[type="radio"] {
+            display: none;
+        }
+        
+        .field-group {
+            transition: all 0.3s ease;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .preview-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    `
+}) -%>
+
+<div class="min-h-screen certificate-gradient py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                    <i class="fas fa-certificate text-[#10B981]"></i>
+                    My Certificates
+                    <% if (user.role === 'admin') { %>
+                        <span class="admin-badge text-white text-sm px-3 py-1 rounded-full">Admin</span>
+                    <% } %>
+                </h1>
+                <p class="mt-2 text-gray-600">
+                    <%= user.role === 'admin' ? 'Manage and issue certificates to students' : 'Your earned certificates from RootShield' %>
+                </p>
+            </div>
+            
+            <!-- Stats -->
+            <div class="bg-white rounded-lg px-4 py-2 border border-gray-200 shadow-sm">
+                <span class="text-gray-600">Total Certificates: </span>
+                <span class="text-2xl font-bold text-[#10B981]"><%= totalCertificates %></span>
+            </div>
+        </div>
+
+        <!-- Admin: Issue Certificate Button -->
+        <% if (user.role === 'admin') { %>
+            <div class="mb-8">
+                <button onclick="openIssueModal()" 
+                        class="px-6 py-3 bg-gradient-to-r from-[#059669] to-[#10B981] text-white rounded-lg font-medium hover:from-[#047857] hover:to-[#059669] transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                    <i class="fas fa-plus-circle"></i>
+                    Issue New Certificate
+                </button>
+            </div>
+        <% } %>
+
+        <!-- Certificates Grid -->
+        <% if (certificates && certificates.length > 0) { %>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <% certificates.forEach(cert => { %>
+                    <div class="certificate-card bg-white rounded-xl overflow-hidden shadow-sm relative">
+                        <!-- Preview Badge -->
+                        <div class="preview-badge">
+                            <i class="fas fa-<%= cert.certificateType === 'OFFERLETTER' ? 'file-signature' : 
+                                                cert.certificateType === 'INTERNSHIP' ? 'briefcase' : 
+                                                cert.certificateType === 'PERFORMANCE' ? 'trophy' :
+                                                cert.certificateType === 'HACKATHON' ? 'code' : 'certificate' %> mr-1"></i>
+                            <%= cert.certificateType.replace('_', ' ') %>
+                        </div>
+                        
+                        <!-- Preview Image -->
+                        <div class="h-32 bg-gradient-to-r from-[#059669] to-[#10B981] p-4 flex items-center justify-center">
+                            <i class="fas fa-certificate text-white text-4xl opacity-30"></i>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
+                                <%= cert.certificateType === 'OFFERLETTER' ? 'Offer Letter' :
+                                   cert.certificateType === 'INTERNSHIP' ? 'Internship Certificate' :
+                                   cert.certificateType === 'PERFORMANCE' ? 'Performance Award' :
+                                   cert.certificateType === 'HACKATHON' ? 'Hackathon Certificate' :
+                                   cert.course?.title || 'Certificate' %>
+                            </h3>
+                            
+                            <p class="text-sm text-gray-600 mb-2">
+                                <i class="fas fa-user mr-2 text-[#10B981]"></i>
+                                <%= cert.student?.name || user.name %>
+                            </p>
+                            
+                            <div class="flex justify-between text-sm text-gray-500 mb-3">
+                                <span><i class="far fa-calendar mr-1"></i><%= new Date(cert.issueDate).toLocaleDateString() %></span>
+                                <% if (cert.grade && cert.grade !== 'COMPLETED' && ['WEB DEV', 'CYBERSECURITY', 'MACHINE LEARNING', 'DATA SCIENCE', 'ARTIFICIAL INTELLIGENCE'].includes(cert.certificateType)) { %>
+                                    <span class="bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full text-xs"><%= cert.grade %></span>
+                                <% } %>
+                            </div>
+                            
+                            <% if (cert.position) { %>
+                                <div class="mb-2 text-xs text-gray-500">
+                                    <i class="fas fa-briefcase mr-1"></i> Position: <%= cert.position %>
+                                </div>
+                            <% } %>
+                            
+                            <% if (cert.duration) { %>
+                                <div class="mb-2 text-xs text-gray-500">
+                                    <i class="far fa-clock mr-1"></i> Duration: <%= cert.duration %>
+                                </div>
+                            <% } %>
+                            
+                            <div class="mb-3 p-2 bg-gray-50 rounded text-center">
+                                <p class="text-xs text-gray-500 font-mono">
+                                    ID: <%= cert.certificateId.substring(0, 8) %>...
+                                </p>
+                            </div>
+                            
+                            <!-- Download Buttons -->
+                            <div class="flex gap-2">
+                                <a href="/certificates/<%= cert._id %>/download/image" 
+                                   class="flex-1 bg-gradient-to-r from-[#059669] to-[#10B981] text-white px-3 py-2 rounded-lg text-sm text-center hover:from-[#047857] hover:to-[#059669] transition-all">
+                                    <i class="fas fa-image mr-1"></i> Image
+                                </a>
+                                <a href="/certificates/<%= cert._id %>/download/pdf" 
+                                   class="flex-1 bg-gradient-to-r from-[#7C3AED] to-[#8B5CF6] text-white px-3 py-2 rounded-lg text-sm text-center hover:from-[#6D28D9] hover:to-[#7C3AED] transition-all">
+                                    <i class="fas fa-file-pdf mr-1"></i> PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <!-- Empty State -->
+            <div class="bg-white rounded-2xl p-16 text-center border border-gray-200 shadow-sm">
+                <div class="w-24 h-24 bg-gradient-to-r from-[#059669] to-[#10B981] rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-certificate text-white text-4xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-3">
+                    No Certificates Yet
+                </h2>
+                <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                    <%= user.role === 'admin' ? 
+                        'Start issuing certificates to your students.' : 
+                        'Complete courses and achievements to earn certificates from RootShield.' %>
+                </p>
+                <% if (user.role !== 'admin') { %>
+                    <a href="/courses" class="px-6 py-3 bg-gradient-to-r from-[#059669] to-[#10B981] text-white rounded-lg font-medium hover:from-[#047857] hover:to-[#059669] transition-all shadow-md">
+                        Browse Courses
+                    </a>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- Issue Certificate Modal (Admin Only) -->
+<% if (user.role === 'admin') { %>
+<div id="issueModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeIssueModal()">&times;</span>
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <i class="fas fa-certificate text-[#10B981]"></i>
+            Issue New Certificate
+        </h2>
+        
+        <form action="/certificate/issue" method="POST" id="issueForm">
+            <!-- Student Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-user-graduate mr-1 text-[#10B981]"></i>
+                    Select Student *
+                </label>
+                
+                <!-- Search Box -->
+                <div class="relative mb-3">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <input type="text" 
+                           id="studentSearch" 
+                           placeholder="Search by name or email..." 
+                           class="w-full px-4 py-2 pl-10 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#10B981] focus:border-transparent">
+                </div>
+                
+                <!-- Students List -->
+                <div id="studentsList" class="border border-gray-200 rounded-lg max-h-48 overflow-y-auto">
+                    <% if (allUsers && allUsers.length > 0) { %>
+                        <% allUsers.forEach(student => { %>
+                            <div class="student-item p-3 hover:bg-gray-50 cursor-pointer transition-all" 
+                                 data-id="<%= student._id %>"
+                                 data-name="<%= student.name %>"
+                                 data-email="<%= student.email %>">
+                                <div class="font-medium text-gray-900"><%= student.name %></div>
+                                <div class="text-sm text-gray-500"><%= student.email %></div>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="p-4 text-center text-gray-500">No students found</div>
+                    <% } %>
+                </div>
+                
+                <input type="hidden" name="studentId" id="selectedStudentId" required>
+            </div>
+            
+            <!-- Selected Student Display -->
+            <div id="selectedStudentDisplay" class="mb-6 p-3 bg-[#D1FAE5] rounded-lg hidden items-center gap-3">
+                <div class="w-10 h-10 bg-[#10B981] rounded-full flex items-center justify-center text-white font-bold">
+                    <span id="displayStudentInitial"></span>
+                </div>
+                <div>
+                    <p class="font-medium text-gray-900" id="displayStudentName"></p>
+                    <p class="text-sm text-gray-600" id="displayStudentEmail"></p>
+                </div>
+            </div>
+            
+            <!-- Certificate Type Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                    <i class="fas fa-tag mr-1 text-[#10B981]"></i>
+                    Certificate Type *
+                </label>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Course Certificates -->
+                    <div class="type-option p-3 border rounded-lg cursor-pointer hover:border-[#10B981] transition-all" onclick="selectType('WEB DEV')">
+                        <input type="radio" name="certificateType" value="WEB DEV" id="typeWebDev" class="hidden" onchange="toggleFields()">
+                        <label for="typeWebDev" class="cursor-pointer">
+                            <i class="fas fa-code text-[#3B82F6] mb-1"></i>
+                            <div class="font-medium text-gray-900">Web Dev</div>
+                            <div class="text-xs text-gray-500">Course Certificate</div>
+                        </label>
+                    </div>
+                    
+                    <div class="type-option p-3 border rounded-lg cursor-pointer hover:border-[#10B981] transition-all" onclick="selectType('CYBERSECURITY')">
+                        <input type="radio" name="certificateType" value="CYBERSECURITY" id="typeCyber" class="hidden" onchange="toggleFields()">
+                        <label for="typeCyber" class="cursor-pointer">
+                            <i class="fas fa-shield-alt text-[#DC2626] mb-1"></i>
+                            <div class="font-medium text-gray-900">Cybersecurity</div>
+                            <div class="text-xs text-gray-500">Course Certificate</div>
+                        </label>
+                    </div>
+                    
+                    <div class="type-option p-3 border rounded-lg cursor-pointer hover:border-[#10B981] transition-all" onclick="selectType('MACHINE LEARNING')">
+                        <input type="radio" name="certificateType" value="MACHINE LEARNING" id="typeML" class="hidden" onchange="toggleFields()">
+                        <label for="typeML" class="cursor-pointer">
+                            <i class="fas fa-brain text-[#7C3AED] mb-1"></i>
+                            <div class="font-medium text-gray-900">ML/AI</div>
+                            <div class="text-xs text-gray-500">Course Certificate</div>
+                        </label>
+                    </div>
+                    
+                    <!-- Achievement Certificates -->
+                    <div class="type-option p-3 border rounded-lg cursor-pointer hover:border-[#10B981] transition-all" onclick="selectType('INTERNSHIP')">
+                        <input type="radio" name="certificateType" value="INTERNSHIP" id="typeInternship" class="hidden" onchange="toggleFields()">
+                        <label for="typeInternship" class="cursor-pointer">
+                            <i class="fas fa-briefcase text-[#059669] mb-1"></i>
+                            <div class="font-medium text-gray-900">Internship</div>
+                            <div class="text-xs text-gray-500">Experience Letter</div>
+                        </label>
+                    </div>
+                    
+                    <div class="type-option p-3 border rounded-lg cursor-pointer hover:border-[#10B981] transition-all" onclick="selectType('OFFERLETTER')">
+                        <input type="radio" name="certificateType" value="OFFERLETTER" id="typeOffer" class="hidden" onchange="toggleFields()">
+                        <label for="typeOffer" class="cursor-pointer">
+                            <i class="fas fa-file-signature text-[#F59E0B] mb-1"></i>
+                            <div class="font-medium text-gray-900">Offer Letter</div>
+                            <div class="text-xs text-gray-500">Job Appointment</div>
+                        </label>
+                    </div>
+                    
+                    <div class="type-option p-3 border rounded-lg cursor-pointer hover:border-[#10B981] transition-all" onclick="selectType('PERFORMANCE')">
+                        <input type="radio" name="certificateType" value="PERFORMANCE" id="typePerformance" class="hidden" onchange="toggleFields()">
+                        <label for="typePerformance" class="cursor-pointer">
+                            <i class="fas fa-trophy text-[#B45309] mb-1"></i>
+                            <div class="font-medium text-gray-900">Performance</div>
+                            <div class="text-xs text-gray-500">Achievement Award</div>
+                        </label>
+                    </div>
+                    
+                    <div class="type-option p-3 border rounded-lg cursor-pointer hover:border-[#10B981] transition-all" onclick="selectType('HACKATHON')">
+                        <input type="radio" name="certificateType" value="HACKATHON" id="typeHackathon" class="hidden" onchange="toggleFields()">
+                        <label for="typeHackathon" class="cursor-pointer">
+                            <i class="fas fa-code-branch text-[#6B21A8] mb-1"></i>
+                            <div class="font-medium text-gray-900">Hackathon</div>
+                            <div class="text-xs text-gray-500">Participation</div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dynamic Fields Container -->
+            <div id="dynamicFields" class="space-y-4">
+                <!-- Course Selection (for Course Certificates only) -->
+                <div id="courseField" class="field-group hidden mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-book-open mr-1 text-[#10B981]"></i>
+                        <span id="courseFieldLabel">Select Course</span> *
+                    </label>
+                    <select name="courseId" id="courseSelect" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#10B981]">
+                        <option value="">Choose a course...</option>
+                        <% if (allCourses) { %>
+                            <% allCourses.forEach(course => { %>
+                                <option value="<%= course._id %>"><%= course.title %></option>
+                            <% }) %>
+                        <% } %>
+                    </select>
+                </div>
+                
+                <!-- Grade (for Course Certificates only) -->
+                <div id="gradeField" class="field-group hidden mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-star mr-1 text-yellow-500"></i>
+                        Grade/Achievement
+                    </label>
+                    <select name="grade" id="grade" class="w-full px-4 py-2 rounded-lg border border-gray-300">
+                        <option value="COMPLETED">Completed</option>
+                        <option value="EXCELLENT">Excellent</option>
+                        <option value="A+">A+</option>
+                        <option value="A">A</option>
+                        <option value="B+">B+</option>
+                        <option value="B">B</option>
+                        <option value="DISTINCTION">Distinction</option>
+                    </select>
+                </div>
+                
+                <!-- Company/Organization Field -->
+<div id="companyField" class="field-group hidden mb-4">
+    <label class="block text-sm font-medium text-gray-700 mb-2">
+        <i class="fas fa-building mr-1 text-[#10B981]"></i>
+        <span id="companyFieldLabel">Company/Organization</span> *
+    </label>
+    <input type="text" name="companyName" id="companyName" class="w-full px-4 py-2 rounded-lg border border-gray-300" 
+           placeholder="e.g., RootShield Technologies">
+</div>
+                
+                <!-- Position Field (for Internship & Offer Letter) -->
+                <div id="positionField" class="field-group hidden mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-briefcase mr-1 text-[#10B981]"></i>
+                        Position/Designation *
+                    </label>
+                    <input type="text" name="position" id="position" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#10B981]" 
+                           placeholder="e.g., Software Developer Intern">
+                </div>
+                
+                <!-- Duration Field (for Internship only) -->
+                <div id="durationField" class="field-group hidden mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="far fa-clock mr-1 text-[#10B981]"></i>
+                        Duration
+                    </label>
+                    <input type="text" name="duration" id="duration" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#10B981]" 
+                           placeholder="e.g., 3 months">
+                </div>
+                
+                <!-- Department Field (for Offer Letter only) -->
+                <div id="departmentField" class="field-group hidden mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-sitemap mr-1 text-[#10B981]"></i>
+                        Department
+                    </label>
+                    <input type="text" name="department" id="department" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#10B981]" 
+                           placeholder="e.g., Engineering">
+                </div>
+                
+                <!-- Project/Event Name (for Hackathon/Performance) -->
+                <div id="projectField" class="field-group hidden mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-project-diagram mr-1 text-[#10B981]"></i>
+                        <span id="projectFieldLabel">Project/Event Name</span> *
+                    </label>
+                    <input type="text" name="projectName" id="projectName" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#10B981]" 
+                           placeholder="e.g., Smart India Hackathon 2024">
+                </div>
+            </div>
+            
+            <!-- Issue Date -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="far fa-calendar-alt mr-1 text-[#10B981]"></i>
+                    Issue Date
+                </label>
+                <input type="date" name="issueDate" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#10B981]" 
+                       value="<%= new Date().toISOString().split('T')[0] %>">
+            </div>
+            
+            <!-- Notes -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-sticky-note mr-1 text-[#10B981]"></i>
+                    Notes (Optional)
+                </label>
+                <textarea name="notes" rows="2" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#10B981]" 
+                          placeholder="Any additional notes..."></textarea>
+            </div>
+            
+            <!-- Buttons -->
+            <div class="flex gap-3 pt-4 border-t border-gray-200">
+                <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-[#059669] to-[#10B981] text-white rounded-lg font-medium hover:from-[#047857] hover:to-[#059669] transition-all shadow-md flex items-center justify-center gap-2">
+                    <i class="fas fa-certificate"></i>
+                    Issue Certificate
+                </button>
+                <button type="button" onclick="closeIssueModal()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Modal functions
+    function openIssueModal() {
+        document.getElementById('issueModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        resetForm();
+    }
+    
+    function closeIssueModal() {
+        document.getElementById('issueModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    function resetForm() {
+        document.getElementById('issueForm').reset();
+        document.getElementById('selectedStudentId').value = '';
+        document.getElementById('selectedStudentDisplay').classList.add('hidden');
+        document.querySelectorAll('.student-item').forEach(item => {
+            item.classList.remove('selected', 'bg-[#D1FAE5]');
+        });
+        
+        // Hide all dynamic fields
+        document.querySelectorAll('.field-group').forEach(field => {
+            field.classList.add('hidden');
+        });
+        
+        // Remove selected class from type options
+        document.querySelectorAll('.type-option').forEach(opt => {
+            opt.classList.remove('selected', 'border-[#10B981]', 'bg-[#D1FAE5]');
+        });
+    }
+    
+    // Student selection
+    document.querySelectorAll('.student-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const studentId = this.dataset.id;
+            const studentName = this.dataset.name;
+            const studentEmail = this.dataset.email;
+            
+            // Set hidden input
+            document.getElementById('selectedStudentId').value = studentId;
+            
+            // Update display
+            document.getElementById('displayStudentName').textContent = studentName;
+            document.getElementById('displayStudentEmail').textContent = studentEmail;
+            document.getElementById('displayStudentInitial').textContent = studentName.charAt(0).toUpperCase();
+            document.getElementById('selectedStudentDisplay').classList.remove('hidden');
+            
+            // Remove selected class from all
+            document.querySelectorAll('.student-item').forEach(i => {
+                i.classList.remove('selected', 'bg-[#D1FAE5]');
+            });
+            
+            // Add selected class to clicked item
+            this.classList.add('selected', 'bg-[#D1FAE5]');
+        });
+    });
+    
+    // Search functionality
+    document.getElementById('studentSearch')?.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.student-item').forEach(student => {
+            const text = student.textContent.toLowerCase();
+            student.style.display = text.includes(searchTerm) ? 'block' : 'none';
+        });
+    });
+    
+    // Certificate type selection
+    function selectType(type) {
+        // Update radio button
+        document.querySelector(`input[value="${type}"]`).checked = true;
+        
+        // Update UI
+        document.querySelectorAll('.type-option').forEach(opt => {
+            opt.classList.remove('selected', 'border-[#10B981]', 'bg-[#D1FAE5]');
+        });
+        event.currentTarget.classList.add('selected', 'border-[#10B981]', 'bg-[#D1FAE5]');
+        
+        // Toggle fields based on type
+        toggleFields();
+    }
+    
+    function toggleFields() {
+        const selectedType = document.querySelector('input[name="certificateType"]:checked')?.value;
+        
+        // Hide all fields first
+        document.querySelectorAll('.field-group').forEach(field => {
+            field.classList.add('hidden');
+        });
+        
+        // Remove required attributes
+        document.getElementById('courseSelect').required = false;
+        document.getElementById('position').required = false;
+        document.getElementById('companyName').required = false;
+        document.getElementById('projectName').required = false;
+        
+        if (!selectedType) return;
+        
+        // Course Certificates
+        if (['WEB DEV', 'CYBERSECURITY', 'MACHINE LEARNING', 'DATA SCIENCE', 'ARTIFICIAL INTELLIGENCE'].includes(selectedType)) {
+            document.getElementById('courseField').classList.remove('hidden');
+            document.getElementById('gradeField').classList.remove('hidden');
+            document.getElementById('courseSelect').required = true;
+            document.getElementById('courseFieldLabel').textContent = 'Select Course';
+        }
+        // Internship
+        else if (selectedType === 'INTERNSHIP') {
+            document.getElementById('companyField').classList.remove('hidden');
+            document.getElementById('positionField').classList.remove('hidden');
+            document.getElementById('durationField').classList.remove('hidden');
+            document.getElementById('companyFieldLabel').textContent = 'Company/Organization';
+            document.getElementById('position').required = true;
+            document.getElementById('companyName').required = true;
+        }
+        // Offer Letter
+        else if (selectedType === 'OFFERLETTER') {
+            document.getElementById('companyField').classList.remove('hidden');
+            document.getElementById('positionField').classList.remove('hidden');
+            document.getElementById('departmentField').classList.remove('hidden');
+            document.getElementById('companyFieldLabel').textContent = 'Company Name';
+            document.getElementById('position').required = true;
+            document.getElementById('companyName').required = true;
+        }
+        // Performance/Hackathon
+        else if (selectedType === 'PERFORMANCE') {
+            document.getElementById('projectField').classList.remove('hidden');
+            document.getElementById('projectFieldLabel').textContent = 'Award Category';
+            document.getElementById('projectName').required = true;
+        }
+        else if (selectedType === 'HACKATHON') {
+            document.getElementById('projectField').classList.remove('hidden');
+            document.getElementById('projectFieldLabel').textContent = 'Event Name';
+            document.getElementById('projectName').required = true;
+        }
+    }
+    
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('issueModal');
+        if (event.target == modal) {
+            closeIssueModal();
+        }
+    }
+    
+    // Form submission
+    document.getElementById('issueForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate student selection
+        if (!document.getElementById('selectedStudentId').value) {
+            alert('Please select a student');
+            return;
+        }
+        
+        // Validate certificate type
+        const selectedType = document.querySelector('input[name="certificateType"]:checked')?.value;
+        if (!selectedType) {
+            alert('Please select a certificate type');
+            return;
+        }
+        
+        // Validate based on type
+        if (['WEB DEV', 'CYBERSECURITY', 'MACHINE LEARNING', 'DATA SCIENCE', 'ARTIFICIAL INTELLIGENCE'].includes(selectedType)) {
+            if (!document.getElementById('courseSelect').value) {
+                alert('Please select a course');
+                return;
+            }
+        }
+        else if (selectedType === 'INTERNSHIP' || selectedType === 'OFFERLETTER') {
+            if (!document.getElementById('companyName').value) {
+                alert('Please enter company name');
+                return;
+            }
+            if (!document.getElementById('position').value) {
+                alert('Please enter position');
+                return;
+            }
+        }
+        else if (selectedType === 'PERFORMANCE' || selectedType === 'HACKATHON') {
+            if (!document.getElementById('projectName').value) {
+                alert(`Please enter ${selectedType === 'PERFORMANCE' ? 'award category' : 'event name'}`);
+                return;
+            }
+        }
+        
+        // Submit form
+        this.submit();
+    });
+</script>
+<% } %>
+
+<style>
+    /* Line clamp utility */
+    .line-clamp-1 {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+    
+    /* Modal animations */
+    .modal {
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .modal-content {
+        animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    /* Type option hover */
+    .type-option:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+</style>

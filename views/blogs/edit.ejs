@@ -1,0 +1,571 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="min-h-[90vh] py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Page Header -->
+        <div class="mb-8" data-aos="fade-up">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </div>
+                        Edit Blog
+                    </h1>
+                    <p class="mt-1 text-gray-600 dark:text-gray-400">
+                        Update your blog content, category and details below.
+                    </p>
+                </div>
+                <div class="mt-4 md:mt-0 flex gap-3">
+                    <a href="/blogs/<%= blog._id %>" 
+                       class="px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 text-sm font-medium">
+                        <i class="fas fa-eye mr-2"></i> View Blog
+                    </a>
+                    <a href="/admin/blogs" 
+                       class="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Blogs
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 sm:p-8" data-aos="fade-up" data-aos-duration="600">
+            <form 
+                action="/blogs/<%= blog._id %>?_method=PUT" 
+                method="POST" 
+                class="space-y-6"
+                enctype="multipart/form-data"
+                id="blogForm"
+            >
+                <!-- Title -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        Title <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="title"
+                        id="title"
+                        value="<%= blog.title %>"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200"
+                        placeholder="Enter blog title..."
+                        required
+                    >
+                    <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i> A clear and engaging title that captures attention
+                    </p>
+                </div>
+
+                <!-- Category -->
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        Category <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        name="category" 
+                        id="category" 
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer"
+                        required
+                    >
+                        <option value="">Select a category</option>
+                        <optgroup label="🔐 Cybersecurity Training">
+                            <option value="OSCP" <%= blog.category === 'OSCP' ? 'selected' : '' %>>OSCP Preparation</option>
+                            <option value="CEH" <%= blog.category === 'CEH' ? 'selected' : '' %>>CEH Certification</option>
+                            <option value="CPENT" <%= blog.category === 'CPENT' ? 'selected' : '' %>>CPENT Training</option>
+                            <option value="RHCSA" <%= blog.category === 'RHCSA' ? 'selected' : '' %>>RHCSA Certification</option>
+                            <option value="CompTIA" <%= blog.category === 'CompTIA' ? 'selected' : '' %>>CompTIA Security+</option>
+                            <option value="CISSP" <%= blog.category === 'CISSP' ? 'selected' : '' %>>CISSP Certification</option>
+                        </optgroup>
+                        <optgroup label="🛡️ Security Operations">
+                            <option value="Red Teaming" <%= blog.category === 'Red Teaming' ? 'selected' : '' %>>Red Teaming</option>
+                            <option value="Penetration Testing" <%= blog.category === 'Penetration Testing' ? 'selected' : '' %>>Penetration Testing</option>
+                            <option value="Vulnerability Assessment" <%= blog.category === 'Vulnerability Assessment' ? 'selected' : '' %>>Vulnerability Assessment</option>
+                            <option value="Incident Response" <%= blog.category === 'Incident Response' ? 'selected' : '' %>>Incident Response</option>
+                            <option value="Digital Forensics" <%= blog.category === 'Digital Forensics' ? 'selected' : '' %>>Digital Forensics</option>
+                            <option value="OSINT" <%= blog.category === 'OSINT' ? 'selected' : '' %>>OSINT</option>
+                        </optgroup>
+                        <optgroup label="💻 Technical Domains">
+                            <option value="Web Security" <%= blog.category === 'Web Security' ? 'selected' : '' %>>Web Security</option>
+                            <option value="Network Security" <%= blog.category === 'Network Security' ? 'selected' : '' %>>Network Security</option>
+                            <option value="Cloud Security" <%= blog.category === 'Cloud Security' ? 'selected' : '' %>>Cloud Security</option>
+                            <option value="Mobile Security" <%= blog.category === 'Mobile Security' ? 'selected' : '' %>>Mobile Security</option>
+                            <option value="Linux Security" <%= blog.category === 'Linux Security' ? 'selected' : '' %>>Linux Security</option>
+                            <option value="DevSecOps" <%= blog.category === 'DevSecOps' ? 'selected' : '' %>>DevSecOps</option>
+                            <option value="IoT Security" <%= blog.category === 'IoT Security' ? 'selected' : '' %>>IoT Security</option>
+                            <option value="Blockchain Security" <%= blog.category === 'Blockchain Security' ? 'selected' : '' %>>Blockchain Security</option>
+                        </optgroup>
+                        <optgroup label="📚 Career & Education">
+                            <option value="Career" <%= blog.category === 'Career' ? 'selected' : '' %>>Career Advice</option>
+                            <option value="Interview Tips" <%= blog.category === 'Interview Tips' ? 'selected' : '' %>>Interview Preparation</option>
+                            <option value="Job Opportunities" <%= blog.category === 'Job Opportunities' ? 'selected' : '' %>>Job Opportunities</option>
+                            <option value="Certification Guidance" <%= blog.category === 'Certification Guidance' ? 'selected' : '' %>>Certification Guidance</option>
+                            <option value="Cyber Security Trends" <%= blog.category === 'Cyber Security Trends' ? 'selected' : '' %>>Cyber Security Trends</option>
+                        </optgroup>
+                        <optgroup label="📰 News & Updates">
+                            <option value="News" <%= blog.category === 'News' ? 'selected' : '' %>>Industry News</option>
+                            <option value="Events" <%= blog.category === 'Events' ? 'selected' : '' %>>Events & Webinars</option>
+                            <option value="Product Updates" <%= blog.category === 'Product Updates' ? 'selected' : '' %>>Platform Updates</option>
+                            <option value="Research" <%= blog.category === 'Research' ? 'selected' : '' %>>Security Research</option>
+                        </optgroup>
+                        <optgroup label="📖 Tutorials & Guides">
+                            <option value="Tutorial" <%= blog.category === 'Tutorial' ? 'selected' : '' %>>Tutorials</option>
+                            <option value="Lab Guides" <%= blog.category === 'Lab Guides' ? 'selected' : '' %>>Lab Guides</option>
+                            <option value="Tool Tutorials" <%= blog.category === 'Tool Tutorials' ? 'selected' : '' %>>Tool Tutorials</option>
+                            <option value="Walkthroughs" <%= blog.category === 'Walkthroughs' ? 'selected' : '' %>>CTF Walkthroughs</option>
+                            <option value="Cheatsheets" <%= blog.category === 'Cheatsheets' ? 'selected' : '' %>>Cheatsheets & References</option>
+                        </optgroup>
+                        <optgroup label="🧠 Industry Insights">
+                            <option value="Expert Insights" <%= blog.category === 'Expert Insights' ? 'selected' : '' %>>Expert Insights</option>
+                            <option value="Case Studies" <%= blog.category === 'Case Studies' ? 'selected' : '' %>>Case Studies</option>
+                            <option value="Best Practices" <%= blog.category === 'Best Practices' ? 'selected' : '' %>>Best Practices</option>
+                            <option value="Compliance" <%= blog.category === 'Compliance' ? 'selected' : '' %>>Compliance & Governance</option>
+                            <option value="Risk Management" <%= blog.category === 'Risk Management' ? 'selected' : '' %>>Risk Management</option>
+                        </optgroup>
+                        <optgroup label="📝 Miscellaneous">
+                            <option value="Student Stories" <%= blog.category === 'Student Stories' ? 'selected' : '' %>>Student Success Stories</option>
+                            <option value="Community" <%= blog.category === 'Community' ? 'selected' : '' %>>Community & Networking</option>
+                            <option value="Cybersecurity Basics" <%= blog.category === 'Cybersecurity Basics' ? 'selected' : '' %>>Cybersecurity Basics</option>
+                            <option value="Others" <%= blog.category === 'Others' ? 'selected' : '' %>>Others</option>
+                        </optgroup>
+                    </select>
+                    <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-tag mr-1"></i> Choose the most relevant category for your blog
+                    </p>
+                </div>
+
+                <!-- Short Description -->
+                <div>
+                    <label for="shortdescription" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        Short Description <span class="text-red-500">*</span>
+                    </label>
+                    <textarea
+                        name="shortdescription"
+                        id="shortdescription"
+                        rows="3"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 resize-none"
+                        placeholder="A short summary of the blog (appears in blog listings)..."
+                        required
+                    ><%= blog.shortdescription %></textarea>
+                    <div class="flex justify-between items-center mt-1.5">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-text-height mr-1"></i> 150-200 characters recommended
+                        </p>
+                        <span id="descCounter" class="text-xs font-medium <%= blog.shortdescription && blog.shortdescription.length >= 150 && blog.shortdescription.length <= 200 ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400' %>">
+                            <%= blog.shortdescription ? blog.shortdescription.length : 0 %> characters
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Current Image Preview -->
+                <% if (originalImageUrl) { %>
+                    <div class="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                            <i class="fas fa-image mr-2 text-purple-500"></i> Current Image
+                        </label>
+                        <div class="flex flex-col sm:flex-row items-start gap-4">
+                            <div class="w-full sm:w-40 h-40 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 flex-shrink-0">
+                                <img 
+                                    src="<%= originalImageUrl %>" 
+                                    alt="<%= blog.imageTitle || 'Blog image' %>"
+                                    class="w-full h-full object-cover"
+                                >
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Current Image:</span><br>
+                                    This image is currently displayed with your blog. Upload a new image below if you want to change it.
+                                </p>
+                                <% if (blog.imageTitle) { %>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Alt Text:</span> <%= blog.imageTitle %>
+                                    </p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+
+                <!-- Upload New Image -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                            <i class="fas fa-upload mr-2 text-purple-500"></i> Upload New Image
+                            <span class="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
+                        </label>
+                        <div class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 hover:border-purple-400 dark:hover:border-purple-500 transition-colors bg-gray-50 dark:bg-gray-700/30">
+                            <input type="file" 
+                                   id="image" 
+                                   name="image" 
+                                   accept="image/*"
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                   onchange="previewImage(this)">
+                            <div class="text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    <span class="font-medium text-purple-600 dark:text-purple-400">Click to upload</span> or drag and drop
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    PNG, JPG, GIF up to 5MB (Recommended: 1200×630px)
+                                </p>
+                            </div>
+                        </div>
+                        <div id="imagePreviewContainer" class="mt-3 hidden">
+                            <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
+                                <div class="flex items-center gap-4 flex-wrap sm:flex-nowrap">
+                                    <div class="w-24 h-24 rounded-lg overflow-hidden border border-green-300 dark:border-green-700 bg-white dark:bg-gray-800 flex-shrink-0">
+                                        <img id="imagePreview" src="#" alt="Preview" class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm text-green-800 dark:text-green-300">
+                                            <strong id="fileName"></strong><br>
+                                            <span id="fileSize"></span>
+                                        </p>
+                                        <p class="text-xs text-green-600 dark:text-green-400 mt-1">
+                                            <i class="fas fa-check-circle mr-1"></i> This image will replace the current one when you update the blog.
+                                        </p>
+                                    </div>
+                                    <button type="button" onclick="removePreview()" class="text-green-700 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Image Alt Text -->
+                    <div>
+                        <label for="imageTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                            <i class="fas fa-font mr-2 text-purple-500"></i> Image Alt Text
+                            <span class="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="imageTitle"
+                            id="imageTitle"
+                            value="<%= blog.imageTitle || '' %>"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200"
+                            placeholder="Describe the image for SEO and accessibility..."
+                        >
+                        <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-1"></i> Helps with search engines and screen readers. Example: "Person writing code on laptop"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Keywords -->
+                <div>
+                    <label for="Keywords" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <i class="fas fa-tags mr-2 text-purple-500"></i> Keywords <span class="text-red-500">*</span>
+                    </label>
+                    <textarea
+                        name="Keywords"
+                        id="Keywords"
+                        rows="2"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 resize-none"
+                        placeholder="Enter keywords separated by commas (e.g., cybersecurity, ethical hacking, penetration testing)"
+                        required
+                    ><%= blog.Keywords %></textarea>
+                    <div class="flex justify-between items-center mt-1.5">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-1"></i> Separate keywords with commas. 2-10 keywords recommended.
+                        </p>
+                        <span id="keywordCounter" class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            <%= blog.Keywords ? blog.Keywords.split(',').filter(k => k.trim()).length : 0 %> keywords
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Full Content -->
+                <div>
+                    <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <i class="fas fa-file-alt mr-2 text-purple-500"></i> Content <span class="text-red-500">*</span>
+                    </label>
+                    <textarea
+                        name="content"
+                        id="content"
+                        rows="12"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 resize-none font-mono text-sm"
+                        placeholder="Write your full blog content here... Use HTML formatting"
+                        required
+                    ><%- blog.content %></textarea>
+                    
+                    <!-- Formatting Tips -->
+                    <div class="mt-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                        <h5 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
+                            <i class="fas fa-code mr-2 text-purple-500"></i> Formatting Tips:
+                        </h5>
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;h2&gt;Heading&lt;/h2&gt;</code></span>
+                            <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;b&gt;Bold&lt;/b&gt;</code></span>
+                            <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;i&gt;Italic&lt;/i&gt;</code></span>
+                            <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;a href="url"&gt;Link&lt;/a&gt;</code></span>
+                            <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;ul&gt;&lt;li&gt;List&lt;/li&gt;&lt;/ul&gt;</code></span>
+                            <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;img src="url" alt="text"&gt;</code></span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mt-1.5">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-1"></i> Use HTML tags for formatting your content
+                        </p>
+                        <span id="contentCounter" class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            <%= blog.content ? blog.content.split(/\s+/).filter(w => w).length : 0 %> words
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button type="submit" id="submitBtn"
+                        class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Update Blog
+                    </button>
+                    <a href="/blogs/<%= blog._id %>"
+                        class="flex-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-3 px-6 rounded-xl transition-colors duration-200 text-center flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Help Tips -->
+        <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+            <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-blue-900 dark:text-blue-300">Editing Tips</h3>
+                    <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="text-sm text-blue-800 dark:text-blue-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Title & Description</p>
+                            <p class="mt-0.5 text-xs opacity-80">Make them compelling to increase readership</p>
+                        </div>
+                        <div class="text-sm text-blue-800 dark:text-blue-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Keywords</p>
+                            <p class="mt-0.5 text-xs opacity-80">Use specific terms your audience searches for</p>
+                        </div>
+                        <div class="text-sm text-blue-800 dark:text-blue-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Images</p>
+                            <p class="mt-0.5 text-xs opacity-80">High-quality images improve engagement by 47%</p>
+                        </div>
+                        <div class="text-sm text-blue-800 dark:text-blue-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Content</p>
+                            <p class="mt-0.5 text-xs opacity-80">Use subheadings and paragraphs for readability</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ========== FORM SUBMISSION ==========
+    const form = document.getElementById('blogForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (form && submitBtn) {
+        form.addEventListener('submit', function(e) {
+            if (submitBtn.disabled) {
+                e.preventDefault();
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Updating...
+            `;
+            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+        });
+    }
+
+    // ========== CHARACTER COUNTERS ==========
+    const shortDesc = document.getElementById('shortdescription');
+    const descCounter = document.getElementById('descCounter');
+    
+    if (shortDesc && descCounter) {
+        shortDesc.addEventListener('input', function() {
+            const length = this.value.length;
+            descCounter.textContent = length + ' characters';
+            
+            if (length >= 150 && length <= 200) {
+                descCounter.className = 'text-xs font-medium text-green-600 dark:text-green-400';
+            } else if (length > 200) {
+                descCounter.className = 'text-xs font-medium text-red-600 dark:text-red-400';
+            } else {
+                descCounter.className = 'text-xs font-medium text-yellow-600 dark:text-yellow-400';
+            }
+        });
+    }
+
+    const keywordsInput = document.getElementById('Keywords');
+    const keywordCounter = document.getElementById('keywordCounter');
+    
+    if (keywordsInput && keywordCounter) {
+        keywordsInput.addEventListener('input', function() {
+            const keywords = this.value.split(',').filter(k => k.trim() !== '');
+            keywordCounter.textContent = keywords.length + ' keywords';
+            
+            if (keywords.length >= 2 && keywords.length <= 10) {
+                keywordCounter.className = 'text-xs font-medium text-green-600 dark:text-green-400';
+            } else if (keywords.length > 10) {
+                keywordCounter.className = 'text-xs font-medium text-yellow-600 dark:text-yellow-400';
+            } else {
+                keywordCounter.className = 'text-xs font-medium text-red-600 dark:text-red-400';
+            }
+        });
+    }
+
+    const contentInput = document.getElementById('content');
+    const contentCounter = document.getElementById('contentCounter');
+    
+    if (contentInput && contentCounter) {
+        contentInput.addEventListener('input', function() {
+            const words = this.value.trim().split(/\s+/).filter(w => w !== '');
+            contentCounter.textContent = words.length + ' words';
+            
+            if (words.length >= 300 && words.length <= 2000) {
+                contentCounter.className = 'text-xs font-medium text-green-600 dark:text-green-400';
+            } else if (words.length > 2000) {
+                contentCounter.className = 'text-xs font-medium text-yellow-600 dark:text-yellow-400';
+            } else {
+                contentCounter.className = 'text-xs font-medium text-gray-500 dark:text-gray-400';
+            }
+        });
+    }
+
+    // ========== IMAGE PREVIEW ==========
+    window.previewImage = function(input) {
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        const preview = document.getElementById('imagePreview');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size should be less than 5MB');
+                input.value = '';
+                previewContainer.classList.add('hidden');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                fileName.textContent = file.name;
+                fileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
+                previewContainer.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        } else {
+            previewContainer.classList.add('hidden');
+        }
+    };
+
+    window.removePreview = function() {
+        const fileInput = document.getElementById('image');
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        fileInput.value = '';
+        previewContainer.classList.add('hidden');
+    };
+
+    // ========== VALIDATION ==========
+    const inputs = form.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.addEventListener('invalid', function(e) {
+            e.preventDefault();
+            this.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('border-red-500')) {
+                this.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
+            }
+        });
+    });
+});
+</script>
+
+<style>
+    /* Custom select styling */
+    select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    .dark select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    }
+
+    /* File input hover effect */
+    .border-dashed:hover {
+        border-color: #a855f7;
+    }
+
+    /* Custom scrollbar for textareas */
+    textarea {
+        scrollbar-width: thin;
+        scrollbar-color: #d1d5db transparent;
+    }
+
+    textarea::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    textarea::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    textarea::-webkit-scrollbar-thumb {
+        background-color: #d1d5db;
+        border-radius: 20px;
+    }
+
+    textarea::-webkit-scrollbar-thumb:hover {
+        background-color: #9ca3af;
+    }
+
+    .dark textarea::-webkit-scrollbar-thumb {
+        background-color: #4b5563;
+    }
+
+    .dark textarea::-webkit-scrollbar-thumb:hover {
+        background-color: #6b7280;
+    }
+
+    /* Loading spinner animation */
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .animate-spin {
+        animation: spin 1s linear infinite;
+    }
+</style>

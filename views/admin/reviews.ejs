@@ -1,0 +1,520 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="min-h-[90vh] py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8" data-aos="fade-up">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                        </svg>
+                    </div>
+                    Manage Reviews
+                </h1>
+                <p class="mt-1 text-gray-600 dark:text-gray-400">
+                    View, approve, and manage all user reviews
+                </p>
+            </div>
+            <div class="mt-4 md:mt-0 flex flex-wrap gap-3">
+                <a href="/admin/dashboard" class="px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 text-sm font-medium">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6" data-aos="fade-up" data-aos-duration="600">
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Total Reviews</p>
+                <p class="text-xl font-bold text-gray-900 dark:text-white"><%= stats?.total || 0 %></p>
+            </div>
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Pending</p>
+                <p class="text-xl font-bold text-yellow-600 dark:text-yellow-400"><%= stats?.pending || 0 %></p>
+            </div>
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Approved</p>
+                <p class="text-xl font-bold text-green-600 dark:text-green-400"><%= stats?.approved || 0 %></p>
+            </div>
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Featured</p>
+                <p class="text-xl font-bold text-purple-600 dark:text-purple-400"><%= stats?.featured || 0 %></p>
+            </div>
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">On Homepage</p>
+                <p class="text-xl font-bold text-indigo-600 dark:text-indigo-400"><%= stats?.homepage || 0 %></p>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap items-center gap-3 mb-6" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+            <a href="?filter=all" class="px-3 py-1.5 text-xs font-medium rounded-full <%= filter === 'all' || !filter ? 'bg-amber-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600' %> transition-all">
+                All
+            </a>
+            <a href="?filter=pending" class="px-3 py-1.5 text-xs font-medium rounded-full <%= filter === 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600' %> transition-all">
+                Pending
+            </a>
+            <a href="?filter=approved" class="px-3 py-1.5 text-xs font-medium rounded-full <%= filter === 'approved' ? 'bg-green-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600' %> transition-all">
+                Approved
+            </a>
+            <a href="?filter=featured" class="px-3 py-1.5 text-xs font-medium rounded-full <%= filter === 'featured' ? 'bg-purple-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600' %> transition-all">
+                Featured
+            </a>
+            <a href="?filter=homepage" class="px-3 py-1.5 text-xs font-medium rounded-full <%= filter === 'homepage' ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600' %> transition-all">
+                Homepage
+            </a>
+        </div>
+
+        <!-- Reviews Table -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 dark:bg-gray-700/50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reviewer</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Rating</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Review</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <% if (reviews && reviews.length > 0) { %>
+                            <% reviews.forEach(review => { %>
+                             <%   // Check if message is long (more than 100 characters)
+                                const isLongMessage = review.message && review.message.length > 100;
+                                const displayMessage = isLongMessage ? review.message.substring(0, 100) + '...' : review.message;
+                            %>
+                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div>
+                                            <p class="font-medium text-gray-900 dark:text-white"><%= review.name %></p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400"><%= review.email %></p>
+                                            <% if (review.user) { %>
+                                                <span class="text-[10px] text-blue-600 dark:text-blue-400">Registered User</span>
+                                            <% } else { %>
+                                                <span class="text-[10px] text-gray-400 dark:text-gray-500">Guest</span>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-1">
+                                            <span class="font-bold text-yellow-500"><%= review.rating %></span>
+                                            <span class="text-gray-400 dark:text-gray-500">/ 5</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div>
+                                            <p class="text-sm text-gray-800 dark:text-gray-200 line-clamp-2">
+                                                <%= displayMessage || 'No message' %>
+                                            </p>
+                                            <% if (isLongMessage) { %>
+                                                <button onclick="openReadMoreModal('<%= review._id %>', `<%= review.message.replace(/`/g, '\\`').replace(/'/g, "\\'") %>`, '<%= review.name %>')" 
+                                                        class="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1 font-medium">
+                                                    Read More <i class="fas fa-arrow-right ml-0.5 text-[10px]"></i>
+                                                </button>
+                                            <% } %>
+                                            <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-1">
+                                                <i class="far fa-clock mr-1"></i> <%= moment(review.createdAt).fromNow() %>
+                                            </p>
+                                            <% if (review.adminResponse) { %>
+                                                <p class="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                                                    <i class="fas fa-reply mr-1"></i> Admin responded
+                                                </p>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex flex-wrap gap-1">
+                                            <% if (review.isApproved) { %>
+                                                <span class="px-2 py-0.5 text-[10px] font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full">Approved</span>
+                                            <% } else if (review.isVerified) { %>
+                                                <span class="px-2 py-0.5 text-[10px] font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-full">Pending</span>
+                                            <% } else { %>
+                                                <span class="px-2 py-0.5 text-[10px] font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">Invited</span>
+                                            <% } %>
+                                            <% if (review.isFeatured) { %>
+                                                <span class="px-2 py-0.5 text-[10px] font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">Featured</span>
+                                            <% } %>
+                                            <% if (review.showOnHomepage) { %>
+                                                <span class="px-2 py-0.5 text-[10px] font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full">Homepage</span>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex flex-wrap gap-1.5">
+                                            <!-- Approve/Unapprove -->
+                                            <% if (review.isVerified) { %>
+                                                <button onclick="toggleReview('<%= review._id %>', `<%= review.isApproved ? 'unapprove' : 'approve' %>`)" 
+                                                        class="px-2.5 py-1 text-[10px] font-medium rounded-lg transition-all duration-200
+                                                        <%= review.isApproved ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 hover:bg-yellow-200 dark:hover:bg-yellow-900/50' : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50' %>">
+                                                    <%= review.isApproved ? 'Unapprove' : 'Approve' %>
+                                                </button>
+                                            <% } %>
+                                            
+                                            <!-- Feature -->
+                                            <button onclick="toggleReview('<%= review._id %>', 'feature')" 
+                                                    class="px-2.5 py-1 text-[10px] font-medium rounded-lg transition-all duration-200
+                                                    <%= review.isFeatured ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600' %>">
+                                                <%= review.isFeatured ? 'Unfeature' : 'Feature' %>
+                                            </button>
+                                            
+                                            <!-- Homepage -->
+                                            <button onclick="toggleReview('<%= review._id %>', 'homepage')" 
+                                                    class="px-2.5 py-1 text-[10px] font-medium rounded-lg transition-all duration-200
+                                                    <%= review.showOnHomepage ? 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-200 dark:hover:bg-indigo-900/50' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600' %>">
+                                                <%= review.showOnHomepage ? 'Remove from Home' : 'Add to Home' %>
+                                            </button>
+                                            
+                                            <!-- Delete -->
+                                            <button onclick="deleteReview('<%= review._id %>')" 
+                                                    class="px-2.5 py-1 text-[10px] font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/50 rounded-lg transition-all duration-200">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-comment-slash text-2xl block mb-2"></i>
+                                    No reviews found
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+            <div class="mt-6 flex items-center justify-center gap-2 flex-wrap">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %><%= filter ? '&filter=' + filter : '' %>" 
+                       class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-200">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </a>
+                <% } %>
+
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <% if (i === currentPage) { %>
+                        <span class="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold"><%= i %></span>
+                    <% } else if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2) { %>
+                        <a href="?page=<%= i %><%= filter ? '&filter=' + filter : '' %>" 
+                           class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-200">
+                            <%= i %>
+                        </a>
+                    <% } else if (i === 2 && currentPage > 4) { %>
+                        <span class="px-2 text-gray-400">…</span>
+                    <% } else if (i === totalPages - 1 && currentPage < totalPages - 3) { %>
+                        <span class="px-2 text-gray-400">…</span>
+                    <% } %>
+                <% } %>
+
+                <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %><%= filter ? '&filter=' + filter : '' %>" 
+                       class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-200">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </a>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- READ MORE MODAL                                              -->
+<!-- ============================================================ -->
+<div id="readMoreModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden border border-gray-200 dark:border-gray-700 transform transition-all duration-300 scale-95 opacity-0" id="readMoreContent">
+        <!-- Modal Header -->
+        <div class="px-6 py-2 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                    <i class="fas fa-quote-left text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 dark:text-white text-lg">Full Review</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400" id="reviewerName">By User</p>
+                </div>
+            </div>
+            <button onclick="closeReadMoreModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="p-6 overflow-y-auto max-h-[60vh]" id="fullMessageContainer">
+            <div class="prose prose-sm dark:prose-invert max-w-none">
+                <p class="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap" id="fullMessage"></p>
+            </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="px-6 py-2 mb-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex justify-end">
+            <button onclick="closeReadMoreModal()" 
+                    class="px-5 py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CUSTOM NOTIFICATION                                           -->
+<!-- ============================================================ -->
+<div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-3"></div>
+
+<script>
+// ================================================================
+// TOGGLE REVIEW STATUS
+// ================================================================
+function toggleReview(id, action) {
+    if (!confirm('Are you sure you want to perform this action?')) return;
+    
+    fetch(`/admin/reviews/${id}/toggle`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Review updated successfully!', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showNotification(data.message || 'Failed to update review', 'error');
+        }
+    })
+    .catch(err => {
+        console.error('Error:', err);
+        showNotification('An error occurred', 'error');
+    });
+}
+
+// ================================================================
+// DELETE REVIEW
+// ================================================================
+function deleteReview(id) {
+    if (!confirm('Are you sure you want to delete this review permanently?')) return;
+    
+    fetch(`/admin/reviews/${id}/toggle`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'delete' })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Review deleted successfully!', 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showNotification(data.message || 'Failed to delete review', 'error');
+        }
+    })
+    .catch(err => {
+        console.error('Error:', err);
+        showNotification('An error occurred', 'error');
+    });
+}
+
+// ================================================================
+// READ MORE MODAL
+// ================================================================
+function openReadMoreModal(id, message, name) {
+    const modal = document.getElementById('readMoreModal');
+    const content = document.getElementById('readMoreContent');
+    const fullMessage = document.getElementById('fullMessage');
+    const reviewerName = document.getElementById('reviewerName');
+    
+    reviewerName.textContent = 'By ' + (name || 'User');
+    fullMessage.textContent = message || 'No content available';
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function closeReadMoreModal() {
+    const modal = document.getElementById('readMoreModal');
+    const content = document.getElementById('readMoreContent');
+    
+    content.classList.remove('scale-100', 'opacity-100');
+    content.classList.add('scale-95', 'opacity-0');
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 300);
+}
+
+// Close modal on outside click
+document.getElementById('readMoreModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeReadMoreModal();
+    }
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeReadMoreModal();
+    }
+});
+
+// ================================================================
+// CUSTOM NOTIFICATION SYSTEM
+// ================================================================
+function showNotification(message, type) {
+    const container = document.getElementById('notificationContainer');
+    
+    const colors = {
+        success: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200',
+        error: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200',
+        warning: 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200',
+        info: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200'
+    };
+
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
+
+    const notification = document.createElement('div');
+    notification.className = `flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-xl border transform transition-all duration-300 translate-x-0 ${colors[type] || colors.info}`;
+    notification.innerHTML = `
+        <i class="fas ${icons[type] || icons.info}"></i>
+        <span class="font-medium text-sm">${message}</span>
+        <button onclick="this.parentElement.remove()" class="ml-auto hover:opacity-70 transition-opacity">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    // Add animation
+    notification.style.animation = 'slideInRight 0.3s ease forwards';
+    
+    container.appendChild(notification);
+
+    // Auto dismiss after 5 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 300);
+    }, 5000);
+}
+
+// ================================================================
+// AUTO DISMISS EXISTING NOTIFICATIONS ON PAGE LOAD
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation styles if not already present
+    if (!document.getElementById('notificationStyles')) {
+        const style = document.createElement('style');
+        style.id = 'notificationStyles';
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+});
+
+// ================================================================
+// FLASH MESSAGE HANDLING (for server-side flash messages)
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for flash messages from server
+    const flashMessages = document.querySelectorAll('.flash-message');
+    flashMessages.forEach(msg => {
+        const type = msg.dataset.type || 'info';
+        const message = msg.textContent.trim();
+        if (message) {
+            showNotification(message, type);
+            msg.remove();
+        }
+    });
+});
+</script>
+
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    /* Read More Modal Animation */
+    #readMoreModal {
+        animation: fadeIn 0.3s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* Custom scrollbar for modal */
+    #fullMessageContainer::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    #fullMessageContainer::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    #fullMessageContainer::-webkit-scrollbar-thumb {
+        background: #D1D5DB;
+        border-radius: 3px;
+    }
+    
+    #fullMessageContainer::-webkit-scrollbar-thumb:hover {
+        background: #9CA3AF;
+    }
+    
+    .dark #fullMessageContainer::-webkit-scrollbar-thumb {
+        background: #4B5563;
+    }
+    
+    .dark #fullMessageContainer::-webkit-scrollbar-thumb:hover {
+        background: #6B7280;
+    }
+    
+    /* Prose styling for message */
+    .prose {
+        font-size: 0.95rem;
+        line-height: 1.8;
+    }
+    
+    .whitespace-pre-wrap {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+</style>

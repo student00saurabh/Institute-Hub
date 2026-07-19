@@ -1,0 +1,539 @@
+<% layout("/layouts/boilerplate") %>
+
+<!-- ============================================================ -->
+<!--  INSTITUTEHUB — ABOUT PAGE                                   -->
+<!--  Company Story | Mission | Team | Stats | Values             -->
+<!-- ============================================================ -->
+
+<%
+  // ---------------------------------------------------------------
+  // DUMMY DATA
+  // ---------------------------------------------------------------
+  const teamMembers = [
+    { 
+      name: "Aarav Mehta", 
+      role: "CEO & Co-Founder", 
+      bio: "Ex-Google Engineer with 12+ years of experience in software development and education. Passionate about making tech education accessible.",
+      img: "https://picsum.photos/seed/team1/400/400",
+      social: { linkedin: "#", twitter: "#", github: "#" },
+      expertise: ["Full Stack", "Cloud", "Architecture"]
+    },
+    { 
+      name: "Priya Nair", 
+      role: "CTO & Co-Founder", 
+      bio: "PhD in Computer Science from Stanford, previously led AI research at Microsoft. Believes in practical, project-based learning.",
+      img: "https://picsum.photos/seed/team2/400/400",
+      social: { linkedin: "#", twitter: "#", github: "#" },
+      expertise: ["AI/ML", "Data Science", "Research"]
+    },
+    { 
+      name: "Kabir Sethi", 
+      role: "Head of Product", 
+      bio: "Former Product Lead at Udemy with 8+ years in edtech. Focuses on creating engaging learning experiences that drive results.",
+      img: "https://picsum.photos/seed/team3/400/400",
+      social: { linkedin: "#", twitter: "#" },
+      expertise: ["Product Design", "EdTech", "UX"]
+    },
+    { 
+      name: "Simran Kaur", 
+      role: "Head of Engineering", 
+      bio: "Cloud Architect with 10+ years of experience. Previously led infrastructure teams at AWS. Passionate about DevOps and scalability.",
+      img: "https://picsum.photos/seed/team4/400/400",
+      social: { linkedin: "#", twitter: "#", github: "#" },
+      expertise: ["DevOps", "Cloud", "Infrastructure"]
+    },
+    { 
+      name: "Rohan Kapoor", 
+      role: "Security Lead", 
+      bio: "Certified Ethical Hacker (CEH) with 8+ years in cybersecurity. Former security consultant for Fortune 500 companies.",
+      img: "https://picsum.photos/seed/team5/400/400",
+      social: { linkedin: "#", twitter: "#" },
+      expertise: ["Cybersecurity", "Ethical Hacking", "Compliance"]
+    },
+    { 
+      name: "Neha Joshi", 
+      role: "Design Lead", 
+      bio: "Award-winning designer with 7+ years of experience in UI/UX. Previously designed products for Google and Adobe.",
+      img: "https://picsum.photos/seed/team6/400/400",
+      social: { linkedin: "#", twitter: "#", dribbble: "#" },
+      expertise: ["UI/UX", "Design Systems", "Product Design"]
+    }
+  ];
+
+  const values = [
+    {
+      icon: "fa-graduation-cap",
+      title: "Quality Education",
+      desc: "We believe in delivering world-class education that's accessible, engaging, and industry-relevant. Every course is crafted by experts with real-world experience."
+    },
+    {
+      icon: "fa-users",
+      title: "Community First",
+      desc: "Learning is better together. We foster a supportive community where students learn from peers, mentors, and industry leaders."
+    },
+    {
+      icon: "fa-rocket",
+      title: "Innovation",
+      desc: "We constantly evolve our platform and curriculum to stay ahead of industry trends. Our focus is on future-ready skills that make an impact."
+    },
+    {
+      icon: "fa-handshake",
+      title: "Trust & Transparency",
+      desc: "We're committed to honesty, integrity, and transparency in everything we do. Our students trust us with their career growth."
+    }
+  ];
+
+  const milestones = [
+    { year: "2020", title: "Founded", desc: "InstituteHub was founded with a mission to democratize tech education." },
+    { year: "2021", title: "First 100 Courses", desc: "Launched 100+ courses across 10 categories, serving 10,000+ students." },
+    { year: "2022", title: "Certificate Program", desc: "Introduced verified certificate program with industry recognition." },
+    { year: "2023", title: "Corporate Training", desc: "Expanded to corporate training, serving 50+ enterprise clients." },
+    { year: "2024", title: "AI-Powered Learning", desc: "Launched AI-powered course recommendations and personalized learning paths." },
+    { year: "2025", title: "Global Expansion", desc: "Reached 120,000+ students across 100+ countries." }
+  ];
+
+  const stats = [
+    { value: 500, suffix: "+", label: "Courses" },
+    { value: 120, suffix: "K+", label: "Students" },
+    { value: 340, suffix: "+", label: "Mentors" },
+    { value: 98, suffix: "%", label: "Satisfaction" },
+    { value: 50, suffix: "+", label: "Countries" },
+    { value: 4.8, suffix: "★", label: "Average Rating" }
+  ];
+
+  const testimonials = [
+    { 
+      name: "Ritika Sharma", 
+      role: "Software Engineer at Google", 
+      text: "InstituteHub's web development bootcamp was instrumental in my career transition. The structured curriculum and mentor support made all the difference.",
+      rating: 5,
+      img: "https://picsum.photos/seed/test1/100/100"
+    },
+    { 
+      name: "Aman Gupta", 
+      role: "Data Scientist at Amazon", 
+      text: "The Data Science course is the most comprehensive I've taken. The hands-on projects and real-world applications prepared me perfectly for my role.",
+      rating: 5,
+      img: "https://picsum.photos/seed/test2/100/100"
+    },
+    { 
+      name: "Sneha Reddy", 
+      role: "Cloud Engineer at Microsoft", 
+      text: "The AWS certification course helped me clear my exam in 6 weeks. The instructors are incredibly knowledgeable and always available for support.",
+      rating: 5,
+      img: "https://picsum.photos/seed/test3/100/100"
+    }
+  ];
+%>
+
+<!-- ============================================================ -->
+<!-- HERO SECTION                                                  -->
+<!-- ============================================================ -->
+<section class="relative overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-[#2563EB] py-20 lg:py-28 -mt-6">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-[#C9A227] rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#2563EB] rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+        <span class="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/90 mb-4 border border-white/20">
+            <i class="fas fa-info-circle mr-2"></i> About Us
+        </span>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
+            Empowering the Next Generation of <span class="text-[#C9A227]">Professionals</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto">
+            We're on a mission to make world-class education accessible, affordable, and relevant for everyone, everywhere.
+        </p>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- STATS SECTION                                                 -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-white dark:bg-[#0B1120] border-b border-[#E2E8F0] dark:border-[#1E293B]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <% stats.forEach((stat, i) => { %>
+                <div class="reveal-up text-center p-5 rounded-2xl bg-[#F8FAFC] dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 transition-all duration-300 hover:-translate-y-1"
+                     style="transition-delay: <%= i * 80 %>ms">
+                    <p class="text-3xl sm:text-4xl font-extrabold text-[#2563EB]"><%= stat.value %><%= stat.suffix %></p>
+                    <p class="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8] font-medium"><%= stat.label %></p>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- OUR STORY + MISSION                                           -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <!-- Left: Story -->
+            <div class="reveal-up">
+                <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Our Story</span>
+                <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                    Built by <span class="text-[#2563EB]">Educators</span> and <span class="text-[#C9A227]">Engineers</span>
+                </h2>
+                <div class="mt-6 space-y-4 text-[#64748B] dark:text-[#94A3B8] leading-relaxed">
+                    <p>
+                        InstituteHub was founded in 2020 by a group of passionate educators and industry professionals who believed that quality tech education should be accessible to everyone. We saw a gap between traditional education and industry demands, and we set out to bridge it.
+                    </p>
+                    <p>
+                        Today, we're proud to serve 120,000+ students across 100+ countries, offering 500+ courses taught by 340+ expert mentors. Our platform combines structured learning with practical projects, personalized mentorship, and a supportive community.
+                    </p>
+                    <p>
+                        Whether you're starting your career, switching industries, or upgrading your skills, InstituteHub is here to help you succeed. Our courses are designed to be practical, industry-relevant, and taught by professionals who actually work in the field.
+                    </p>
+                </div>
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a href="/courses" class="inline-flex items-center gap-2 px-6 py-3 bg-[#2563EB] text-white font-semibold rounded-xl hover:bg-[#1D4ED8] transition-all duration-300 hover:scale-105 shadow-lg shadow-[#2563EB]/25">
+                        Explore Courses
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="/contact" class="inline-flex items-center gap-2 px-6 py-3 border-2 border-[#2563EB] text-[#2563EB] font-semibold rounded-xl hover:bg-[#2563EB] hover:text-white transition-all duration-300">
+                        Get In Touch
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Mission Card -->
+            <div class="reveal-up reveal-delay-1">
+                <div class="relative bg-white dark:bg-[#111827] rounded-2xl p-8 border border-[#E2E8F0] dark:border-[#1E293B] shadow-xl">
+                    <div class="absolute -top-3 -right-3 w-16 h-16 bg-[#C9A227] rounded-full flex items-center justify-center text-white text-2xl shadow-lg shadow-[#C9A227]/30">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0F172A] dark:text-white">Our Mission</h3>
+                    <p class="mt-3 text-[#64748B] dark:text-[#94A3B8] leading-relaxed">
+                        To democratize high-quality technical education and empower individuals worldwide to build meaningful careers in technology, design, and business.
+                    </p>
+                    
+                    <div class="mt-6 space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] flex-shrink-0">
+                                <i class="fas fa-check-circle text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-[#0F172A] dark:text-white">Practical Learning</h4>
+                                <p class="text-sm text-[#64748B] dark:text-[#94A3B8]">Real-world projects and case studies, not just theory</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] flex-shrink-0">
+                                <i class="fas fa-check-circle text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-[#0F172A] dark:text-white">Expert Mentors</h4>
+                                <p class="text-sm text-[#64748B] dark:text-[#94A3B8]">Learn from professionals actively working in the industry</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] flex-shrink-0">
+                                <i class="fas fa-check-circle text-sm"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-[#0F172A] dark:text-white">Career Support</h4>
+                                <p class="text-sm text-[#64748B] dark:text-[#94A3B8]">Resume reviews, interview prep, and job placement assistance</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- MILESTONES / TIMELINE                                         -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-white dark:bg-[#0F172A]/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 reveal-up">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Our Journey</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                Milestones & <span class="text-[#2563EB]">Achievements</span>
+            </h2>
+            <p class="mt-3 text-[#64748B] dark:text-[#94A3B8] max-w-2xl mx-auto">
+                The key moments that shaped InstituteHub into what it is today
+            </p>
+        </div>
+
+        <div class="relative">
+            <!-- Timeline Line -->
+            <div class="absolute left-4 sm:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#2563EB] via-[#C9A227] to-[#2563EB]"></div>
+
+            <div class="space-y-8 relative">
+                <% milestones.forEach((milestone, i) => { %>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 reveal-up"
+                         style="transition-delay: <%= i * 80 %>ms">
+                        <!-- Dot -->
+                        <div class="absolute left-4 sm:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#2563EB] border-4 border-white dark:border-[#0B1120] shadow-lg shadow-[#2563EB]/30 z-10"></div>
+                        
+                        <!-- Content -->
+                        <div class="w-full sm:w-5/12 <%= i % 2 === 0 ? 'sm:text-right sm:pr-12' : 'sm:ml-auto sm:pl-12' %> pl-12 sm:pl-0">
+                            <div class="bg-[#F8FAFC] dark:bg-[#111827] p-5 rounded-2xl border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 transition-all duration-300 hover:-translate-y-1">
+                                <span class="inline-block px-3 py-1 bg-[#2563EB]/10 text-[#2563EB] text-xs font-bold rounded-full">
+                                    <%= milestone.year %>
+                                </span>
+                                <h3 class="mt-2 text-lg font-bold text-[#0F172A] dark:text-white"><%= milestone.title %></h3>
+                                <p class="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8]"><%= milestone.desc %></p>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CORE VALUES                                                   -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 reveal-up">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Core Values</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                What Drives <span class="text-[#2563EB]">Us</span>
+            </h2>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <% values.forEach((value, i) => { %>
+                <div class="reveal-up group bg-white dark:bg-[#111827] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl hover:shadow-[#2563EB]/10 hover:-translate-y-2 transition-all duration-400"
+                     style="transition-delay: <%= i * 80 %>ms">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-[#2563EB]/10 to-[#C9A227]/10 flex items-center justify-center text-[#2563EB] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300">
+                        <i class="fas <%= value.icon %> text-2xl"></i>
+                    </div>
+                    <h3 class="mt-4 text-lg font-bold text-[#0F172A] dark:text-white"><%= value.title %></h3>
+                    <p class="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8] leading-relaxed"><%= value.desc %></p>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- TEAM SECTION                                                  -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-white dark:bg-[#0F172A]/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 reveal-up">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Team</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                Meet Our <span class="text-[#2563EB]">Leadership</span>
+            </h2>
+            <p class="mt-3 text-[#64748B] dark:text-[#94A3B8] max-w-2xl mx-auto">
+                Passionate educators, engineers, and designers committed to your success
+            </p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% teamMembers.forEach((member, i) => { %>
+                <div class="reveal-up group bg-[#F8FAFC] dark:bg-[#111827] rounded-2xl overflow-hidden border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl hover:shadow-[#2563EB]/10 hover:-translate-y-2 transition-all duration-400"
+                     style="transition-delay: <%= i * 60 %>ms">
+                    <div class="relative overflow-hidden h-64">
+                        <img src="<%= member.img %>" alt="<%= member.name %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A]/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
+                                <% if (member.social.linkedin) { %>
+                                    <a href="<%= member.social.linkedin %>" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-all duration-300">
+                                        <i class="fab fa-linkedin-in"></i>
+                                    </a>
+                                <% } %>
+                                <% if (member.social.twitter) { %>
+                                    <a href="<%= member.social.twitter %>" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-all duration-300">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                <% } %>
+                                <% if (member.social.github) { %>
+                                    <a href="<%= member.social.github %>" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-all duration-300">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                <% } %>
+                                <% if (member.social.dribbble) { %>
+                                    <a href="<%= member.social.dribbble %>" class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-all duration-300">
+                                        <i class="fab fa-dribbble"></i>
+                                    </a>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-[#0F172A] dark:text-white"><%= member.name %></h3>
+                        <p class="text-sm font-semibold text-[#2563EB]"><%= member.role %></p>
+                        <p class="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8] line-clamp-2"><%= member.bio %></p>
+                        <div class="mt-3 flex flex-wrap gap-1.5">
+                            <% member.expertise.forEach(skill => { %>
+                                <span class="px-2 py-0.5 bg-[#2563EB]/10 text-[#2563EB] text-[10px] font-medium rounded-full">
+                                    <%= skill %>
+                                </span>
+                            <% }) %>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- TESTIMONIALS                                                  -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 reveal-up">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Testimonials</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                What Our <span class="text-[#2563EB]">Students</span> Say
+            </h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <% testimonials.forEach((testimonial, i) => { %>
+                <div class="reveal-up bg-white dark:bg-[#111827] rounded-2xl p-8 border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl transition-all duration-300"
+                     style="transition-delay: <%= i * 80 %>ms">
+                    <div class="flex items-center gap-1 text-[#C9A227] mb-4">
+                        <% for (let s = 0; s < 5; s++) { %>
+                            <i class="fa-star <%= s < testimonial.rating ? 'fas' : 'far' %> text-sm"></i>
+                        <% } %>
+                    </div>
+                    <p class="text-[#0F172A] dark:text-white text-sm font-medium leading-relaxed">"<%= testimonial.text %>"</p>
+                    <div class="mt-6 flex items-center gap-4 pt-4 border-t border-[#E2E8F0] dark:border-[#1E293B]">
+                        <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-[#2563EB]">
+                            <img src="<%= testimonial.img %>" alt="<%= testimonial.name %>" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-[#0F172A] dark:text-white"><%= testimonial.name %></h4>
+                            <p class="text-xs text-[#64748B] dark:text-[#94A3B8]"><%= testimonial.role %></p>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- STYLES                                                        -->
+<!-- ============================================================ -->
+<style>
+    .reveal-up {
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), 
+                    transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .reveal-up.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .reveal-delay-1.in-view { transition-delay: 0.1s; }
+    .reveal-delay-2.in-view { transition-delay: 0.2s; }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    @keyframes pulse-slow {
+        0%, 100% { opacity: 0.1; }
+        50% { opacity: 0.2; }
+    }
+    .animate-pulse-slow {
+        animation: pulse-slow 3s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .reveal-up {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .timeline-dot {
+            left: 1rem !important;
+        }
+    }
+</style>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS                                                       -->
+<!-- ============================================================ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        'use strict';
+
+        // ========== REVEAL ON SCROLL ==========
+        const revealEls = document.querySelectorAll('.reveal-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { 
+            threshold: 0.12,
+            rootMargin: '0px 0px -20px 0px'
+        });
+        revealEls.forEach(el => observer.observe(el));
+
+        // ========== SMOOTH SCROLL FOR ANCHOR LINKS ==========
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return;
+                
+                const target = document.querySelector(href);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ========== COUNTER ANIMATION FOR STATS ==========
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const text = el.textContent;
+                    const match = text.match(/(\d+)(\w*)/);
+                    if (match) {
+                        const target = parseInt(match[1]);
+                        const suffix = match[2] || '';
+                        const duration = 1500;
+                        const start = performance.now();
+                        
+                        function tick(now) {
+                            const progress = Math.min((now - start) / duration, 1);
+                            const eased = 1 - Math.pow(1 - progress, 3);
+                            el.textContent = Math.floor(eased * target) + suffix;
+                            if (progress < 1) {
+                                requestAnimationFrame(tick);
+                            } else {
+                                el.textContent = target + suffix;
+                            }
+                        }
+                        requestAnimationFrame(tick);
+                    }
+                    statObserver.unobserve(el);
+                }
+            });
+        }, { threshold: 0.4 });
+
+        document.querySelectorAll('.stat-number').forEach(el => {
+            statObserver.observe(el);
+        });
+    });
+</script>

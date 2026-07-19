@@ -1,0 +1,638 @@
+<% layout("/layouts/boilerplate") %>
+
+<!-- ============================================================ -->
+<!--  INSTITUTEHUB — TERMS AND CONDITIONS PAGE                    -->
+<!--  Comprehensive T&C | Horizontal Scrollable TOC              -->
+<!-- ============================================================ -->
+
+<%
+  // ---------------------------------------------------------------
+  // DUMMY DATA
+  // ---------------------------------------------------------------
+  const lastUpdated = "July 18, 2026";
+  
+  const sections = [
+    {
+      id: "introduction",
+      title: "Introduction",
+      icon: "fa-file-contract",
+      content: `
+        <p>Welcome to InstituteHub ("we," "our," "us"). These Terms and Conditions ("Terms") govern your use of our website, platform, and services. By accessing or using InstituteHub, you agree to be bound by these Terms.</p>
+        <p class="mt-3">Please read these Terms carefully before using our services. If you do not agree with any part of these Terms, you must not use our platform.</p>
+        <p class="mt-3">These Terms constitute a legally binding agreement between you and InstituteHub. By using our services, you acknowledge that you have read, understood, and accepted these Terms.</p>
+      `
+    },
+    {
+      id: "acceptance",
+      title: "Acceptance of Terms",
+      icon: "fa-check-circle",
+      content: `
+        <p>By creating an account, enrolling in courses, or using any of our services, you agree to comply with and be bound by these Terms and Conditions.</p>
+        <p class="mt-3">You represent and warrant that:</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li>You are at least 13 years of age (or have parental consent if between 13-18 years).</li>
+          <li>You have the legal capacity to enter into a binding agreement.</li>
+          <li>All information you provide is accurate, current, and complete.</li>
+          <li>You will use our services in compliance with all applicable laws and regulations.</li>
+        </ul>
+      `
+    },
+    {
+      id: "account",
+      title: "Account Registration",
+      icon: "fa-user-plus",
+      content: `
+        <p>To access certain features of our platform, you must create an account. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Account Security:</strong> You are responsible for protecting your password and account information. We are not liable for any unauthorized access to your account.</li>
+          <li><strong>Account Accuracy:</strong> You must provide accurate and complete information during registration and update it promptly if changes occur.</li>
+          <li><strong>One Account:</strong> You may only create one account per individual. Multiple accounts are not permitted.</li>
+          <li><strong>Account Suspension:</strong> We reserve the right to suspend or terminate accounts that violate these Terms or engage in fraudulent activities.</li>
+        </ul>
+      `
+    },
+    {
+      id: "courses",
+      title: "Course Enrollment & Access",
+      icon: "fa-graduation-cap",
+      content: `
+        <p>Our platform offers various courses and learning materials. By enrolling in a course, you agree to the following:</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Course Access:</strong> Access to course materials is granted upon successful enrollment and payment.</li>
+          <li><strong>License:</strong> You receive a limited, non-transferable license to access and use course materials for personal learning purposes.</li>
+          <li><strong>No Redistribution:</strong> You may not share, sell, or redistribute any course materials without our explicit written consent.</li>
+          <li><strong>Course Updates:</strong> We reserve the right to update, modify, or discontinue any course at any time.</li>
+          <li><strong>Completion:</strong> Course completion is based on your progress and meeting the defined requirements.</li>
+        </ul>
+      `
+    },
+    {
+      id: "payments",
+      title: "Payments & Refunds",
+      icon: "fa-credit-card",
+      content: `
+        <p>We offer various payment options for course enrollments and services. By making a payment, you agree to the following:</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Payment Processing:</strong> We use secure third-party payment processors to handle transactions.</li>
+          <li><strong>Pricing:</strong> All prices are listed in INR and are subject to change without notice. Prices displayed at the time of enrollment will apply.</li>
+          <li><strong>Refund Policy:</strong> We offer a 7-day money-back guarantee on all courses. Refund requests must be submitted within 7 days of enrollment.</li>
+          <li><strong>Refund Processing:</strong> Refunds are processed within 5-10 business days from the date of approval.</li>
+          <li><strong>Late Fees:</strong> We reserve the right to charge late fees for overdue payments.</li>
+        </ul>
+      `
+    },
+    {
+      id: "intellectual-property",
+      title: "Intellectual Property",
+      icon: "fa-copyright",
+      content: `
+        <p>All content, materials, and intellectual property available on InstituteHub are owned by us or our licensors and are protected by copyright, trademark, and other intellectual property laws.</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Content Ownership:</strong> All course materials, videos, documents, and other content are owned by InstituteHub or our content partners.</li>
+          <li><strong>Restricted Use:</strong> You may not copy, reproduce, modify, distribute, or create derivative works from our content without explicit written permission.</li>
+          <li><strong>User Content:</strong> You retain ownership of content you submit, but grant us a license to use it for platform functionality and improvement.</li>
+          <li><strong>Trademarks:</strong> InstituteHub name and logo are registered trademarks. You may not use them without our consent.</li>
+        </ul>
+      `
+    },
+    {
+      id: "user-conduct",
+      title: "User Conduct",
+      icon: "fa-gavel",
+      content: `
+        <p>You agree to use our platform responsibly and in accordance with these Terms. The following conduct is strictly prohibited:</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Harassment:</strong> Harassing, bullying, or intimidating other users or staff members.</li>
+          <li><strong>Fraud:</strong> Attempting to defraud, impersonate, or deceive other users or our team.</li>
+          <li><strong>Content Abuse:</strong> Sharing inappropriate, offensive, or illegal content.</li>
+          <li><strong>System Abuse:</strong> Attempting to hack, disrupt, or compromise our platform or security systems.</li>
+          <li><strong>Plagiarism:</strong> Submitting plagiarized work or infringing on others' intellectual property.</li>
+          <li><strong>Commercial Use:</strong> Using our platform for unauthorized commercial purposes.</li>
+        </ul>
+      `
+    },
+    {
+      id: "privacy",
+      title: "Privacy & Data Protection",
+      icon: "fa-shield-alt",
+      content: `
+        <p>Your privacy is important to us. Our Privacy Policy explains how we collect, use, and protect your personal information.</p>
+        <p class="mt-3">By using our platform, you consent to our data collection and processing practices as described in our <a href="/privacy-policy" class="text-[#2563EB] hover:underline">Privacy Policy</a>.</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Data Collection:</strong> We collect data to improve our services and provide personalized learning experiences.</li>
+          <li><strong>Data Security:</strong> We implement robust security measures to protect your data.</li>
+          <li><strong>Third-Party Sharing:</strong> We only share data with trusted partners and service providers as described in our Privacy Policy.</li>
+        </ul>
+      `
+    },
+    {
+      id: "termination",
+      title: "Termination",
+      icon: "fa-times-circle",
+      content: `
+        <p>We reserve the right to terminate or suspend your account and access to our services at our sole discretion, without prior notice, for any reason, including but not limited to:</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Violation of Terms:</strong> Breach of any provision of these Terms and Conditions.</li>
+          <li><strong>Fraudulent Activity:</strong> Engaging in fraudulent or illegal activities on our platform.</li>
+          <li><strong>Abuse:</strong> Harassing or abusing other users or our team.</li>
+          <li><strong>Non-Payment:</strong> Failure to complete payments for enrolled courses or services.</li>
+        </ul>
+        <p class="mt-3">Upon termination, your right to access and use the platform will immediately cease. Any outstanding payments will remain due and payable.</p>
+      `
+    },
+    {
+      id: "liability",
+      title: "Limitation of Liability",
+      icon: "fa-balance-scale",
+      content: `
+        <p>To the fullest extent permitted by law, InstituteHub and its affiliates, officers, directors, employees, and agents shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from or related to your use of our platform.</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Service Interruptions:</strong> We are not liable for any downtime or interruptions to our services.</li>
+          <li><strong>Content Accuracy:</strong> While we strive for accuracy, we do not guarantee that all content is error-free.</li>
+          <li><strong>Third-Party Links:</strong> We are not responsible for third-party content or services linked from our platform.</li>
+          <li><strong>Maximum Liability:</strong> Our total liability shall not exceed the amount you paid to us for the specific course or service in question.</li>
+        </ul>
+      `
+    },
+    {
+      id: "indemnification",
+      title: "Indemnification",
+      icon: "fa-handshake",
+      content: `
+        <p>You agree to indemnify, defend, and hold harmless InstituteHub, its affiliates, officers, directors, employees, and agents from and against any and all claims, damages, losses, liabilities, costs, and expenses arising from:</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li>Your use of our platform and services.</li>
+          <li>Your violation of these Terms and Conditions.</li>
+          <li>Your violation of any applicable laws or regulations.</li>
+          <li>Your infringement of any third-party rights, including intellectual property rights.</li>
+        </ul>
+      `
+    },
+    {
+      id: "disclaimer",
+      title: "Disclaimer of Warranties",
+      icon: "fa-exclamation-triangle",
+      content: `
+        <p>Our platform and services are provided on an "as is" and "as available" basis without any warranties, express or implied.</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>No Guarantees:</strong> We do not guarantee that our services will be uninterrupted, error-free, or secure.</li>
+          <li><strong>Educational Outcomes:</strong> We do not guarantee specific learning outcomes, job placements, or career advancements.</li>
+          <li><strong>Content Accuracy:</strong> While we strive to provide accurate content, we make no warranties about the completeness or reliability of course materials.</li>
+        </ul>
+      `
+    },
+    {
+      id: "changes",
+      title: "Changes to Terms",
+      icon: "fa-edit",
+      content: `
+        <p>We reserve the right to modify or update these Terms and Conditions at any time. Changes will be effective immediately upon posting on our website.</p>
+        <p class="mt-3">We will notify you of significant changes through:</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Email Notification:</strong> Sending an email to the address associated with your account.</li>
+          <li><strong>Website Notice:</strong> Posting a prominent notice on our website.</li>
+          <li><strong>In-App Notification:</strong> Displaying a notice when you log in.</li>
+        </ul>
+        <p class="mt-3">Your continued use of the platform after changes constitute your acceptance of the updated Terms.</p>
+      `
+    },
+    {
+      id: "governing-law",
+      title: "Governing Law",
+      icon: "fa-gavel",
+      content: `
+        <p>These Terms and Conditions shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions.</p>
+        <ul class="terms-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Jurisdiction:</strong> Any disputes arising from these Terms shall be subject to the exclusive jurisdiction of the courts in Delhi, India.</li>
+          <li><strong>Arbitration:</strong> We may, at our discretion, resolve disputes through binding arbitration in accordance with Indian arbitration laws.</li>
+        </ul>
+      `
+    },
+    {
+      id: "contact",
+      title: "Contact Us",
+      icon: "fa-envelope",
+      content: `
+        <p>If you have any questions, concerns, or requests regarding these Terms and Conditions, please contact us:</p>
+        <div class="mt-4 space-y-2 text-sm bg-[#F8FAFC] dark:bg-[#111827] p-4 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B]">
+          <p><strong class="text-[#0F172A] dark:text-white">Email:</strong> <a href="mailto:terms@InstituteHub.org.in" class="text-[#2563EB] hover:underline">terms@InstituteHub.org.in</a></p>
+          <p><strong class="text-[#0F172A] dark:text-white">Phone:</strong> <a href="tel:+919310643303" class="text-[#2563EB] hover:underline">+91 9310643303</a></p>
+          <p><strong class="text-[#0F172A] dark:text-white">Address:</strong> 123, Tech Park, Sector 62, Noida, Uttar Pradesh 201301, India</p>
+          <p><strong class="text-[#0F172A] dark:text-white">Working Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM IST</p>
+        </div>
+      `
+    }
+  ];
+%>
+
+<!-- ============================================================ -->
+<!-- PAGE HEADER                                                   -->
+<!-- ============================================================ -->
+<section class="terms-page relative overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-[#2563EB] py-16 lg:py-20 -mt-6">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-[#C9A227] rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#2563EB] rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+        <span class="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/90 mb-4 border border-white/20">
+            <i class="fas fa-file-contract mr-2"></i> Legal Agreement
+        </span>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
+            Terms & <span class="text-[#C9A227]">Conditions</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto">
+            Please read these terms carefully before using our platform and services.
+        </p>
+        <div class="mt-4 inline-flex items-center gap-2 text-sm text-white/60">
+            <i class="fas fa-clock"></i>
+            <span>Last Updated: <%= lastUpdated %></span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- HORIZONTAL SCROLLABLE TOC                                     -->
+<!-- ============================================================ -->
+<section class="terms-toc-wrapper py-3 bg-white dark:bg-[#0B1120] border-b border-[#E2E8F0] dark:border-[#1E293B] sticky top-16 z-30 backdrop-blur-lg bg-white/95 dark:bg-[#0B1120]/95">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="terms-toc-container relative">
+            <!-- Left Gradient Fade -->
+            <div class="terms-toc-fade-left absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none"></div>
+            
+            <!-- Right Gradient Fade -->
+            <div class="terms-toc-fade-right absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none"></div>
+            
+            <!-- Scrollable Container -->
+            <div id="termsTocScroll" class="terms-toc-scroll flex gap-2 overflow-x-auto scroll-smooth py-2">
+                <% sections.forEach((section, i) => { %>
+                    <a href="#terms-<%= section.id %>" 
+                       class="terms-toc-link flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap
+                              bg-[#F8FAFC] dark:bg-[#111827] text-[#64748B] dark:text-[#94A3B8] 
+                              hover:bg-[#2563EB]/10 hover:text-[#2563EB] dark:hover:bg-[#2563EB]/20 dark:hover:text-[#2563EB]
+                              border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40
+                              <%= i === 0 ? 'terms-toc-active' : '' %>">
+                        <i class="fas <%= section.icon %> text-[10px] sm:text-xs"></i>
+                        <span class="hidden sm:inline"><%= section.title %></span>
+                        <span class="sm:hidden"><%= section.title.split(' ').slice(0, 2).join(' ') %></span>
+                    </a>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- TERMS CONTENT                                                 -->
+<!-- ============================================================ -->
+<section class="terms-content-wrapper py-12 lg:py-16 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Last Updated Notice -->
+        <div class="terms-reveal bg-white dark:bg-[#111827] rounded-2xl p-4 mb-8 border border-[#E2E8F0] dark:border-[#1E293B] text-center">
+            <p class="text-sm text-[#64748B] dark:text-[#94A3B8]">
+                <i class="fas fa-info-circle text-[#2563EB] mr-2"></i>
+                These Terms and Conditions were last updated on <strong class="text-[#0F172A] dark:text-white"><%= lastUpdated %></strong>
+            </p>
+        </div>
+
+        <!-- Sections -->
+        <div class="terms-sections space-y-6">
+            <% sections.forEach((section, i) => { %>
+                <div id="terms-<%= section.id %>" class="terms-reveal bg-white dark:bg-[#111827] rounded-2xl p-6 sm:p-8 border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 transition-all duration-300 scroll-mt-32"
+                     style="transition-delay: <%= i * 40 %>ms">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#2563EB]/10 to-[#C9A227]/10 flex items-center justify-center text-[#2563EB]">
+                            <i class="fas <%= section.icon %> text-lg"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h2 class="text-xl sm:text-2xl font-bold text-[#0F172A] dark:text-white mb-4">
+                                <%= section.title %>
+                            </h2>
+                            <div class="terms-prose text-[#64748B] dark:text-[#94A3B8] leading-relaxed">
+                                <%- section.content %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+
+        <!-- Quick Summary -->
+        <div class="terms-reveal mt-8 bg-gradient-to-br from-[#2563EB]/5 to-[#C9A227]/5 dark:from-[#2563EB]/10 dark:to-[#C9A227]/10 rounded-2xl p-6 sm:p-8 border border-[#2563EB]/20 dark:border-[#2563EB]/30">
+            <h3 class="text-lg font-bold text-[#0F172A] dark:text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-check-circle text-[#22C55E]"></i>
+                Key Terms Summary
+            </h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-[#22C55E]/10 flex items-center justify-center text-[#22C55E] flex-shrink-0 mt-0.5">
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-[#0F172A] dark:text-white text-sm">Account Responsibility</p>
+                        <p class="text-xs text-[#64748B] dark:text-[#94A3B8]">You are responsible for your account security and activity</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-[#22C55E]/10 flex items-center justify-center text-[#22C55E] flex-shrink-0 mt-0.5">
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-[#0F172A] dark:text-white text-sm">Course Access</p>
+                        <p class="text-xs text-[#64748B] dark:text-[#94A3B8]">Personal, non-transferable license for course materials</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-[#22C55E]/10 flex items-center justify-center text-[#22C55E] flex-shrink-0 mt-0.5">
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-[#0F172A] dark:text-white text-sm">7-Day Refund</p>
+                        <p class="text-xs text-[#64748B] dark:text-[#94A3B8]">Money-back guarantee within 7 days of enrollment</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-[#22C55E]/10 flex items-center justify-center text-[#22C55E] flex-shrink-0 mt-0.5">
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-[#0F172A] dark:text-white text-sm">Acceptable Use</p>
+                        <p class="text-xs text-[#64748B] dark:text-[#94A3B8]">Must comply with all applicable laws and guidelines</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact CTA -->
+        <div class="terms-reveal mt-8 text-center">
+            <div class="bg-[#0F172A] dark:bg-[#0B1120] rounded-2xl p-8 border border-[#1E293B]">
+                <h3 class="text-lg font-bold text-white mb-2">Questions About These Terms?</h3>
+                <p class="text-sm text-[#94A3B8] mb-4">
+                    Our legal team is here to help. Contact us anytime.
+                </p>
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <a href="mailto:terms@InstituteHub.org.in" class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#2563EB] text-white font-semibold rounded-xl hover:bg-[#1D4ED8] transition-all duration-300">
+                        <i class="fas fa-envelope"></i>
+                        Email Legal Team
+                    </a>
+                    <a href="/contact" class="inline-flex items-center gap-2 px-6 py-2.5 border-2 border-white/20 text-white font-semibold rounded-xl hover:bg-white/10 transition-all duration-300">
+                        <i class="fas fa-headset"></i>
+                        Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCOPED STYLES — Only affects this page                      -->
+<!-- ============================================================ -->
+<style>
+    /* ===== TERMS PAGE SPECIFIC STYLES ===== */
+    
+    /* Hide scrollbar for TOC */
+    .terms-toc-scroll::-webkit-scrollbar { display: none; }
+    .terms-toc-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Reveal animations */
+    .terms-reveal {
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), 
+                    transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .terms-reveal.terms-in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Scroll margin for sticky TOC */
+    .scroll-mt-32 {
+        scroll-margin-top: 8rem;
+    }
+
+    /* TOC Link Active State */
+    .terms-toc-link.terms-toc-active {
+        background: rgba(37, 99, 235, 0.1) !important;
+        color: #2563EB !important;
+        border-color: rgba(37, 99, 235, 0.4) !important;
+    }
+    .dark .terms-toc-link.terms-toc-active {
+        background: rgba(37, 99, 235, 0.2) !important;
+        color: #2563EB !important;
+    }
+
+    /* TOC Scroll Animation */
+    #termsTocScroll {
+        scroll-behavior: smooth;
+    }
+
+    /* Gradient fades for TOC */
+    .terms-toc-fade-left {
+        background-image: linear-gradient(to right, rgba(255,255,255,0.95) 0%, transparent 100%);
+    }
+    .dark .terms-toc-fade-left {
+        background-image: linear-gradient(to right, rgba(11, 17, 32, 0.95) 0%, transparent 100%);
+    }
+    .terms-toc-fade-right {
+        background-image: linear-gradient(to left, rgba(255,255,255,0.95) 0%, transparent 100%);
+    }
+    .dark .terms-toc-fade-right {
+        background-image: linear-gradient(to left, rgba(11, 17, 32, 0.95) 0%, transparent 100%);
+    }
+
+    /* Terms prose styles - scoped to terms page */
+    .terms-prose ul.terms-list-disc {
+        list-style-type: disc !important;
+        padding-left: 1.5rem !important;
+    }
+    .terms-prose ul.terms-list-disc li {
+        margin-bottom: 0.5rem !important;
+        line-height: 1.6 !important;
+    }
+    .terms-prose strong {
+        color: #0F172A;
+    }
+    .dark .terms-prose strong {
+        color: #FFFFFF;
+    }
+    .terms-prose a {
+        color: #2563EB;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+    .terms-prose a:hover {
+        color: #3B82F6;
+    }
+
+    /* Pulse animation for background blobs */
+    @keyframes termsPulse {
+        0%, 100% { opacity: 0.1; }
+        50% { opacity: 0.2; }
+    }
+    .terms-page .animate-pulse {
+        animation: termsPulse 3s ease-in-out infinite;
+    }
+
+    /* Sticky TOC shadow */
+    .terms-toc-wrapper {
+        transition: box-shadow 0.3s ease;
+    }
+    .terms-toc-wrapper.terms-scrolled {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .terms-reveal {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+        #termsTocScroll {
+            scroll-behavior: auto;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .terms-toc-wrapper {
+            position: relative !important;
+            top: 0 !important;
+        }
+        .scroll-mt-32 {
+            scroll-margin-top: 4rem;
+        }
+        .terms-prose ul.terms-list-disc {
+            padding-left: 1rem !important;
+        }
+        .terms-toc-link {
+            padding: 0.5rem 0.75rem !important;
+            font-size: 10px !important;
+        }
+        .terms-toc-fade-left,
+        .terms-toc-fade-right {
+            width: 1.5rem !important;
+        }
+    }
+</style>
+
+<!-- ============================================================ -->
+<!-- SCOPED SCRIPTS                                                -->
+<!-- ============================================================ -->
+<script>
+    (function() {
+        'use strict';
+
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        function init() {
+            // ========== REVEAL ON SCROLL ==========
+            const revealEls = document.querySelectorAll('.terms-reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('terms-in-view');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { 
+                threshold: 0.12,
+                rootMargin: '0px 0px -20px 0px'
+            });
+            revealEls.forEach(el => observer.observe(el));
+
+            // ========== STICKY TOC SHADOW ==========
+            const toc = document.querySelector('.terms-toc-wrapper');
+            if (toc) {
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 80) {
+                        toc.classList.add('terms-scrolled');
+                    } else {
+                        toc.classList.remove('terms-scrolled');
+                    }
+                });
+            }
+
+            // ========== SMOOTH SCROLL FOR ANCHOR LINKS ==========
+            document.querySelectorAll('.terms-toc-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    const target = document.querySelector(href);
+                    if (target) {
+                        // Update active state
+                        document.querySelectorAll('.terms-toc-link').forEach(l => l.classList.remove('terms-toc-active'));
+                        this.classList.add('terms-toc-active');
+                        
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // ========== ACTIVE SECTION HIGHLIGHT IN TOC ==========
+            const sections = document.querySelectorAll('[id^="terms-"]');
+            const tocLinks = document.querySelectorAll('.terms-toc-link');
+            
+            if (tocLinks.length > 0) {
+                const observerToc = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const id = entry.target.id;
+                            tocLinks.forEach(link => {
+                                link.classList.remove('terms-toc-active');
+                                if (link.getAttribute('href') === '#' + id) {
+                                    link.classList.add('terms-toc-active');
+                                    
+                                    // Scroll the TOC to show the active link
+                                    const tocScroll = document.getElementById('termsTocScroll');
+                                    if (tocScroll) {
+                                        const linkRect = link.getBoundingClientRect();
+                                        const containerRect = tocScroll.getBoundingClientRect();
+                                        const scrollLeft = link.offsetLeft - containerRect.width / 2 + linkRect.width / 2;
+                                        tocScroll.scrollTo({
+                                            left: scrollLeft,
+                                            behavior: 'smooth'
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }, { 
+                    threshold: 0.3,
+                    rootMargin: '-100px 0px -100px 0px'
+                });
+                
+                sections.forEach(section => {
+                    if (section.id) observerToc.observe(section);
+                });
+            }
+
+            // ========== KEYBOARD NAVIGATION FOR TOC ==========
+            document.addEventListener('keydown', function(e) {
+                const tocScroll = document.getElementById('termsTocScroll');
+                if (!tocScroll) return;
+                
+                // Only if TOC is visible and in viewport
+                const rect = tocScroll.getBoundingClientRect();
+                if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+                
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    tocScroll.scrollBy({ left: 200, behavior: 'smooth' });
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    tocScroll.scrollBy({ left: -200, behavior: 'smooth' });
+                }
+            });
+        }
+    })();
+</script>

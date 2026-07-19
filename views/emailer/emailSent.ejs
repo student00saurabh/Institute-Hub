@@ -1,0 +1,286 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="forgot-page min-h-[80vh] flex items-center justify-center px-4 py-12">
+    <div class="w-full max-w-md">
+        <!-- Card with enhanced glassmorphism -->
+        <div class="bg-white/90 dark:bg-[#111827]/90 backdrop-blur-xl rounded-3xl shadow-2xl shadow-[#2563EB]/10 dark:shadow-[#2563EB]/5 border border-[#E2E8F0] dark:border-[#1E293B] p-8 relative overflow-hidden" data-aos="fade-up" data-aos-duration="600">
+            
+            <!-- Card accent gradient bar -->
+            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2563EB] via-[#C9A227] to-[#2563EB]"></div>
+
+            <!-- Decorative floating shapes -->
+            <div class="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-[#2563EB]/5 blur-2xl"></div>
+            <div class="absolute -bottom-12 -left-12 w-32 h-32 rounded-full bg-[#C9A227]/5 blur-2xl"></div>
+
+            <div class="relative">
+                <!-- Title -->
+                <div class="text-center mb-6">
+                    
+                    <h2 class="text-2xl font-extrabold text-[#0F172A] dark:text-white">
+                        Reset Password
+                    </h2>
+
+                    <% if (message && !alertmsg) { %>
+                        <p class="mt-2 text-sm text-[#F59E0B] dark:text-[#F59E0B] bg-[#F59E0B]/10 dark:bg-[#F59E0B]/20 px-4 py-2 rounded-lg border border-[#F59E0B]/20 dark:border-[#F59E0B]/30">
+                            <i class="fas fa-info-circle mr-1.5"></i>
+                            <%= message %>
+                        </p>
+                    <% } else if (message && alertmsg) { %>
+                        <p class="mt-2 text-sm text-[#EF4444] dark:text-[#EF4444] bg-[#EF4444]/10 dark:bg-[#EF4444]/20 px-4 py-2 rounded-lg border border-[#EF4444]/20 dark:border-[#EF4444]/30">
+                            <i class="fas fa-exclamation-circle mr-1.5"></i>
+                            <%= message %>
+                        </p>
+                    <% } %>
+                </div>
+
+                <!-- Description -->
+                <p class="text-sm text-[#64748B] dark:text-[#94A3B8] mb-6 text-center leading-relaxed">
+                    Enter your registered email address. We'll send you a secure link to reset your password.
+                </p>
+
+                <!-- Form -->
+                <form action="/forgot-password" method="POST" class="space-y-5" id="forgotForm">
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-[#0F172A] dark:text-white mb-1.5">
+                            Email Address
+                        </label>
+                        
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#94A3B8] transition-colors duration-300 group-focus-within:text-[#2563EB]">
+                                <i class="fas fa-envelope text-sm"></i>
+                            </div>
+                            
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                required
+                                placeholder="you@example.com"
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-[#E2E8F0] dark:border-[#334155] bg-[#F8FAFC] dark:bg-[#1E293B] text-[#0F172A] dark:text-white placeholder-[#94A3B8] dark:placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button
+                        type="submit"
+                        id="submitBtn"
+                        class="forgot-btn-shine relative overflow-hidden w-full py-3.5 px-4 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#3B82F6] hover:to-[#2563EB] text-white font-semibold rounded-xl shadow-lg shadow-[#2563EB]/30 hover:shadow-xl hover:shadow-[#2563EB]/40 transition-all duration-300 transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                    >
+                        <span class="relative z-10 flex items-center gap-2">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Reset Link
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Footer Links -->
+                <div class="mt-6 text-center space-y-3">
+                    <a href="/login"
+                       class="text-sm font-medium text-[#2563EB] dark:text-[#3B82F6] hover:text-[#3B82F6] dark:hover:text-[#60A5FA] transition-colors duration-300 inline-flex items-center group">
+                        <i class="fas fa-arrow-left text-xs mr-1.5 group-hover:-translate-x-1 transition-transform duration-300"></i>
+                        Back to Login
+                    </a>
+                    
+                    <div class="pt-3 border-t border-[#E2E8F0] dark:border-[#1E293B]">
+                        <p class="text-xs text-[#94A3B8] dark:text-[#64748B]">
+                            Don't have an account?
+                            <a href="/signup" class="text-[#2563EB] dark:text-[#3B82F6] hover:text-[#3B82F6] dark:hover:text-[#60A5FA] font-medium transition-colors duration-300 hover:underline">
+                                Sign up
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trust Text -->
+        <p class="mt-6 text-center text-xs text-[#94A3B8] dark:text-[#64748B]">
+            <i class="fas fa-shield-halved text-[#2563EB] mr-1"></i>
+            InstituteHub ensures secure access and protects your data with enterprise-grade security.
+        </p>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCOPED STYLES — Only affects this page                      -->
+<!-- ============================================================ -->
+<style>
+    /* ===== FORGOT PASSWORD PAGE SPECIFIC STYLES ===== */
+
+    /* Submit button shine sweep */
+    .forgot-btn-shine::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -75%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+        transform: skewX(-20deg);
+        transition: left 0.6s ease;
+        z-index: 0;
+    }
+    .forgot-btn-shine:hover::after {
+        left: 130%;
+    }
+
+    /* Input focus micro-interaction */
+    .forgot-page input:focus {
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    /* Notification styles */
+    .forgot-notification {
+        animation: forgotSlideIn 0.3s ease forwards;
+    }
+    
+    @keyframes forgotSlideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Card hover effect */
+    .forgot-page .rounded-3xl {
+        transition: all 0.4s ease;
+    }
+    .forgot-page .rounded-3xl:hover {
+        border-color: rgba(37, 99, 235, 0.3);
+    }
+
+    /* Reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+        .forgot-btn-shine::after {
+            display: none !important;
+        }
+        .forgot-notification {
+            animation: none !important;
+        }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 640px) {
+        .forgot-page .rounded-3xl {
+            border-radius: 1.5rem;
+        }
+        .forgot-page .p-8 {
+            padding: 1.5rem;
+        }
+        .forgot-page .w-16 {
+            width: 3.5rem;
+            height: 3.5rem;
+        }
+        .forgot-page .text-2xl {
+            font-size: 1.25rem;
+        }
+    }
+</style>
+
+<!-- ============================================================ -->
+<!-- SCOPED SCRIPTS                                                -->
+<!-- ============================================================ -->
+<script>
+    (function() {
+        'use strict';
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        function init() {
+            const form = document.getElementById('forgotForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const emailInput = document.getElementById('email');
+
+            // Auto-focus on email
+            if (emailInput) {
+                setTimeout(() => emailInput.focus(), 500);
+            }
+
+            // Form validation
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const email = emailInput.value.trim();
+                    
+                    if (!email) {
+                        e.preventDefault();
+                        showNotification('Please enter your email address.', 'error');
+                        return;
+                    }
+                    
+                    if (!isValidEmail(email)) {
+                        e.preventDefault();
+                        showNotification('Please enter a valid email address.', 'error');
+                        return;
+                    }
+
+                    // Show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = `
+                        <span class="relative z-10 flex items-center gap-2">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Sending...
+                        </span>
+                    `;
+                    submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+                });
+            }
+
+            function isValidEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+
+            function showNotification(message, type = 'info') {
+                // Remove existing notification
+                const existingNotification = document.querySelector('.forgot-notification');
+                if (existingNotification) {
+                    existingNotification.remove();
+                }
+                
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `forgot-notification fixed top-4 right-4 z-50 max-w-sm px-4 py-3 rounded-xl shadow-lg border transition-all duration-300 transform translate-x-full ${
+                    type === 'error' 
+                        ? 'bg-[#EF4444]/10 dark:bg-[#EF4444]/20 border-[#EF4444]/20 dark:border-[#EF4444]/30 text-[#EF4444] dark:text-[#EF4444]' 
+                        : type === 'success'
+                        ? 'bg-[#22C55E]/10 dark:bg-[#22C55E]/20 border-[#22C55E]/20 dark:border-[#22C55E]/30 text-[#22C55E] dark:text-[#22C55E]'
+                        : 'bg-[#2563EB]/10 dark:bg-[#2563EB]/20 border-[#2563EB]/20 dark:border-[#2563EB]/30 text-[#2563EB] dark:text-[#2563EB]'
+                }`;
+                
+                notification.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'} text-sm mt-0.5"></i>
+                        <span class="text-sm font-medium">${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Animate in
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full');
+                    notification.classList.add('translate-x-0');
+                }, 10);
+                
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-0');
+                    notification.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 5000);
+            }
+        }
+    })();
+</script>

@@ -1,0 +1,784 @@
+<!-- ============================================================ -->
+<!--  INSTITUTEHUB PREMIUM NAVBAR - Final Version                 -->
+<!-- ============================================================ -->
+
+<nav class="sticky top-0 z-50 bg-white/95 dark:bg-[#0B1120]/95 backdrop-blur-xl border-b border-[#E2E8F0]/50 dark:border-[#1E293B]/50 shadow-sm transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 lg:h-20">
+            
+            <!-- ====== LOGO ====== -->
+            <div class="flex items-center">
+                <a href="/" class="logo-link flex items-center gap-2 relative group">
+                    <!-- Logo Icon -->
+<div class="relative w-11 h-11 flex items-center justify-center flex-shrink-0">
+
+    <img
+        src="/images/logo.png"
+        alt="InstituteHub"
+        class="logo-img w-10 h-10 object-contain transition-all  duration-300 dark:[filter:brightness(1.15)_contrast(1.15)_drop-shadow(0_0_8px_rgba(255,255,255,0.28))]"
+        
+    >
+
+    <div class="absolute -inset-1 rounded-xl border-2 border-transparent group-hover:border-[#C9A227]/30 transition-all duration-500"></div>
+
+</div>
+                    
+                    <!-- Brand Text -->
+                    <div class="hidden md:flex items-center">
+                        <span class="text-2xl font-extrabold tracking-tight">
+                            <span class="text-[#0F172A] dark:text-white">Institute</span>
+                            <span class="text-[#C9A227]">Hub</span>
+                        </span>
+                        
+                    </div>
+                </a>
+            </div>
+
+            <!-- ====== DESKTOP NAVIGATION ====== -->
+            <div class="hidden lg:flex items-center space-x-0.5">
+                <% 
+                    const navItems = [
+                        { name: 'Home', path: '/', icon: 'fa-home' },
+                        { name: 'Courses', path: '/courses', icon: 'fa-graduation-cap' },
+                        { name: 'Blogs', path: '/blogs', icon: 'fa-blog' },
+                        { name: 'About', path: '/about', icon: 'fa-info-circle' },
+                        { name: 'Contact', path: '/contact', icon: 'fa-envelope' }
+                    ]; 
+                %>
+                <% navItems.forEach(item => { %>
+                <% const isActive = currentPath === item.path || (item.path !== '/' && currentPath?.startsWith(item.path)); %>
+                    <a href="<%= item.path %>" 
+                       class="nav-link relative px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300
+                              <%= isActive ? 'text-[#2563EB] dark:text-[#2563EB] bg-[#2563EB]/10 dark:bg-[#2563EB]/20' : 'text-[#0F172A]/70 dark:text-white/70 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10' %>
+                              <%= isActive ? 'active' : '' %>">
+                        <span class="flex items-center gap-2.5">
+                            <i class="fas <%= item.icon %> text-xs transition-all duration-300 group-hover:scale-110 
+                                <%= isActive ? 'text-[#2563EB]' : 'text-[#0F172A]/40 dark:text-white/40 group-hover:text-[#2563EB]' %>">
+                            </i>
+                            <%= item.name %>
+                        </span>
+                        
+                        <!-- Active Indicator -->
+                        <% if (isActive) { %>
+                            <span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-5 h-0.5 bg-[#2563EB] rounded-full shadow-sm shadow-[#2563EB]/30"></span>
+                        <% } %>
+                    </a>
+                <% }); %>
+            </div>
+
+            <!-- ====== RIGHT ACTIONS ====== -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                
+                <div class="relative hidden lg:block">
+
+    <button id="searchToggle"
+        class="relative w-9 h-9 rounded-xl flex items-center justify-center ...">
+        <i class="fas fa-search text-sm"></i>
+    </button>
+
+    <!-- Desktop Search Dropdown -->
+    <div id="searchOverlay"
+        class="hidden absolute top-full right-0 mt-3
+               w-[480px]
+               bg-white dark:bg-[#111827]
+               rounded-2xl
+               border border-[#E2E8F0] dark:border-[#1E293B]
+               shadow-2xl
+               z-50">
+
+        <div class="p-3">
+
+            <div class="relative">
+
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+
+                <input
+                    id="searchInput"
+                    type="text"
+                    placeholder="Search courses, blogs..."
+                    class="w-full pl-11 pr-4 py-2 rounded-xl
+                    border
+                    bg-[#F8FAFC]
+                    dark:bg-[#0B1120]
+                    dark:text-white
+                    focus:border-[#2563EB]
+                    outline-none">
+
+            </div>
+
+            <div id="searchResults"
+                class="hidden mt-3 max-h-80 overflow-y-auto">
+
+                <div id="resultsList"
+                    class="space-y-1">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+                <!-- Theme Toggle -->
+                <button id="themeToggle" 
+                        class="relative w-9 h-9 rounded-xl flex items-center justify-center text-[#0F172A]/60 dark:text-white/60 hover:text-[#C9A227] dark:hover:text-[#C9A227] hover:bg-[#C9A227]/10 dark:hover:bg-[#C9A227]/20 transition-all duration-300 border border-[#E2E8F0]/50 dark:border-[#1E293B]/50 hover:border-[#C9A227]/30 group overflow-hidden">
+                    <i class="fas fa-sun absolute text-[#C9A227]/80 transition-all duration-500 
+                          dark:opacity-0 dark:translate-y-8 dark:rotate-180 opacity-100 translate-y-0 rotate-0"></i>
+                    <i class="fas fa-moon absolute text-[#2563EB]/80 transition-all duration-500 
+                          dark:opacity-100 dark:translate-y-0 dark:rotate-0 opacity-0 translate-y-8 rotate-180"></i>
+                </button>
+
+                <!-- User Actions -->
+                <% if (currUser) { %>
+                    <div class="hidden sm:block relative group">
+                        <button class="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#2563EB]/5 to-[#C9A227]/5 dark:from-[#2563EB]/10 dark:to-[#C9A227]/10 hover:from-[#2563EB]/10 hover:to-[#C9A227]/10 dark:hover:from-[#2563EB]/20 dark:hover:to-[#C9A227]/20 transition-all duration-300 border border-[#E2E8F0]/50 dark:border-[#1E293B]/50 hover:border-[#2563EB]/30 group">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#2563EB] to-[#C9A227] flex items-center justify-center text-white text-sm font-bold shadow-md shadow-[#2563EB]/25">
+                                <%= (currUser.name || currUser.username || 'U')[0].toUpperCase() %>
+                            </div>
+                            <span class="hidden md:inline text-sm font-medium text-[#0F172A] dark:text-white">
+                                <%= currUser.name || currUser.username || 'User' %>
+                            </span>
+                            <i class="fas fa-chevron-down text-[10px] text-[#0F172A]/40 dark:text-white/40 group-hover:text-[#2563EB] transition-all duration-300 group-hover:rotate-180"></i>
+                        </button>
+                        
+                        <!-- User Dropdown -->
+                        <div class="absolute right-0 mt-2 w-64 bg-white/95 dark:bg-[#111827]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#E2E8F0]/50 dark:border-[#1E293B]/50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right scale-95 group-hover:scale-100">
+                            <div class="p-4 border-b border-[#E2E8F0]/50 dark:border-[#1E293B]/50 bg-gradient-to-r from-[#2563EB]/5 to-[#C9A227]/5 dark:from-[#2563EB]/10 dark:to-[#C9A227]/10 rounded-t-2xl">
+                                <p class="text-sm font-semibold text-[#0F172A] dark:text-white"><%= currUser.name || currUser.username %></p>
+                                <p class="text-xs text-[#64748B] dark:text-[#94A3B8]"><%= currUser.email %></p>
+                            </div>
+                            <div class="p-2">
+                                <% if (currUser.role === 'admin' || currUser.role === 'teacher') { %>
+                                    <div class="px-3 py-1.5 text-[10px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-widest">Admin</div>
+                                    <a href="/admin/dashboard" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-[#0F172A]/80 dark:text-white/80 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10 transition-all duration-200">
+                                        <i class="fas fa-chart-pie w-4 text-center text-[#2563EB]"></i> Dashboard
+                                    </a>
+                                    <a href="/admin/courses" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-[#0F172A]/80 dark:text-white/80 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10 transition-all duration-200">
+                                        <i class="fas fa-graduation-cap w-4 text-center text-[#2563EB]"></i> Manage Courses
+                                    </a>
+                                    <a href="/admin/blogs" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-[#0F172A]/80 dark:text-white/80 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10 transition-all duration-200">
+                                        <i class="fas fa-blog w-4 text-center text-[#2563EB]"></i> Manage Blogs
+                                    </a>
+                                    <hr class="my-1 border-[#E2E8F0]/50 dark:border-[#1E293B]/50">
+                                <% } %>
+                                <a href="/profile" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-[#0F172A]/80 dark:text-white/80 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10 transition-all duration-200">
+                                    <i class="fas fa-user-circle w-4 text-center text-[#2563EB]"></i> My Profile
+                                </a>
+                                <a href="/my-courses" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-[#0F172A]/80 dark:text-white/80 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10 transition-all duration-200">
+                                    <i class="fas fa-book-open w-4 text-center text-[#2563EB]"></i> My Courses
+                                </a>
+                                <a href="/blogs/saved" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-[#0F172A]/80 dark:text-white/80 hover:text-[#C9A227] dark:hover:text-[#C9A227] hover:bg-[#C9A227]/5 dark:hover:bg-[#C9A227]/10 transition-all duration-200">
+                                    <i class="fas fa-bookmark w-4 text-center text-[#C9A227]"></i> Saved Blogs
+                                </a>
+                                <hr class="my-1 border-[#E2E8F0]/50 dark:border-[#1E293B]/50">
+                                <a href="/logout" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-[#EF4444] hover:bg-[#EF4444]/5 dark:hover:bg-[#EF4444]/10 transition-all duration-200">
+                                    <i class="fas fa-sign-out-alt w-4 text-center"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <a href="/login" class="login-link hidden sm:inline-block px-4 py-2 text-sm font-medium text-[#0F172A]/70 dark:text-white/70 hover:text-[#2563EB] dark:hover:text-[#2563EB] transition-all duration-300 hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10 rounded-xl">
+                        Login
+                    </a>
+                    <a href="/signup" class="hidden sm:inline-block relative overflow-hidden group px-5 py-2.5 text-sm font-semibold text-white rounded-xl shadow-lg shadow-[#2563EB]/30 hover:shadow-[#2563EB]/50 transition-all duration-300 transform hover:scale-105 active:scale-95">
+                        <span class="absolute inset-0 bg-gradient-to-r from-[#2563EB] to-[#2563EB]/80 group-hover:from-[#2563EB] group-hover:to-[#2563EB]/90 transition-all duration-500"></span>
+                        <span class="absolute inset-0 bg-gradient-to-r from-transparent via-[#C9A227]/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+                        <span class="relative flex items-center gap-2">
+                            <i class="fas fa-user-plus"></i> Sign Up
+                        </span>
+                    </a>
+                <% } %>
+
+                <!-- Mobile Menu Toggle -->
+                <button id="mobileMenuToggle" class="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center text-[#0F172A]/60 dark:text-white/60 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/10 dark:hover:bg-[#2563EB]/20 transition-all duration-300 border border-[#E2E8F0]/50 dark:border-[#1E293B]/50">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+</nav>
+
+<!-- ============================================================ -->
+<!--  MOBILE SIDEBAR                                              -->
+<!-- ============================================================ -->
+
+<div id="mobileSidebar" class="fixed inset-0 z-[100] lg:hidden pointer-events-none">
+    <!-- Overlay -->
+    <div id="sidebarOverlay" class="absolute inset-0 bg-[#0F172A]/60 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+    
+    <!-- Sidebar Panel -->
+    <div id="sidebarPanel" class="absolute top-0 left-0 h-full w-[88%] max-w-sm bg-white dark:bg-[#111827] shadow-2xl shadow-[#0F172A]/20 transform -translate-x-full transition-transform duration-300 ease-out pointer-events-auto overflow-y-auto">
+        
+        <!-- Sidebar Header -->
+        <div class="relative p-5 border-b border-[#E2E8F0]/50 dark:border-[#1E293B]/50 bg-gradient-to-r from-[#2563EB]/5 to-[#C9A227]/5 dark:from-[#2563EB]/10 dark:to-[#C9A227]/10">
+            <div class="flex items-center justify-between">
+                <a href="/" class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0F172A] to-[#2563EB] flex items-center justify-center text-white shadow-lg shadow-[#2563EB]/25">
+                        <i class="fas fa-graduation-cap text-lg"></i>
+                    </div>
+                    <span class="text-xl font-extrabold">
+                        <span class="text-[#0F172A] dark:text-white">Institute</span>
+                        <span class="text-[#C9A227]">Hub</span>
+                    </span>
+                </a>
+                <button id="closeSidebar" class="w-9 h-9 rounded-xl flex items-center justify-center text-[#0F172A]/60 dark:text-white/60 hover:text-[#EF4444] dark:hover:text-[#EF4444] hover:bg-[#EF4444]/10 dark:hover:bg-[#EF4444]/20 transition-all duration-300">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#2563EB] via-[#C9A227] to-[#2563EB]"></div>
+        </div>
+
+        <!-- User Info (Mobile) -->
+        <% if (currUser) { %>
+            <div class="p-4 border-b border-[#E2E8F0]/50 dark:border-[#1E293B]/50 bg-gradient-to-r from-[#2563EB]/5 to-[#C9A227]/5 dark:from-[#2563EB]/10 dark:to-[#C9A227]/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-[#2563EB] to-[#C9A227] flex items-center justify-center text-white text-base font-bold shadow-md shadow-[#2563EB]/25">
+                        <%= (currUser.name || currUser.username || 'U')[0].toUpperCase() %>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-[#0F172A] dark:text-white"><%= currUser.name || currUser.username %></p>
+                        <p class="text-xs text-[#64748B] dark:text-[#94A3B8]"><%= currUser.email %></p>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- Mobile Search -->
+        <div class="p-4 border-b border-[#E2E8F0]/50 dark:border-[#1E293B]/50">
+            <div class="relative">
+                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-[#64748B] dark:text-[#94A3B8] text-xs"></i>
+                <input type="text" 
+                       id="mobileSearchInput" 
+                       placeholder="Search..." 
+                       autocomplete="off"
+                       class="w-full pl-10 pr-3 py-3 rounded-xl border border-[#E2E8F0]/50 dark:border-[#1E293B]/50 bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-white text-sm placeholder-[#64748B] dark:placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] dark:focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-all duration-300">
+            </div>
+            <div id="mobileSearchResults" class="mt-2 bg-white dark:bg-[#111827] rounded-xl shadow-xl border border-[#E2E8F0]/50 dark:border-[#1E293B]/50 hidden max-h-60 overflow-y-auto">
+                <div id="mobileResultsList" class="p-2"></div>
+            </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="p-3 space-y-0.5">
+            <!-- Courses Link -->
+            <div class="mb-1">
+                <a href="/courses" 
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300
+                          <%= currentPath?.startsWith('/courses') ? 'text-[#2563EB] bg-[#2563EB]/10 dark:bg-[#2563EB]/20' : 'text-[#0F172A]/70 dark:text-white/70 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10' %>">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2563EB] to-[#C9A227]/60 flex items-center justify-center text-white shadow-sm">
+                        <i class="fas fa-graduation-cap text-xs"></i>
+                    </div>
+                    <span class="flex-1">Courses</span>
+                    <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-[#2563EB]/10 dark:bg-[#2563EB]/20 text-[#2563EB]">
+                        <%= navbarCourses ? navbarCourses.length : 0 %>
+                    </span>
+                </a>
+            </div>
+            
+            <% const mobileNavItems = [
+                { name: 'Home', path: '/', icon: 'fa-home' },
+                { name: 'Blogs', path: '/blogs', icon: 'fa-blog' },
+                { name: 'About', path: '/about', icon: 'fa-info-circle' },
+                { name: 'Contact', path: '/contact', icon: 'fa-envelope' }
+            ]; %>
+            
+            <% mobileNavItems.forEach(item => { %>
+                <% const isActive = currentPath === item.path || (item.path !== '/' && currentPath?.startsWith(item.path)); %>
+                <a href="<%= item.path %>" 
+                   class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300
+                          <%= isActive ? 'text-[#2563EB] bg-[#2563EB]/10 dark:bg-[#2563EB]/20' : 'text-[#0F172A]/70 dark:text-white/70 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10' %>
+                          hover:translate-x-1">
+                    <i class="fas <%= item.icon %> w-5 text-center <%= isActive ? 'text-[#2563EB]' : 'text-[#64748B] dark:text-[#94A3B8]' %>"></i>
+                    <%= item.name %>
+                    <% if (isActive) { %>
+                        <span class="ml-auto w-1.5 h-1.5 rounded-full bg-[#2563EB] shadow-sm shadow-[#2563EB]/50"></span>
+                    <% } %>
+                </a>
+            <% }); %>
+
+            <!-- Admin Links (Mobile) -->
+            <% if (currUser && (currUser.role === 'admin' || currUser.role === 'teacher')) { %>
+                <div class="mt-3 pt-3 border-t border-[#E2E8F0]/50 dark:border-[#1E293B]/50">
+                    <div class="px-4 py-1 text-[10px] font-bold text-[#64748B] dark:text-[#94A3B8] uppercase tracking-widest">Admin Panel</div>
+                    
+                    <a href="/admin/dashboard" 
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300
+                              <%= currentPath?.startsWith('/admin/dashboard') ? 'text-[#2563EB] bg-[#2563EB]/10 dark:bg-[#2563EB]/20' : 'text-[#0F172A]/70 dark:text-white/70 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10' %>
+                              hover:translate-x-1">
+                        <i class="fas fa-chart-pie w-5 text-center text-[#2563EB]"></i>
+                        Dashboard
+                    </a>
+                    <a href="/admin/courses" 
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300
+                              <%= currentPath?.startsWith('/admin/courses') ? 'text-[#2563EB] bg-[#2563EB]/10 dark:bg-[#2563EB]/20' : 'text-[#0F172A]/70 dark:text-white/70 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10' %>
+                              hover:translate-x-1">
+                        <i class="fas fa-graduation-cap w-5 text-center text-[#2563EB]"></i>
+                        Manage Courses
+                    </a>
+                    <a href="/admin/blogs" 
+                       class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300
+                              <%= currentPath?.startsWith('/admin/blogs') ? 'text-[#2563EB] bg-[#2563EB]/10 dark:bg-[#2563EB]/20' : 'text-[#0F172A]/70 dark:text-white/70 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10' %>
+                              hover:translate-x-1">
+                        <i class="fas fa-blog w-5 text-center text-[#2563EB]"></i>
+                        Manage Blogs
+                    </a>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-[#E2E8F0]/50 dark:border-[#1E293B]/50 mx-4"></div>
+
+        <!-- User Actions (Mobile) -->
+        <div class="p-4 space-y-1">
+            <% if (currUser) { %>
+                <a href="/profile" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-[#0F172A]/70 dark:text-white/70 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10 transition-all duration-300">
+                    <i class="fas fa-user-circle w-5 text-center text-[#64748B] dark:text-[#94A3B8]"></i> My Profile
+                </a>
+                <a href="/my-courses" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-[#0F172A]/70 dark:text-white/70 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10 transition-all duration-300">
+                    <i class="fas fa-book-open w-5 text-center text-[#64748B] dark:text-[#94A3B8]"></i> My Courses
+                </a>
+                <a href="/blogs/saved" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-[#0F172A]/70 dark:text-white/70 hover:text-[#C9A227] dark:hover:text-[#C9A227] hover:bg-[#C9A227]/5 dark:hover:bg-[#C9A227]/10 transition-all duration-300">
+                    <i class="fas fa-bookmark w-5 text-center text-[#C9A227]"></i> Saved Blogs
+                </a>
+                <a href="/logout" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm text-[#EF4444] hover:bg-[#EF4444]/5 dark:hover:bg-[#EF4444]/10 transition-all duration-300">
+                    <i class="fas fa-sign-out-alt w-5 text-center"></i> Logout
+                </a>
+            <% } else { %>
+                <a href="/login" class="flex items-center justify-center px-4 py-3 rounded-xl text-sm font-semibold text-[#2563EB] border-2 border-[#2563EB]/20 hover:border-[#2563EB]/50 hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10 transition-all duration-300">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Login
+                </a>
+                <a href="/signup" class="flex items-center justify-center px-4 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-[#2563EB] to-[#2563EB]/80 hover:from-[#2563EB] hover:to-[#2563EB]/90 transition-all duration-300 shadow-lg shadow-[#2563EB]/30">
+                    <i class="fas fa-user-plus mr-2"></i> Create Account
+                </a>
+            <% } %>
+        </div>
+
+        <!-- Theme Toggle (Mobile) -->
+        <div class="p-4 border-t border-[#E2E8F0]/50 dark:border-[#1E293B]/50">
+            <button id="mobileThemeToggle" class="flex items-center justify-between w-full px-4 py-2.5 rounded-xl text-sm text-[#0F172A]/70 dark:text-white/70 hover:text-[#2563EB] dark:hover:text-[#2563EB] hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10 transition-all duration-300">
+                <span class="flex items-center gap-3">
+                    <i class="fas fa-palette w-5 text-center text-[#64748B] dark:text-[#94A3B8]"></i>
+                    Theme
+                </span>
+                <span id="mobileThemeLabel" class="text-xs font-medium text-[#64748B] dark:text-[#94A3B8]">
+                    <i class="fas fa-sun text-[#C9A227] mr-1"></i> Light
+                </span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  JAVASCRIPT - Optimized                                     -->
+<!-- ============================================================ -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    'use strict';
+
+    // ========== MOBILE SIDEBAR ==========
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const sidebarPanel = document.getElementById('sidebarPanel');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const closeSidebar = document.getElementById('closeSidebar');
+
+    function openSidebar() {
+        mobileSidebar.style.pointerEvents = 'auto';
+        sidebarOverlay.classList.replace('opacity-0', 'opacity-100');
+        sidebarPanel.classList.replace('-translate-x-full', 'translate-x-0');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebarFn() {
+        sidebarPanel.classList.replace('translate-x-0', '-translate-x-full');
+        sidebarOverlay.classList.replace('opacity-100', 'opacity-0');
+        setTimeout(() => {
+            mobileSidebar.style.pointerEvents = 'none';
+            document.body.style.overflow = '';
+        }, 300);
+    }
+
+    if (mobileMenuToggle) mobileMenuToggle.addEventListener('click', openSidebar);
+    if (closeSidebar) closeSidebar.addEventListener('click', closeSidebarFn);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebarFn);
+    
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeSidebarFn();
+    });
+
+    // Close sidebar when clicking links
+    document.querySelectorAll('#sidebarPanel a').forEach(link => {
+        link.addEventListener('click', closeSidebarFn);
+    });
+
+    // ========== SEARCH TOGGLE ==========
+    const searchToggle = document.getElementById('searchToggle');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchInput = document.getElementById('searchInput');
+
+    if (searchToggle && searchOverlay) {
+        searchToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isHidden = searchOverlay.classList.contains('hidden');
+            searchOverlay.classList.toggle('hidden');
+            if (isHidden) {
+                setTimeout(() => searchInput?.focus(), 100);
+            }
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('nav')) {
+            if (searchOverlay) searchOverlay.classList.add('hidden');
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            if (searchOverlay) searchOverlay.classList.add('hidden');
+            if (searchInput) searchInput.blur();
+        }
+        // Ctrl+K or Cmd+K to open search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            if (searchToggle) searchToggle.click();
+        }
+    });
+
+    // ========== SEARCH FUNCTION ==========
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    async function performSearch(query, resultsContainer, resultsList) {
+        if (!query || query.length < 2) {
+            if (resultsContainer) resultsContainer.classList.add('hidden');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                resultsList.innerHTML = data.results.map(item => `
+                    <a href="${item.url}" class="flex items-start gap-3 px-3 py-2.5 hover:bg-[#2563EB]/5 dark:hover:bg-[#2563EB]/10 rounded-lg transition-all duration-200 group">
+                        ${item.image ? `
+                            <img src="${item.image}" alt="${item.title}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0">
+                        ` : `
+                            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#2563EB]/20 to-[#C9A227]/20 flex items-center justify-center text-[#2563EB] flex-shrink-0">
+                                <i class="${item.icon || 'fas fa-search'} text-sm"></i>
+                            </div>
+                        `}
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-[#0F172A] dark:text-white group-hover:text-[#2563EB] transition-colors">
+                                ${item.title}
+                            </p>
+                            ${item.description ? `<p class="text-xs text-[#64748B] dark:text-[#94A3B8] line-clamp-1">${item.description}</p>` : ''}
+                            ${item.price ? `<span class="text-xs font-bold text-[#C9A227]">₹${item.price}</span>` : ''}
+                        </div>
+                        <i class="fas fa-chevron-right text-xs text-[#64748B]/30 group-hover:text-[#2563EB] transition-colors"></i>
+                    </a>
+                `).join('');
+                resultsContainer.classList.remove('hidden');
+            } else {
+                resultsList.innerHTML = `
+                    <div class="px-3 py-6 text-center">
+                        <i class="fas fa-search text-2xl text-[#64748B]/30 mb-2"></i>
+                        <p class="text-sm text-[#64748B] dark:text-[#94A3B8]">No results for "<strong class="text-[#0F172A] dark:text-white">${query}</strong>"</p>
+                    </div>
+                `;
+                resultsContainer.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            resultsList.innerHTML = `
+                <div class="px-3 py-6 text-center">
+                    <i class="fas fa-exclamation-circle text-2xl text-[#EF4444]/50 mb-2"></i>
+                    <p class="text-sm text-[#64748B] dark:text-[#94A3B8]">Search unavailable</p>
+                </div>
+            `;
+            resultsContainer.classList.remove('hidden');
+        }
+    }
+
+    const debouncedSearch = debounce(performSearch, 300);
+
+    // Desktop search
+    if (searchInput) {
+        const searchResults = document.getElementById('searchResults');
+        const resultsList = document.getElementById('resultsList');
+        
+        searchInput.addEventListener('input', function(e) {
+            debouncedSearch(e.target.value.trim(), searchResults, resultsList);
+        });
+
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim();
+                if (query.length >= 2) {
+                    window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    }
+
+    // Mobile search
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    const mobileSearchResults = document.getElementById('mobileSearchResults');
+    const mobileResultsList = document.getElementById('mobileResultsList');
+
+    if (mobileSearchInput) {
+        mobileSearchInput.addEventListener('input', function(e) {
+            debouncedSearch(e.target.value.trim(), mobileSearchResults, mobileResultsList);
+        });
+
+        mobileSearchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const query = this.value.trim();
+                if (query.length >= 2) {
+                    window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                }
+            }
+        });
+    }
+
+    // ========== THEME TOGGLE ==========
+    const themeToggle = document.getElementById('themeToggle');
+    const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+    const mobileThemeLabel = document.getElementById('mobileThemeLabel');
+
+    function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.classList.contains('dark');
+        
+        if (isDark) {
+            html.classList.remove('dark');
+            localStorage.theme = 'light';
+            if (mobileThemeLabel) {
+                mobileThemeLabel.innerHTML = '<i class="fas fa-sun text-[#C9A227] mr-1"></i> Light';
+            }
+        } else {
+            html.classList.add('dark');
+            localStorage.theme = 'dark';
+            if (mobileThemeLabel) {
+                mobileThemeLabel.innerHTML = '<i class="fas fa-moon text-[#2563EB] mr-1"></i> Dark';
+            }
+        }
+    }
+
+    if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+    if (mobileThemeToggle) mobileThemeToggle.addEventListener('click', toggleTheme);
+
+    // Set initial theme label
+    if (mobileThemeLabel) {
+        const isDark = document.documentElement.classList.contains('dark');
+        mobileThemeLabel.innerHTML = isDark ? 
+            '<i class="fas fa-moon text-[#2563EB] mr-1"></i> Dark' : 
+            '<i class="fas fa-sun text-[#C9A227] mr-1"></i> Light';
+    }
+
+    // ========== USER DROPDOWN ==========
+    const userMenuBtn = document.querySelector('.group button');
+    const userDropdown = document.querySelector('.group .absolute');
+
+    if (userMenuBtn && userDropdown) {
+        let timeout;
+
+        userMenuBtn.addEventListener('mouseenter', () => {
+            clearTimeout(timeout);
+            userDropdown.classList.remove('opacity-0', 'invisible', 'scale-95');
+            userDropdown.classList.add('opacity-100', 'visible', 'scale-100');
+        });
+
+        userMenuBtn.addEventListener('mouseleave', () => {
+            timeout = setTimeout(() => {
+                userDropdown.classList.remove('opacity-100', 'visible', 'scale-100');
+                userDropdown.classList.add('opacity-0', 'invisible', 'scale-95');
+            }, 150);
+        });
+
+        userDropdown.addEventListener('mouseenter', () => clearTimeout(timeout));
+        userDropdown.addEventListener('mouseleave', () => {
+            timeout = setTimeout(() => {
+                userDropdown.classList.remove('opacity-100', 'visible', 'scale-100');
+                userDropdown.classList.add('opacity-0', 'invisible', 'scale-95');
+            }, 150);
+        });
+    }
+});
+</script>
+
+<style>
+/* ====== ANIMATIONS ====== */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ====== NAVBAR STYLES ====== */
+nav {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Search overlay animation */
+#searchOverlay {
+    animation: slideDown 0.3s ease forwards;
+}
+
+#searchOverlay.hidden {
+    display: none;
+}
+
+/* ====== FIX: No hover underline on active links ====== */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(to right, #2563EB, #C9A227);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+    border-radius: 1px;
+}
+
+/* Only show hover underline for non-active links */
+.nav-link:not(.active):hover::after {
+    width: 60%;
+}
+
+/* Active link has no hover underline */
+.nav-link.active::after {
+    display: none !important;
+}
+
+/* Dark mode adjustments */
+.dark .nav-link:not(.active)::after {
+    background: linear-gradient(to right, #3B82F6, #E6C35A);
+}
+
+/* ====== FIX: Login link no underline ====== */
+.login-link::after {
+    display: none !important;
+}
+
+.login-link {
+    position: relative;
+}
+
+/* ====== SEARCH RESULTS BACKGROUND ====== */
+#searchResults {
+    background: transparent;
+}
+
+#resultsList {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+.dark #resultsList {
+    background: #111827;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* ====== SCROLLBAR STYLING ====== */
+#searchResults::-webkit-scrollbar,
+#mobileSearchResults::-webkit-scrollbar {
+    width: 4px;
+}
+
+#searchResults::-webkit-scrollbar-track,
+#mobileSearchResults::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#searchResults::-webkit-scrollbar-thumb,
+#mobileSearchResults::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 2px;
+}
+
+.dark #searchResults::-webkit-scrollbar-thumb,
+.dark #mobileSearchResults::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+/* ====== LINE CLAMP ====== */
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ====== MOBILE SIDEBAR ====== */
+#sidebarPanel {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#sidebarOverlay {
+    transition: opacity 0.3s ease;
+}
+
+#sidebarPanel a:hover {
+    transform: translateX(4px);
+}
+
+/* ====== THEME TOGGLE ICONS ====== */
+#themeToggle i {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ====== USER DROPDOWN ====== */
+.user-dropdown {
+    transform-origin: top right;
+}
+
+/* ====== RESPONSIVE SEARCH ====== */
+@media (max-width: 768px) {
+    #searchOverlay .max-w-2xl {
+        max-width: 100%;
+        padding: 0.75rem 1rem;
+    }
+}
+
+.logo-img {
+    transition: .3s;
+
+    filter:
+        /* White Outline */
+        drop-shadow(1px 0 0 rgba(255,255,255,.95))
+        drop-shadow(-1px 0 0 rgba(255,255,255,.95))
+        drop-shadow(0 1px 0 rgba(255,255,255,.95))
+        drop-shadow(0 -1px 0 rgba(255,255,255,.95))
+
+        /* Soft White Glow */
+        drop-shadow(0 0 4px rgba(255,255,255,.6))
+
+        /* Gold Glow */
+        drop-shadow(0 0 12px rgba(243,191,20,.65))
+
+        /* Outer Glow */
+        drop-shadow(0 0 18px rgba(243,191,20,.35)) !important;
+}
+</style>

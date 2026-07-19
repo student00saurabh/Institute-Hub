@@ -1,0 +1,839 @@
+<% layout("/layouts/boilerplate") %>
+
+<!-- ============================================================ -->
+<!--  INSTITUTEHUB — BLOGS PAGE                                   -->
+<!--  Complete Blog System | Categories | Search | Pagination     -->
+<!-- ============================================================ -->
+
+<%
+  // ---------------------------------------------------------------
+  // DUMMY DATA — All Blogs
+  // ---------------------------------------------------------------
+  const allBlogs = [
+    { 
+      id: 1, 
+      title: "10 Habits of Highly Effective Self-Taught Developers", 
+      category: "Career", 
+      author: "Aarav Mehta", 
+      authorImg: "AM", 
+      date: "Jul 12, 2026", 
+      readTime: "6 min read", 
+      img: "https://picsum.photos/seed/blog1/800/500", 
+      comments: 34, 
+      views: 2840,
+      excerpt: "Discover the daily habits that separate successful self-taught developers from those who struggle. Learn how to structure your learning, build projects, and stay motivated.",
+      tags: ["career", "development", "productivity"]
+    },
+    { 
+      id: 2, 
+      title: "How to Choose Your First Programming Language in 2026", 
+      category: "Web Development", 
+      author: "Priya Nair", 
+      authorImg: "PN", 
+      date: "Jul 8, 2026", 
+      readTime: "8 min read", 
+      img: "https://picsum.photos/seed/blog2/800/500", 
+      comments: 21, 
+      views: 1970,
+      excerpt: "With so many programming languages available, choosing the right one can be overwhelming. This guide will help you make an informed decision based on your goals.",
+      tags: ["programming", "beginners", "web-development"]
+    },
+    { 
+      id: 3, 
+      title: "Portfolio Projects That Actually Get You Hired", 
+      category: "Career", 
+      author: "Kabir Sethi", 
+      authorImg: "KS", 
+      date: "Jul 3, 2026", 
+      readTime: "5 min read", 
+      img: "https://picsum.photos/seed/blog3/800/500", 
+      comments: 47, 
+      views: 3620,
+      excerpt: "Not all portfolio projects are created equal. Learn which types of projects impress employers and how to showcase them effectively to land your dream job.",
+      tags: ["career", "portfolio", "hiring"]
+    },
+    { 
+      id: 4, 
+      title: "A Beginner's Guide to Cloud Certifications", 
+      category: "Cloud & DevOps", 
+      author: "Simran Kaur", 
+      authorImg: "SK", 
+      date: "Jun 27, 2026", 
+      readTime: "7 min read", 
+      img: "https://picsum.photos/seed/blog4/800/500", 
+      comments: 18, 
+      views: 1540,
+      excerpt: "Cloud certifications can accelerate your career, but where do you start? This comprehensive guide covers AWS, Azure, and GCP certifications for beginners.",
+      tags: ["cloud", "certifications", "devops"]
+    },
+    { 
+      id: 5, 
+      title: "Why Every Designer Should Learn Basic Front-End Code", 
+      category: "UI / UX Design", 
+      author: "Neha Joshi", 
+      authorImg: "NJ", 
+      date: "Jun 20, 2026", 
+      readTime: "4 min read", 
+      img: "https://picsum.photos/seed/blog5/800/500", 
+      comments: 29, 
+      views: 2210,
+      excerpt: "Understanding the basics of HTML, CSS, and JavaScript can make you a better designer. Learn why coding skills are valuable for UI/UX professionals.",
+      tags: ["design", "frontend", "ui-ux"]
+    },
+    { 
+      id: 6, 
+      title: "Cybersecurity Basics Every Developer Should Know", 
+      category: "Cybersecurity", 
+      author: "Rohan Kapoor", 
+      authorImg: "RK", 
+      date: "Jun 14, 2026", 
+      readTime: "9 min read", 
+      img: "https://picsum.photos/seed/blog6/800/500", 
+      comments: 52, 
+      views: 4130,
+      excerpt: "Security is everyone's responsibility. Learn the essential security concepts every developer must understand to build secure applications and protect user data.",
+      tags: ["security", "development", "best-practices"]
+    },
+    { 
+      id: 7, 
+      title: "Mastering React Hooks: A Comprehensive Guide", 
+      category: "Web Development", 
+      author: "Aarav Mehta", 
+      authorImg: "AM", 
+      date: "Jun 8, 2026", 
+      readTime: "10 min read", 
+      img: "https://picsum.photos/seed/blog7/800/500", 
+      comments: 38, 
+      views: 2950,
+      excerpt: "React Hooks have revolutionized how we write React components. This deep dive covers all the essential hooks, common patterns, and best practices.",
+      tags: ["react", "frontend", "javascript"]
+    },
+    { 
+      id: 8, 
+      title: "Data Science vs. AI: What's the Difference?", 
+      category: "Data Science", 
+      author: "Priya Nair", 
+      authorImg: "PN", 
+      date: "Jun 2, 2026", 
+      readTime: "6 min read", 
+      img: "https://picsum.photos/seed/blog8/800/500", 
+      comments: 15, 
+      views: 1830,
+      excerpt: "Data Science and Artificial Intelligence are often used interchangeably, but they're not the same. Understand the key differences and how they complement each other.",
+      tags: ["data-science", "ai", "machine-learning"]
+    },
+    { 
+      id: 9, 
+      title: "Building Microservices with Spring Boot", 
+      category: "Web Development", 
+      author: "Dev Malhotra", 
+      authorImg: "DM", 
+      date: "May 25, 2026", 
+      readTime: "12 min read", 
+      img: "https://picsum.photos/seed/blog9/800/500", 
+      comments: 26, 
+      views: 1670,
+      excerpt: "Microservices architecture is the modern way to build scalable applications. Learn how to build robust microservices using Spring Boot and Spring Cloud.",
+      tags: ["java", "microservices", "spring-boot"]
+    },
+    { 
+      id: 10, 
+      title: "The Future of Remote Work in Tech", 
+      category: "Career", 
+      author: "Ritika Sharma", 
+      authorImg: "RS", 
+      date: "May 18, 2026", 
+      readTime: "5 min read", 
+      img: "https://picsum.photos/seed/blog10/800/500", 
+      comments: 43, 
+      views: 3210,
+      excerpt: "Remote work is here to stay. Explore the trends, tools, and strategies that will define the future of work in the technology industry.",
+      tags: ["career", "remote-work", "future"]
+    },
+    { 
+      id: 11, 
+      title: "Design Systems: Building for Scale", 
+      category: "UI / UX Design", 
+      author: "Kabir Sethi", 
+      authorImg: "KS", 
+      date: "May 12, 2026", 
+      readTime: "8 min read", 
+      img: "https://picsum.photos/seed/blog11/800/500", 
+      comments: 19, 
+      views: 1450,
+      excerpt: "Design systems are essential for maintaining consistency at scale. Learn how to create and maintain a design system that works for your team.",
+      tags: ["design", "design-systems", "ui-ux"]
+    },
+    { 
+      id: 12, 
+      title: "Kubernetes for Beginners: A Practical Guide", 
+      category: "Cloud & DevOps", 
+      author: "Simran Kaur", 
+      authorImg: "SK", 
+      date: "May 5, 2026", 
+      readTime: "9 min read", 
+      img: "https://picsum.photos/seed/blog12/800/500", 
+      comments: 31, 
+      views: 2090,
+      excerpt: "Kubernetes can seem intimidating, but it doesn't have to be. This practical guide walks you through the basics and helps you get started with container orchestration.",
+      tags: ["kubernetes", "devops", "containers"]
+    }
+  ];
+
+  // Blog Categories for filter
+  const blogCategories = [
+    "All Categories",
+    "Career",
+    "Web Development",
+    "Data Science",
+    "UI / UX Design",
+    "Cybersecurity",
+    "Cloud & DevOps"
+  ];
+
+  // Popular Tags
+  const popularTags = [
+    "Development", "Career", "React", "JavaScript", "Python", 
+    "Cloud", "DevOps", "UI/UX", "Security", "Machine Learning",
+    "Data Science", "Frontend", "Backend", "Design"
+  ];
+
+  // Trending Blogs (for sidebar)
+  const trendingBlogs = allBlogs.slice(0, 4);
+%>
+
+<!-- ============================================================ -->
+<!-- PAGE HEADER                                                   -->
+<!-- ============================================================ -->
+<section class="relative overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-[#2563EB] py-16 lg:py-20 -mt-6">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-[#C9A227] rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#2563EB] rounded-full blur-3xl"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+        <span class="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/90 mb-4 border border-white/20">
+            <i class="fas fa-blog mr-2"></i> Insights & Stories
+        </span>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
+            <span class="text-[#C9A227]">Blog</span> & Articles
+        </h1>
+        <p class="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto">
+            Stay updated with the latest trends, tutorials, and insights from industry experts
+        </p>
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-white/60">
+            <span><i class="fas fa-newspaper text-[#C9A227] mr-1"></i> 50+ Articles</span>
+            <span class="w-px h-4 bg-white/20"></span>
+            <span><i class="fas fa-users text-[#C9A227] mr-1"></i> 25K+ Readers</span>
+            <span class="w-px h-4 bg-white/20"></span>
+            <span><i class="fas fa-tags text-[#C9A227] mr-1"></i> 7 Categories</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FEATURED BLOG — Hero Article                                 -->
+<!-- ============================================================ -->
+<section class="py-12 lg:py-16 bg-white dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-5 gap-8 reveal-up">
+            <!-- Featured Article -->
+            <div class="lg:col-span-3 group relative rounded-2xl overflow-hidden bg-[#F8FAFC] dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 transition-all duration-500">
+                <div class="relative h-full overflow-hidden">
+                    <img src="<%= allBlogs[0].img %>" alt="<%= allBlogs[0].title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A]/80 via-[#0F172A]/20 to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6">
+                        <span class="inline-block px-3 py-1 bg-[#2563EB] text-white text-xs font-bold rounded-full mb-3">
+                            <i class="fas fa-star mr-1"></i> Featured
+                        </span>
+                        <span class="inline-block px-3 py-1 bg-[#C9A227] text-white text-xs font-bold rounded-full mb-3 ml-2">
+                            <%= allBlogs[0].category %>
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white leading-tight group-hover:text-[#C9A227] transition-colors">
+                            <a href="/blogs/<%= allBlogs[0].id %>"><%= allBlogs[0].title %></a>
+                        </h2>
+                        <div class="flex items-center gap-4 mt-3 text-sm text-white/70">
+                            <span><i class="fas fa-user mr-1"></i> <%= allBlogs[0].author %></span>
+                            <span><i class="fas fa-calendar mr-1"></i> <%= allBlogs[0].date %></span>
+                            <span><i class="fas fa-clock mr-1"></i> <%= allBlogs[0].readTime %></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar: Trending / Quick Reads -->
+            <div class="lg:col-span-2 space-y-4">
+                <h3 class="text-sm font-bold text-[#0F172A] dark:text-white uppercase tracking-wider flex items-center gap-2">
+                    <i class="fas fa-fire text-[#C9A227]"></i> Trending Now
+                </h3>
+                <div class="space-y-3">
+                    <% trendingBlogs.slice(0, 4).forEach((blog, idx) => { %>
+                        <a href="/blogs/<%= blog.id %>" class="group flex items-start gap-4 p-3 rounded-xl bg-[#F8FAFC] dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 transition-all duration-300 hover:-translate-y-0.5">
+                            <div class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
+                                <img src="<%= blog.img %>" alt="<%= blog.title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <span class="text-[10px] font-bold text-[#2563EB] uppercase"><%= blog.category %></span>
+                                <h4 class="text-sm font-semibold text-[#0F172A] dark:text-white line-clamp-2 group-hover:text-[#2563EB] transition-colors">
+                                    <%= blog.title %>
+                                </h4>
+                                <div class="flex items-center gap-2 mt-1 text-[10px] text-[#64748B] dark:text-[#94A3B8]">
+                                    <span><i class="far fa-eye mr-0.5"></i> <%= blog.views.toLocaleString() %></span>
+                                    <span><i class="far fa-comment mr-0.5"></i> <%= blog.comments %></span>
+                                </div>
+                            </div>
+                        </a>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- BLOG FILTER & SEARCH                                         -->
+<!-- ============================================================ -->
+<section class="py-6 lg:py-8 bg-white dark:bg-[#0F172A]/40 border-b border-[#E2E8F0] dark:border-[#1E293B] sticky top-16 z-30 backdrop-blur-lg bg-white/90 dark:bg-[#0F172A]/90">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-center gap-4">
+            
+            <!-- Search -->
+            <div class="relative flex-1 min-w-[200px]">
+                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                <input type="text" 
+                       id="blogSearch" 
+                       placeholder="Search articles, topics, authors..." 
+                       class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white placeholder-[#94A3B8] text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300">
+            </div>
+
+            <!-- Category Filter -->
+            <div class="relative min-w-[160px]">
+                <i class="fas fa-tag absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                <select id="blogCategoryFilter" class="w-full pl-10 pr-8 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 cursor-pointer">
+                    <% blogCategories.forEach(cat => { %>
+                        <option value="<%= cat %>"><%= cat %></option>
+                    <% }) %>
+                </select>
+                <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-xs pointer-events-none"></i>
+            </div>
+
+            <!-- Sort -->
+            <div class="relative min-w-[140px]">
+                <i class="fas fa-arrow-up-wide-short absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                <select id="blogSort" class="w-full pl-10 pr-8 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 cursor-pointer">
+                    <option value="newest">Newest First</option>
+                    <option value="popular">Most Popular</option>
+                    <option value="trending">Trending</option>
+                </select>
+                <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-xs pointer-events-none"></i>
+            </div>
+
+            <!-- Reset -->
+            <button id="resetBlogFilters" class="px-4 py-2.5 text-sm font-medium text-[#2563EB] border border-[#2563EB]/30 rounded-xl hover:bg-[#2563EB]/10 transition-all duration-300 whitespace-nowrap">
+                <i class="fas fa-rotate-right mr-1.5"></i> Reset
+            </button>
+
+            <!-- Results Count -->
+            <span id="blogCount" class="text-sm text-[#64748B] dark:text-[#94A3B8] whitespace-nowrap font-medium">
+                <span id="blogResultsCount"><%= allBlogs.length %></span> articles
+            </span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- BLOG GRID                                                     -->
+<!-- ============================================================ -->
+<section class="py-12 lg:py-16 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Active Filters -->
+        <div id="blogActiveFilters" class="flex flex-wrap items-center gap-2 mb-6 reveal-up">
+            <span class="text-sm text-[#64748B] dark:text-[#94A3B8]">Active filters:</span>
+            <span class="text-sm text-[#64748B] dark:text-[#94A3B8]">None</span>
+        </div>
+
+        <!-- Blog Grid -->
+        <div id="blogGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% allBlogs.forEach((blog, i) => { %>
+                <article class="group reveal-up bg-white dark:bg-[#111827] rounded-2xl overflow-hidden border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl hover:shadow-[#2563EB]/10 hover:-translate-y-2 transition-all duration-400 blog-card"
+                         data-id="<%= blog.id %>"
+                         data-category="<%= blog.category %>"
+                         data-title="<%= blog.title.toLowerCase() %>"
+                         data-author="<%= blog.author.toLowerCase() %>"
+                         data-tags="<%= blog.tags.join(',') %>"
+                         data-views="<%= blog.views %>"
+                         data-date="<%= new Date(blog.date).getTime() %>"
+                         style="transition-delay: <%= (i % 3) * 60 %>ms">
+                    
+                    <div class="relative overflow-hidden h-52">
+                        <a href="/blogs/<%= blog.id %>" class="block w-full h-full">
+                            <img src="<%= blog.img %>" alt="<%= blog.title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        </a>
+                        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                            <span class="px-2.5 py-1 bg-[#2563EB] text-white text-[10px] font-bold rounded-lg shadow">
+                                <%= blog.category %>
+                            </span>
+                            <% if (blog.views > 3000) { %>
+                                <span class="px-2.5 py-1 bg-[#C9A227] text-white text-[10px] font-bold rounded-lg shadow">
+                                    <i class="fas fa-fire mr-0.5"></i> Trending
+                                </span>
+                            <% } %>
+                        </div>
+                        <button type="button" onclick="toggleSaveBlog(this, event)" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 dark:bg-[#0B1120]/90 backdrop-blur flex items-center justify-center text-[#64748B] hover:text-[#C9A227] shadow transition-all duration-300">
+                            <i class="far fa-bookmark text-xs"></i>
+                        </button>
+                        <div class="absolute bottom-3 left-3 flex items-center gap-3 text-white text-[10px] bg-black/40 backdrop-blur px-2.5 py-1 rounded-lg w-fit">
+                            <span><i class="far fa-eye mr-0.5"></i> <%= blog.views.toLocaleString() %></span>
+                            <span class="w-px h-3 bg-white/30"></span>
+                            <span><i class="far fa-comment mr-0.5"></i> <%= blog.comments %></span>
+                            <span class="w-px h-3 bg-white/30"></span>
+                            <span><i class="far fa-clock mr-0.5"></i> <%= blog.readTime %></span>
+                        </div>
+                    </div>
+
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 text-[10px] text-[#64748B] dark:text-[#94A3B8]">
+                            <span><i class="far fa-calendar mr-0.5"></i> <%= blog.date %></span>
+                            <span class="w-1 h-1 rounded-full bg-[#CBD5E1] dark:bg-[#334155]"></span>
+                            <span>by <%= blog.author %></span>
+                        </div>
+
+                        <h3 class="mt-2 text-base font-bold text-[#0F172A] dark:text-white leading-snug line-clamp-2 min-h-[3rem] group-hover:text-[#2563EB] transition-colors">
+                            <a href="/blogs/<%= blog.id %>"><%= blog.title %></a>
+                        </h3>
+
+                        <p class="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8] line-clamp-2"><%= blog.excerpt %></p>
+
+                        <!-- Tags -->
+                        <div class="mt-3 flex flex-wrap gap-1.5">
+                            <% blog.tags.slice(0, 3).forEach(tag => { %>
+                                <span class="px-2 py-0.5 bg-[#2563EB]/10 text-[#2563EB] text-[9px] font-medium rounded-full">
+                                    #<%= tag %>
+                                </span>
+                            <% }) %>
+                            <% if (blog.tags.length > 3) { %>
+                                <span class="px-2 py-0.5 text-[#64748B] text-[9px] font-medium">+<%= blog.tags.length - 3 %> more</span>
+                            <% } %>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow"
+                                     style="background: linear-gradient(135deg, <%= i % 2 === 0 ? '#2563EB, #1D4ED8' : '#C9A227, #B8901E' %>);">
+                                    <%= blog.authorImg %>
+                                </div>
+                                <span class="text-xs font-medium text-[#0F172A] dark:text-white"><%= blog.author %></span>
+                            </div>
+                            <a href="/blogs/<%= blog.id %>" class="text-xs font-semibold text-[#2563EB] hover:underline flex items-center gap-1">
+                                Read More <i class="fas fa-arrow-right text-[10px]"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            <% }) %>
+        </div>
+
+        <!-- No Results -->
+        <div id="blogNoResults" class="hidden text-center py-16">
+            <div class="w-24 h-24 mx-auto rounded-full bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] text-4xl mb-4">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3 class="text-xl font-bold text-[#0F172A] dark:text-white">No articles found</h3>
+            <p class="text-sm text-[#64748B] dark:text-[#94A3B8] mt-2">Try adjusting your filters or search query</p>
+            <button id="clearBlogFilters" class="mt-4 px-6 py-2.5 bg-[#2563EB] text-white rounded-xl hover:bg-[#1D4ED8] transition-all duration-300">
+                Clear all filters
+            </button>
+        </div>
+
+        <!-- Load More -->
+        <div class="text-center mt-12 reveal-up">
+            <button id="loadMoreBlogs" class="px-8 py-3.5 rounded-xl border-2 border-[#2563EB] text-[#2563EB] font-semibold hover:bg-[#2563EB] hover:text-white transition-all duration-300 hover:shadow-lg hover:shadow-[#2563EB]/25">
+                <i class="fas fa-spinner hidden animate-spin mr-2"></i>
+                Load More Articles
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- POPULAR TAGS SECTION                                         -->
+<!-- ============================================================ -->
+<section class="py-12 lg:py-16 bg-white dark:bg-[#0F172A]/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8 reveal-up">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Explore</span>
+            <h2 class="mt-2 text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white">
+                Popular <span class="text-[#2563EB]">Tags</span>
+            </h2>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-3 reveal-up">
+            <% popularTags.forEach(tag => { %>
+                <a href="/blogs?tag=<%= encodeURIComponent(tag) %>" 
+                   class="group px-4 py-2 rounded-full border border-[#E2E8F0] dark:border-[#1E293B] text-sm text-[#64748B] dark:text-[#94A3B8] hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all duration-300 hover:shadow-lg hover:shadow-[#2563EB]/25">
+                    #<%= tag %>
+                </a>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- NEWSLETTER CTA                                                -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-[#0F172A] relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-[#2563EB] blur-[100px]"></div>
+        <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full bg-[#C9A227] blur-[100px]"></div>
+    </div>
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 mb-6">
+            <i class="fas fa-envelope-open-text text-[#C9A227]"></i>
+            <span class="text-white/90 text-sm font-medium">Stay Updated</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-4">
+            Subscribe to Our <span class="text-[#C9A227]">Newsletter</span>
+        </h2>
+        <p class="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
+            Get the latest articles, tutorials, and industry insights delivered straight to your inbox. No spam, unsubscribe anytime.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+            <input type="email" 
+                   id="blogNewsletterEmail" 
+                   placeholder="Enter your email" 
+                   class="flex-1 px-4 py-3.5 rounded-xl border-2 border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder:text-white/50 focus:outline-none focus:border-[#2563EB] transition-all duration-300">
+            <button onclick="subscribeBlogNewsletter()" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#3B82F6] hover:to-[#2563EB] text-white font-semibold transition-all duration-300 hover:scale-105 shadow-lg shadow-[#2563EB]/25">
+                <i class="fas fa-paper-plane mr-2"></i> Subscribe
+            </button>
+        </div>
+        <p class="mt-4 text-xs text-white/50">
+            <i class="fas fa-check-circle text-[#22C55E] mr-1"></i> Join 5,000+ subscribers
+        </p>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- STYLES                                                        -->
+<!-- ============================================================ -->
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .reveal-up { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+    .reveal-up.in-view { opacity: 1; transform: translateY(0); }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    @keyframes savePop {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.25); }
+        100% { transform: scale(1); }
+    }
+    .save-pop i { animation: savePop 0.35s ease; }
+
+    /* Sticky filter bar */
+    .sticky {
+        transition: box-shadow 0.3s ease;
+    }
+    .sticky.scrolled {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Blog card transition */
+    .blog-card {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .reveal-up { opacity: 1 !important; transform: none !important; transition: none !important; }
+    }
+
+    @media (max-width: 640px) {
+        .sticky {
+            position: relative !important;
+            top: 0 !important;
+        }
+    }
+</style>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS                                                       -->
+<!-- ============================================================ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        'use strict';
+
+        // ========== BLOG FILTER SYSTEM ==========
+        const searchInput = document.getElementById('blogSearch');
+        const categoryFilter = document.getElementById('blogCategoryFilter');
+        const sortFilter = document.getElementById('blogSort');
+        const resetBtn = document.getElementById('resetBlogFilters');
+        const blogGrid = document.getElementById('blogGrid');
+        const noResults = document.getElementById('blogNoResults');
+        const blogCountSpan = document.getElementById('blogResultsCount');
+        const loadMoreBtn = document.getElementById('loadMoreBlogs');
+        const clearFiltersBtn = document.getElementById('clearBlogFilters');
+
+        let visibleBlogs = [];
+        let currentPage = 1;
+        const blogsPerPage = 6;
+
+        function getFilteredBlogs() {
+            const search = searchInput.value.toLowerCase().trim();
+            const category = categoryFilter.value;
+            const sort = sortFilter.value;
+
+            const cards = document.querySelectorAll('.blog-card');
+            let visible = [];
+
+            cards.forEach(card => {
+                const title = card.dataset.title || '';
+                const cardCategory = card.dataset.category || '';
+                const author = card.dataset.author || '';
+                const tags = card.dataset.tags || '';
+                const views = parseInt(card.dataset.views) || 0;
+                const date = parseInt(card.dataset.date) || 0;
+
+                let show = true;
+
+                // Search filter
+                if (search) {
+                    const searchable = `${title} ${author} ${tags}`.toLowerCase();
+                    if (!searchable.includes(search)) {
+                        show = false;
+                    }
+                }
+
+                // Category filter
+                if (category !== 'All Categories' && cardCategory !== category) {
+                    show = false;
+                }
+
+                if (show) {
+                    visible.push({
+                        element: card,
+                        views: views,
+                        date: date,
+                        title: title
+                    });
+                }
+            });
+
+            // Sort
+            switch(sort) {
+                case 'newest':
+                    visible.sort((a, b) => b.date - a.date);
+                    break;
+                case 'popular':
+                    visible.sort((a, b) => b.views - a.views);
+                    break;
+                case 'trending':
+                    visible.sort((a, b) => {
+                        // Trending = high views + recent
+                        const scoreA = a.views / (Date.now() - a.date) * 1000000;
+                        const scoreB = b.views / (Date.now() - b.date) * 1000000;
+                        return scoreB - scoreA;
+                    });
+                    break;
+                default:
+                    break;
+            }
+
+            return visible;
+        }
+
+        function updateBlogDisplay() {
+            const filtered = getFilteredBlogs();
+            visibleBlogs = filtered;
+
+            // Hide all cards first
+            document.querySelectorAll('.blog-card').forEach(card => {
+                card.style.display = 'none';
+            });
+
+            // Show filtered cards
+            const start = 0;
+            const end = currentPage * blogsPerPage;
+            const toShow = filtered.slice(start, end);
+
+            toShow.forEach(item => {
+                item.element.style.display = 'block';
+            });
+
+            // Update count
+            blogCountSpan.textContent = filtered.length;
+
+            // Show/hide no results
+            if (filtered.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            // Show/hide load more
+            if (filtered.length > currentPage * blogsPerPage) {
+                loadMoreBtn.classList.remove('hidden');
+            } else {
+                loadMoreBtn.classList.add('hidden');
+            }
+
+            // Update active filters
+            updateBlogActiveFilters();
+        }
+
+        function updateBlogActiveFilters() {
+            const container = document.getElementById('blogActiveFilters');
+            const filters = [];
+
+            if (categoryFilter.value !== 'All Categories') {
+                filters.push(categoryFilter.value);
+            }
+            if (searchInput.value.trim()) {
+                filters.push(`"${searchInput.value.trim()}"`);
+            }
+
+            let html = '<span class="text-sm text-[#64748B] dark:text-[#94A3B8]">Active filters:</span>';
+            if (filters.length === 0) {
+                html += '<span class="text-sm text-[#64748B] dark:text-[#94A3B8]">None</span>';
+            } else {
+                filters.forEach(filter => {
+                    html += `
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2563EB]/10 text-[#2563EB] text-xs font-medium rounded-full">
+                            ${filter}
+                            <button class="hover:text-[#EF4444] transition-colors" onclick="removeBlogFilter('${filter}')">
+                                <i class="fas fa-times text-[10px]"></i>
+                            </button>
+                        </span>
+                    `;
+                });
+            }
+            container.innerHTML = html;
+        }
+
+        // Remove filter (called from active filter chips)
+        window.removeBlogFilter = function(filter) {
+            if (categoryFilter.value === filter) {
+                categoryFilter.value = 'All Categories';
+            }
+            if (searchInput.value.trim() === filter.replace(/"/g, '')) {
+                searchInput.value = '';
+            }
+            currentPage = 1;
+            updateBlogDisplay();
+        };
+
+        // Event listeners
+        searchInput.addEventListener('input', function() {
+            currentPage = 1;
+            updateBlogDisplay();
+        });
+
+        categoryFilter.addEventListener('change', function() {
+            currentPage = 1;
+            updateBlogDisplay();
+        });
+
+        sortFilter.addEventListener('change', function() {
+            currentPage = 1;
+            updateBlogDisplay();
+        });
+
+        resetBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            categoryFilter.value = 'All Categories';
+            sortFilter.value = 'newest';
+            currentPage = 1;
+            updateBlogDisplay();
+        });
+
+        clearFiltersBtn.addEventListener('click', function() {
+            resetBtn.click();
+        });
+
+        // Load More
+        loadMoreBtn.addEventListener('click', function() {
+            currentPage++;
+            updateBlogDisplay();
+        });
+
+        // ========== SAVE BLOG FUNCTION ==========
+        window.toggleSaveBlog = function(btn, evt) {
+            if (evt) { evt.preventDefault(); evt.stopPropagation(); }
+            const icon = btn.querySelector('i');
+            const isSaved = icon.classList.contains('fas');
+
+            icon.classList.toggle('fas', !isSaved);
+            icon.classList.toggle('far', isSaved);
+            btn.style.color = isSaved ? '' : '#C9A227';
+            
+            btn.classList.remove('save-pop');
+            void btn.offsetWidth;
+            btn.classList.add('save-pop');
+        };
+
+        // ========== NEWSLETTER SUBSCRIPTION ==========
+        window.subscribeBlogNewsletter = function() {
+            const email = document.getElementById('blogNewsletterEmail');
+            const btn = event.target;
+            
+            if (!email.value || !email.value.includes('@')) {
+                email.classList.add('border-[#EF4444]');
+                setTimeout(() => email.classList.remove('border-[#EF4444]'), 2000);
+                return;
+            }
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Subscribing...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check mr-2"></i> Subscribed!';
+                btn.classList.add('bg-[#22C55E]');
+                email.value = '';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Subscribe';
+                    btn.disabled = false;
+                    btn.classList.remove('bg-[#22C55E]');
+                }, 2000);
+            }, 1500);
+        };
+
+        // ========== REVEAL ON SCROLL ==========
+        const revealEls = document.querySelectorAll('.reveal-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        revealEls.forEach(el => observer.observe(el));
+
+        // ========== INIT ==========
+        updateBlogDisplay();
+
+        // Sticky filter bar shadow on scroll
+        const filterBar = document.querySelector('.sticky');
+        if (filterBar) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 80) {
+                    filterBar.classList.add('scrolled');
+                } else {
+                    filterBar.classList.remove('scrolled');
+                }
+            });
+        }
+    });
+</script>

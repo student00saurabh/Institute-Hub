@@ -1,0 +1,709 @@
+<% layout("/layouts/boilerplate") %>
+
+<!-- ============================================================ -->
+<!--  INSTITUTEHUB — CAREER PAGE                                  -->
+<!--  Job Openings | Culture | Benefits | Apply Now              -->
+<!-- ============================================================ -->
+
+<%
+  // ---------------------------------------------------------------
+  // DUMMY DATA
+  // ---------------------------------------------------------------
+  const lastUpdated = "July 19, 2026";
+
+  const stats = [
+    { value: 50, suffix: "+", label: "Team Members" },
+    { value: 12, suffix: "+", label: "Open Positions" },
+    { value: 5, suffix: "★", label: "Glassdoor Rating" },
+    { value: 95, suffix: "%", label: "Employee Satisfaction" }
+  ];
+
+  const benefits = [
+    {
+      icon: "fa-heart",
+      title: "Health Insurance",
+      desc: "Comprehensive health coverage for you and your family, including dental and vision."
+    },
+    {
+      icon: "fa-graduation-cap",
+      title: "Learning Budget",
+      desc: "Annual budget for courses, conferences, and professional development."
+    },
+    {
+      icon: "fa-laptop",
+      title: "Remote First",
+      desc: "Work from anywhere with flexible hours and remote-first culture."
+    },
+    {
+      icon: "fa-clock",
+      title: "Flexible Hours",
+      desc: "Choose your working hours and maintain a healthy work-life balance."
+    },
+    {
+      icon: "fa-bolt",
+      title: "Stock Options",
+      desc: "Equity and stock options for all employees to share in our success."
+    },
+    {
+      icon: "fa-utensils",
+      title: "Free Meals",
+      desc: "Daily meals, snacks, and beverages at our office locations."
+    },
+    {
+      icon: "fa-hand-holding-heart",
+      title: "Wellness Program",
+      desc: "Mental health support, gym memberships, and wellness activities."
+    },
+    {
+      icon: "fa-plane",
+      title: "Paid Time Off",
+      desc: "Generous vacation, sick leave, and paid holidays for work-life balance."
+    }
+  ];
+
+  const values = [
+    {
+      title: "Innovation",
+      icon: "fa-lightbulb",
+      desc: "We encourage creative thinking and embrace new ideas that push boundaries."
+    },
+    {
+      title: "Collaboration",
+      icon: "fa-users",
+      desc: "We believe in the power of teamwork and diverse perspectives."
+    },
+    {
+      title: "Excellence",
+      icon: "fa-star",
+      desc: "We strive for excellence in everything we do, from products to people."
+    },
+    {
+      title: "Integrity",
+      icon: "fa-shield-alt",
+      desc: "We act with honesty, transparency, and accountability at all times."
+    }
+  ];
+
+  const jobs = [
+    {
+      id: 1,
+      title: "Senior Full Stack Developer",
+      department: "Engineering",
+      location: "Remote / Noida",
+      type: "Full-time",
+      experience: "5+ years",
+      posted: "2 days ago",
+      description: "We're looking for a Senior Full Stack Developer to lead our product development team. You'll architect and build scalable web applications using React, Node.js, and cloud technologies.",
+      requirements: [
+        "5+ years of experience in full stack development",
+        "Expertise in React, Node.js, and TypeScript",
+        "Experience with cloud platforms (AWS, Azure, or GCP)",
+        "Strong understanding of system architecture and design patterns",
+        "Experience leading technical teams and mentoring junior developers"
+      ],
+      tags: ["React", "Node.js", "AWS", "TypeScript"]
+    },
+    {
+      id: 2,
+      title: "UI/UX Designer",
+      department: "Design",
+      location: "Remote / Bangalore",
+      type: "Full-time",
+      experience: "3+ years",
+      posted: "3 days ago",
+      description: "Join our design team to create beautiful, intuitive user experiences for our learning platform. You'll work closely with product and engineering to bring designs to life.",
+      requirements: [
+        "3+ years of UI/UX design experience",
+        "Proficiency in Figma, Adobe Creative Suite",
+        "Strong portfolio demonstrating design thinking",
+        "Experience with user research and usability testing",
+        "Understanding of design systems and component libraries"
+      ],
+      tags: ["Figma", "UI/UX", "Design Systems", "Research"]
+    },
+    {
+      id: 3,
+      title: "Data Scientist",
+      department: "Data & AI",
+      location: "Remote / Mumbai",
+      type: "Full-time",
+      experience: "4+ years",
+      posted: "5 days ago",
+      description: "Help us build intelligent learning experiences through data. You'll work on recommendation systems, learning analytics, and personalization algorithms.",
+      requirements: [
+        "4+ years of data science experience",
+        "Strong Python and SQL skills",
+        "Experience with machine learning frameworks (TensorFlow, PyTorch)",
+        "Understanding of recommendation systems and personalization",
+        "Experience with big data technologies (Spark, Hadoop)"
+      ],
+      tags: ["Python", "ML", "TensorFlow", "Spark"]
+    },
+    {
+      id: 4,
+      title: "DevOps Engineer",
+      department: "Engineering",
+      location: "Remote / Pune",
+      type: "Full-time",
+      experience: "4+ years",
+      posted: "1 week ago",
+      description: "Join our infrastructure team to build and maintain our cloud infrastructure. You'll automate deployments, ensure high availability, and optimize performance.",
+      requirements: [
+        "4+ years of DevOps/SRE experience",
+        "Expertise in Kubernetes and Docker",
+        "Experience with CI/CD pipelines (Jenkins, GitHub Actions)",
+        "Strong knowledge of cloud platforms (AWS, GCP)",
+        "Infrastructure as Code (Terraform, CloudFormation)"
+      ],
+      tags: ["Kubernetes", "Docker", "AWS", "Terraform"]
+    },
+    {
+      id: 5,
+      title: "Content Manager",
+      department: "Education",
+      location: "Remote / Noida",
+      type: "Full-time",
+      experience: "3+ years",
+      posted: "2 weeks ago",
+      description: "Lead our content strategy and curriculum development. You'll work with subject matter experts to create engaging, high-quality educational content.",
+      requirements: [
+        "3+ years of content management experience",
+        "Experience in educational content development",
+        "Strong writing and editing skills",
+        "Understanding of learning design principles",
+        "Project management experience"
+      ],
+      tags: ["Content Strategy", "Curriculum", "EdTech", "Writing"]
+    },
+    {
+      id: 6,
+      title: "Marketing Specialist",
+      department: "Marketing",
+      location: "Remote / Delhi",
+      type: "Full-time",
+      experience: "2+ years",
+      posted: "2 weeks ago",
+      description: "Join our marketing team to drive growth and brand awareness. You'll create marketing campaigns, manage social media, and analyze performance metrics.",
+      requirements: [
+        "2+ years of marketing experience",
+        "Experience with digital marketing channels",
+        "Strong analytical and communication skills",
+        "Understanding of SEO and content marketing",
+        "Experience with marketing automation tools"
+      ],
+      tags: ["Digital Marketing", "SEO", "Social Media", "Analytics"]
+    }
+  ];
+
+  const departments = [
+    "All Departments",
+    "Engineering",
+    "Design",
+    "Data & AI",
+    "Education",
+    "Marketing"
+  ];
+
+  const locations = [
+    "All Locations",
+    "Remote",
+    "Noida",
+    "Bangalore",
+    "Mumbai",
+    "Pune",
+    "Delhi"
+  ];
+
+  const teamMembers = [
+    {
+      name: "Aarav Mehta",
+      role: "CEO & Co-Founder",
+      img: "https://picsum.photos/seed/team1/200/200",
+      quote: "We're building a company where people love to work and grow."
+    },
+    {
+      name: "Priya Nair",
+      role: "CTO & Co-Founder",
+      img: "https://picsum.photos/seed/team2/200/200",
+      quote: "Technology is our tool, but people are our strength."
+    },
+    {
+      name: "Kabir Sethi",
+      role: "Head of Product",
+      img: "https://picsum.photos/seed/team3/200/200",
+      quote: "Great products come from great teams and great culture."
+    }
+  ];
+%>
+
+<!-- ============================================================ -->
+<!-- PAGE HEADER                                                   -->
+<!-- ============================================================ -->
+<section class="career-page relative overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-[#2563EB] py-20 lg:py-28 -mt-6">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-[#C9A227] rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#2563EB] rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#3B82F6] rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+        <span class="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/90 mb-4 border border-white/20">
+            <i class="fas fa-briefcase mr-2"></i> Join Our Team
+        </span>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
+            Build Your <span class="text-[#C9A227]">Career</span> at InstituteHub
+        </h1>
+        <p class="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto">
+            Join a passionate team dedicated to transforming education and empowering learners worldwide.
+        </p>
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-sm text-white/60">
+            <span><i class="fas fa-users text-[#C9A227] mr-1"></i> 50+ Team Members</span>
+            <span class="w-px h-4 bg-white/20"></span>
+            <span><i class="fas fa-globe text-[#C9A227] mr-1"></i> Remote First</span>
+            <span class="w-px h-4 bg-white/20"></span>
+            <span><i class="fas fa-rocket text-[#C9A227] mr-1"></i> 12+ Open Positions</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- STATS SECTION                                                 -->
+<!-- ============================================================ -->
+<section class="career-stats-wrapper py-12 lg:py-16 bg-white dark:bg-[#0B1120] border-b border-[#E2E8F0] dark:border-[#1E293B]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <% stats.forEach((stat, i) => { %>
+                <div class="career-reveal text-center p-5 rounded-2xl bg-[#F8FAFC] dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 transition-all duration-300 hover:-translate-y-1"
+                     style="transition-delay: <%= i * 80 %>ms">
+                    <p class="text-3xl sm:text-4xl font-extrabold text-[#2563EB]"><%= stat.value %><%= stat.suffix %></p>
+                    <p class="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8] font-medium"><%= stat.label %></p>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHY JOIN US - BENEFITS                                       -->
+<!-- ============================================================ -->
+<section class="career-benefits-wrapper py-16 lg:py-20 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 career-reveal">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Benefits</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                Why Join <span class="text-[#2563EB]">InstituteHub</span>?
+            </h2>
+            <p class="mt-3 text-[#64748B] dark:text-[#94A3B8] max-w-2xl mx-auto">
+                We believe in creating an environment where you can grow, innovate, and thrive
+            </p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <% benefits.forEach((benefit, i) => { %>
+                <div class="career-reveal group bg-white dark:bg-[#111827] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl hover:shadow-[#2563EB]/10 hover:-translate-y-2 transition-all duration-400"
+                     style="transition-delay: <%= i * 60 %>ms">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-[#2563EB]/10 to-[#C9A227]/10 flex items-center justify-center text-[#2563EB] group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300">
+                        <i class="fas <%= benefit.icon %> text-2xl"></i>
+                    </div>
+                    <h3 class="mt-4 text-lg font-bold text-[#0F172A] dark:text-white"><%= benefit.title %></h3>
+                    <p class="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8] leading-relaxed"><%= benefit.desc %></p>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- OUR VALUES                                                    -->
+<!-- ============================================================ -->
+<section class="career-values-wrapper py-16 lg:py-20 bg-white dark:bg-[#0F172A]/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 career-reveal">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Culture</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                Our <span class="text-[#2563EB]">Core Values</span>
+            </h2>
+            <p class="mt-3 text-[#64748B] dark:text-[#94A3B8] max-w-2xl mx-auto">
+                These values guide everything we do and define who we are as a team
+            </p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <% values.forEach((value, i) => { %>
+                <div class="career-reveal group bg-[#F8FAFC] dark:bg-[#111827] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-lg hover:-translate-y-2 transition-all duration-400 text-center"
+                     style="transition-delay: <%= i * 80 %>ms">
+                    <div class="w-16 h-16 mx-auto rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] flex items-center justify-center text-white text-2xl shadow-lg shadow-[#2563EB]/25 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300">
+                        <i class="fas <%= value.icon %>"></i>
+                    </div>
+                    <h3 class="mt-4 text-lg font-bold text-[#0F172A] dark:text-white"><%= value.title %></h3>
+                    <p class="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8] leading-relaxed"><%= value.desc %></p>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- JOB OPENINGS                                                   -->
+<!-- ============================================================ -->
+<section class="career-jobs-wrapper py-16 lg:py-20 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-10 career-reveal">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Opportunities</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                Open <span class="text-[#2563EB]">Positions</span>
+            </h2>
+            <p class="mt-3 text-[#64748B] dark:text-[#94A3B8] max-w-2xl mx-auto">
+                Find the perfect role that matches your skills and career goals
+            </p>
+        </div>
+
+        <!-- Filters -->
+        <div class="career-filters flex flex-wrap items-center gap-4 mb-8 career-reveal">
+            <div class="relative flex-1 min-w-[160px]">
+                <i class="fas fa-building absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                <select id="careerDepartmentFilter" class="w-full pl-10 pr-8 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-white dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 cursor-pointer">
+                    <% departments.forEach(dept => { %>
+                        <option value="<%= dept %>"><%= dept %></option>
+                    <% }) %>
+                </select>
+                <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-xs pointer-events-none"></i>
+            </div>
+
+            <div class="relative flex-1 min-w-[140px]">
+                <i class="fas fa-map-marker-alt absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                <select id="careerLocationFilter" class="w-full pl-10 pr-8 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-white dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 cursor-pointer">
+                    <% locations.forEach(loc => { %>
+                        <option value="<%= loc %>"><%= loc %></option>
+                    <% }) %>
+                </select>
+                <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-xs pointer-events-none"></i>
+            </div>
+
+            <button id="careerResetFilters" class="px-4 py-2.5 text-sm font-medium text-[#2563EB] border border-[#2563EB]/30 rounded-xl hover:bg-[#2563EB]/10 transition-all duration-300">
+                <i class="fas fa-rotate-right mr-1.5"></i> Reset
+            </button>
+
+            <span id="careerJobCount" class="text-sm text-[#64748B] dark:text-[#94A3B8] font-medium ml-auto">
+                <span id="careerResultsCount"><%= jobs.length %></span> positions
+            </span>
+        </div>
+
+        <!-- Job Listings -->
+        <div id="careerJobGrid" class="space-y-4">
+            <% jobs.forEach((job, i) => { %>
+                <div class="career-job-card career-reveal bg-white dark:bg-[#111827] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-lg transition-all duration-300"
+                     data-department="<%= job.department %>"
+                     data-location="<%= job.location %>"
+                     data-title="<%= job.title %>"
+                     style="transition-delay: <%= i * 40 %>ms">
+                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h3 class="text-lg font-bold text-[#0F172A] dark:text-white"><%= job.title %></h3>
+                                <span class="px-2.5 py-0.5 bg-[#22C55E]/10 text-[#22C55E] text-[10px] font-bold rounded-full"><%= job.type %></span>
+                                <span class="px-2.5 py-0.5 bg-[#2563EB]/10 text-[#2563EB] text-[10px] font-bold rounded-full"><%= job.department %></span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3 mt-2 text-sm text-[#64748B] dark:text-[#94A3B8]">
+                                <span><i class="fas fa-map-marker-alt text-[#2563EB] mr-1"></i> <%= job.location %></span>
+                                <span class="w-1 h-1 rounded-full bg-[#CBD5E1] dark:bg-[#334155]"></span>
+                                <span><i class="fas fa-briefcase text-[#2563EB] mr-1"></i> <%= job.experience %></span>
+                                <span class="w-1 h-1 rounded-full bg-[#CBD5E1] dark:bg-[#334155]"></span>
+                                <span><i class="fas fa-clock text-[#2563EB] mr-1"></i> <%= job.posted %></span>
+                            </div>
+                            <p class="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8] line-clamp-2"><%= job.description %></p>
+                            <div class="flex flex-wrap gap-1.5 mt-3">
+                                <% job.tags.forEach(tag => { %>
+                                    <span class="px-2 py-0.5 bg-[#F8FAFC] dark:bg-[#1E293B] text-[#64748B] dark:text-[#94A3B8] text-[10px] font-medium rounded-full border border-[#E2E8F0] dark:border-[#1E293B]">
+                                        <%= tag %>
+                                    </span>
+                                <% }) %>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 flex items-center gap-3">
+                            <button onclick="toggleJobDetails('<%= job.id %>')" class="text-sm font-medium text-[#2563EB] hover:underline whitespace-nowrap">
+                                View Details <i class="fas fa-chevron-down text-xs ml-1"></i>
+                            </button>
+                            <a href="/careers/apply/<%= job.id %>" class="px-5 py-2.5 bg-[#2563EB] text-white text-sm font-semibold rounded-xl hover:bg-[#1D4ED8] transition-all duration-300 hover:scale-105 shadow-md shadow-[#2563EB]/25 whitespace-nowrap">
+                                Apply Now
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Job Details Expandable -->
+                    <div id="careerJobDetails-<%= job.id %>" class="career-job-details hidden mt-4 pt-4 border-t border-[#E2E8F0] dark:border-[#1E293B]">
+                        <h4 class="font-semibold text-[#0F172A] dark:text-white mb-2">Requirements</h4>
+                        <ul class="list-disc pl-5 space-y-1 text-sm text-[#64748B] dark:text-[#94A3B8]">
+                            <% job.requirements.forEach(req => { %>
+                                <li><%= req %></li>
+                            <% }) %>
+                        </ul>
+                        <div class="mt-4 flex items-center gap-3">
+                            <a href="/careers/apply/<%= job.id %>" class="px-6 py-2.5 bg-[#2563EB] text-white text-sm font-semibold rounded-xl hover:bg-[#1D4ED8] transition-all duration-300">
+                                Apply Now
+                            </a>
+                            <a href="#" class="text-sm text-[#64748B] dark:text-[#94A3B8] hover:text-[#2563EB] transition-colors">
+                                <i class="fas fa-share-alt mr-1"></i> Share
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+
+        <!-- No Results -->
+        <div id="careerNoResults" class="hidden text-center py-16">
+            <div class="w-24 h-24 mx-auto rounded-full bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] text-4xl mb-4">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3 class="text-xl font-bold text-[#0F172A] dark:text-white">No positions found</h3>
+            <p class="text-sm text-[#64748B] dark:text-[#94A3B8] mt-2">Try adjusting your filters</p>
+            <button onclick="resetCareerFilters()" class="mt-4 px-6 py-2.5 bg-[#2563EB] text-white rounded-xl hover:bg-[#1D4ED8] transition-all duration-300">
+                Clear all filters
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- MEET THE TEAM                                                 -->
+<!-- ============================================================ -->
+<section class="career-team-wrapper py-16 lg:py-20 bg-white dark:bg-[#0F172A]/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 career-reveal">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Team</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                Meet Our <span class="text-[#2563EB]">Leaders</span>
+            </h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <% teamMembers.forEach((member, i) => { %>
+                <div class="career-reveal group bg-[#F8FAFC] dark:bg-[#111827] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl transition-all duration-400 text-center"
+                     style="transition-delay: <%= i * 80 %>ms">
+                    <div class="w-28 h-28 mx-auto rounded-full overflow-hidden border-4 border-[#2563EB] group-hover:scale-105 transition-all duration-300">
+                        <img src="<%= member.img %>" alt="<%= member.name %>" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="mt-4 text-lg font-bold text-[#0F172A] dark:text-white"><%= member.name %></h3>
+                    <p class="text-sm font-semibold text-[#2563EB]"><%= member.role %></p>
+                    <p class="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8] italic">"<%= member.quote %>"</p>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+<!-- SCOPED STYLES — Only affects this page                      -->
+<!-- ============================================================ -->
+<style>
+    /* ===== CAREER PAGE SPECIFIC STYLES ===== */
+    
+    /* Reveal animations */
+    .career-reveal {
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), 
+                    transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .career-reveal.career-in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Pulse animation for background blobs */
+    @keyframes careerPulse {
+        0%, 100% { opacity: 0.1; }
+        50% { opacity: 0.2; }
+    }
+    .career-page .animate-pulse {
+        animation: careerPulse 3s ease-in-out infinite;
+    }
+
+    /* Line clamp for job descriptions */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Job details expand animation */
+    .career-job-details {
+        animation: careerSlideDown 0.3s ease forwards;
+    }
+
+    @keyframes careerSlideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Filter select custom styling */
+    .career-filters select {
+        cursor: pointer;
+    }
+    .career-filters select option {
+        padding: 8px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .career-reveal {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .career-filters {
+            flex-direction: column;
+        }
+        .career-filters select {
+            width: 100% !important;
+        }
+        .career-filters .ml-auto {
+            margin-left: 0 !important;
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<!-- ============================================================ -->
+<!-- SCOPED SCRIPTS                                                -->
+<!-- ============================================================ -->
+<script>
+    (function() {
+        'use strict';
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        function init() {
+            // ========== REVEAL ON SCROLL ==========
+            const revealEls = document.querySelectorAll('.career-reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('career-in-view');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { 
+                threshold: 0.12,
+                rootMargin: '0px 0px -20px 0px'
+            });
+            revealEls.forEach(el => observer.observe(el));
+
+            // ========== JOB FILTER SYSTEM ==========
+            const deptFilter = document.getElementById('careerDepartmentFilter');
+            const locFilter = document.getElementById('careerLocationFilter');
+            const resetBtn = document.getElementById('careerResetFilters');
+            const jobGrid = document.getElementById('careerJobGrid');
+            const noResults = document.getElementById('careerNoResults');
+            const resultsCount = document.getElementById('careerResultsCount');
+
+            function filterJobs() {
+                const dept = deptFilter.value;
+                const loc = locFilter.value;
+
+                const cards = document.querySelectorAll('.career-job-card');
+                let visibleCount = 0;
+
+                cards.forEach(card => {
+                    const cardDept = card.dataset.department || '';
+                    const cardLoc = card.dataset.location || '';
+
+                    let show = true;
+
+                    if (dept !== 'All Departments' && cardDept !== dept) {
+                        show = false;
+                    }
+                    if (loc !== 'All Locations' && !cardLoc.includes(loc)) {
+                        show = false;
+                    }
+
+                    if (show) {
+                        card.style.display = '';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Update count
+                resultsCount.textContent = visibleCount;
+
+                // Show/hide no results
+                if (visibleCount === 0) {
+                    noResults.classList.remove('hidden');
+                } else {
+                    noResults.classList.add('hidden');
+                }
+            }
+
+            // Event listeners
+            deptFilter.addEventListener('change', filterJobs);
+            locFilter.addEventListener('change', filterJobs);
+
+            resetBtn.addEventListener('click', function() {
+                deptFilter.value = 'All Departments';
+                locFilter.value = 'All Locations';
+                filterJobs();
+            });
+
+            // ========== JOB DETAILS TOGGLE ==========
+            window.toggleJobDetails = function(jobId) {
+                const details = document.getElementById('careerJobDetails-' + jobId);
+                if (details) {
+                    details.classList.toggle('hidden');
+                    
+                    // Toggle chevron icon
+                    const btn = document.querySelector(`[onclick="toggleJobDetails('${jobId}')"]`);
+                    if (btn) {
+                        const icon = btn.querySelector('.fa-chevron-down');
+                        if (icon) {
+                            icon.classList.toggle('rotate-180');
+                        }
+                    }
+                }
+            };
+
+            // ========== RESET FILTERS ==========
+            window.resetCareerFilters = function() {
+                deptFilter.value = 'All Departments';
+                locFilter.value = 'All Locations';
+                filterJobs();
+            };
+
+            // ========== INITIAL FILTER ==========
+            filterJobs();
+
+            // ========== SMOOTH SCROLL FOR LINKS ==========
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#') return;
+                    
+                    const target = document.querySelector(href);
+                    if (target) {
+                        e.preventDefault();
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+    })();
+</script>

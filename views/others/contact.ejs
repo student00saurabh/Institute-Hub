@@ -1,0 +1,620 @@
+<% layout("/layouts/boilerplate") %>
+
+<!-- ============================================================ -->
+<!--  INSTITUTEHUB — CONTACT PAGE                                 -->
+<!--  Contact Form | Map | Office Info | FAQ | Social             -->
+<!-- ============================================================ -->
+
+<%
+  // ---------------------------------------------------------------
+  // DUMMY DATA
+  // ---------------------------------------------------------------
+  const contactInfo = {
+    address: "123, Tech Park, Sector 62, Noida, Uttar Pradesh 201301, India",
+    phone: "+91 9310643303",
+    email: "info@InstituteHub.org.in",
+    supportEmail: "support@InstituteHub.org.in",
+    workingHours: "Monday - Friday, 9:00 AM - 6:00 PM IST"
+  };
+
+  const offices = [
+    {
+      city: "Noida",
+      address: "123, Tech Park, Sector 62, Noida, UP 201301",
+      phone: "+91 9310643303",
+      email: "noida@InstituteHub.org.in",
+      isMain: true
+    },
+    {
+      city: "Bangalore",
+      address: "456, MG Road, Indiranagar, Bangalore, KA 560038",
+      phone: "+91 9876543210",
+      email: "bangalore@InstituteHub.org.in",
+      isMain: false
+    },
+    {
+      city: "Mumbai",
+      address: "789, BKC, Bandra East, Mumbai, MH 400051",
+      phone: "+91 8765432109",
+      email: "mumbai@InstituteHub.org.in",
+      isMain: false
+    }
+  ];
+
+  const faqs = [
+    {
+      question: "How do I enroll in a course?",
+      answer: "Simply browse our course catalog, choose your preferred course, and click the 'Enroll Now' button. You'll be guided through the payment process and get instant access to all course materials."
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer: "We accept all major credit/debit cards, UPI, net banking, and PayPal. We also offer EMI options for select courses through our banking partners."
+    },
+    {
+      question: "Do you offer refunds?",
+      answer: "Yes! We offer a 7-day money-back guarantee on all courses. If you're not satisfied with a course, simply contact our support team within 7 days of enrollment for a full refund."
+    },
+    {
+      question: "How do I access my purchased courses?",
+      answer: "Once you enroll in a course, you can access it anytime from your dashboard. Simply log in to your account and navigate to 'My Courses' to continue learning."
+    },
+    {
+      question: "Do you provide certificates?",
+      answer: "Yes! Upon successful completion of any course, you'll receive a verified certificate that you can share on LinkedIn, add to your resume, or download and print."
+    },
+    {
+      question: "Can I get corporate training for my team?",
+      answer: "Absolutely! We offer customized corporate training programs for teams of all sizes. Contact our enterprise sales team at enterprise@InstituteHub.org.in for a custom quote."
+    }
+  ];
+
+  const supportHours = [
+    { day: "Monday - Friday", hours: "9:00 AM - 6:00 PM IST" },
+    { day: "Saturday", hours: "10:00 AM - 2:00 PM IST" },
+    { day: "Sunday", hours: "Closed" }
+  ];
+
+  const socialLinks = [
+    { name: "LinkedIn", icon: "fa-linkedin-in", url: "#", color: "#0A66C2" },
+    { name: "Twitter", icon: "fa-twitter", url: "#", color: "#1DA1F2" },
+    { name: "YouTube", icon: "fa-youtube", url: "#", color: "#FF0000" },
+    { name: "GitHub", icon: "fa-github", url: "#", color: "#333" },
+    { name: "Instagram", icon: "fa-instagram", url: "#", color: "#E4405F" },
+    { name: "Facebook", icon: "fa-facebook-f", url: "#", color: "#1877F2" }
+  ];
+%>
+
+<!-- ============================================================ -->
+<!-- PAGE HEADER                                                   -->
+<!-- ============================================================ -->
+<section class="relative overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-[#2563EB] py-20 lg:py-28 -mt-6">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-[#C9A227] rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#2563EB] rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#3B82F6] rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+        <span class="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/90 mb-4 border border-white/20">
+            <i class="fas fa-headset mr-2"></i> Get in Touch
+        </span>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
+            <span class="text-[#C9A227]">Contact</span> Us
+        </h1>
+        <p class="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto">
+            Have questions? We'd love to hear from you. Reach out and we'll get back to you within 24 hours.
+        </p>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CONTACT FORM & INFO                                           -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-5 gap-8">
+            
+            <!-- Left: Contact Form -->
+            <div class="lg:col-span-3 reveal-up">
+                <div class="bg-white dark:bg-[#111827] rounded-2xl p-6 sm:p-8 border border-[#E2E8F0] dark:border-[#1E293B] shadow-lg">
+                    <h2 class="text-2xl font-bold text-[#0F172A] dark:text-white mb-2">Send Us a Message</h2>
+                    <p class="text-sm text-[#64748B] dark:text-[#94A3B8] mb-6">We'll get back to you within 24 hours</p>
+                    
+                    <form id="contactForm" onsubmit="return handleContactSubmit(event)">
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="contactName" class="block text-sm font-medium text-[#0F172A] dark:text-white mb-1.5">
+                                    Full Name <span class="text-[#EF4444]">*</span>
+                                </label>
+                                <input type="text" 
+                                       id="contactName" 
+                                       name="name" 
+                                       placeholder="Enter your full name"
+                                       required
+                                       class="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300">
+                            </div>
+                            <div>
+                                <label for="contactEmail" class="block text-sm font-medium text-[#0F172A] dark:text-white mb-1.5">
+                                    Email Address <span class="text-[#EF4444]">*</span>
+                                </label>
+                                <input type="email" 
+                                       id="contactEmail" 
+                                       name="email" 
+                                       placeholder="Enter your email"
+                                       required
+                                       class="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label for="contactPhone" class="block text-sm font-medium text-[#0F172A] dark:text-white mb-1.5">
+                                Phone Number <span class="text-[#64748B] dark:text-[#94A3B8] text-xs font-normal">(optional)</span>
+                            </label>
+                            <input type="tel" 
+                                   id="contactPhone" 
+                                   name="phone" 
+                                   placeholder="Enter your phone number"
+                                   class="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300">
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label for="contactSubject" class="block text-sm font-medium text-[#0F172A] dark:text-white mb-1.5">
+                                Subject <span class="text-[#EF4444]">*</span>
+                            </label>
+                            <select id="contactSubject" 
+                                    name="subject"
+                                    required
+                                    class="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300">
+                                <option value="">Select a subject</option>
+                                <option value="General Inquiry">General Inquiry</option>
+                                <option value="Course Information">Course Information</option>
+                                <option value="Certification Support">Certification Support</option>
+                                <option value="Corporate Training">Corporate Training</option>
+                                <option value="Technical Support">Technical Support</option>
+                                <option value="Partnership Opportunities">Partnership Opportunities</option>
+                                <option value="Demo Request">Demo Request</option>
+                                <option value="Career Opportunities">Career Opportunities</option>
+                                <option value="Feedback">Feedback</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <label for="contactMessage" class="block text-sm font-medium text-[#0F172A] dark:text-white mb-1.5">
+                                Message <span class="text-[#EF4444]">*</span>
+                            </label>
+                            <textarea id="contactMessage" 
+                                      name="message" 
+                                      rows="5"
+                                      placeholder="Write your message here..."
+                                      required
+                                      class="w-full px-4 py-3 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#0B1120] text-[#0F172A] dark:text-white placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 resize-none"></textarea>
+                        </div>
+                        
+                        <div class="mt-4 flex items-start gap-3">
+                            <input type="checkbox" 
+                                   id="contactConsent" 
+                                   name="consent"
+                                   required
+                                   class="mt-1 w-4 h-4 rounded border-[#E2E8F0] dark:border-[#1E293B] text-[#2563EB] focus:ring-[#2563EB]/40 focus:ring-2 transition-all duration-300">
+                            <label for="contactConsent" class="text-sm text-[#64748B] dark:text-[#94A3B8]">
+                                I agree to the <a href="/privacy" class="text-[#2563EB] hover:underline">Privacy Policy</a> and consent to being contacted regarding my inquiry.
+                            </label>
+                        </div>
+                        
+                        <button type="submit" 
+                                id="contactSubmitBtn"
+                                class="mt-6 w-full py-3.5 px-6 bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#3B82F6] hover:to-[#2563EB] text-white font-semibold rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-95 shadow-lg shadow-[#2563EB]/25 flex items-center justify-center gap-2">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Message
+                        </button>
+                        
+                        <div id="contactFormResponse" class="mt-4 text-sm hidden p-3 rounded-lg"></div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Right: Contact Info -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Quick Contact -->
+                <div class="reveal-up reveal-delay-1 bg-white dark:bg-[#111827] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#1E293B]">
+                    <h3 class="text-lg font-bold text-[#0F172A] dark:text-white mb-4">Quick Contact</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3 group">
+                            <div class="w-10 h-10 rounded-xl bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white transition-all duration-300 flex-shrink-0">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-[#0F172A] dark:text-white">Address</p>
+                                <p class="text-sm text-[#64748B] dark:text-[#94A3B8]"><%= contactInfo.address %></p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3 group">
+                            <div class="w-10 h-10 rounded-xl bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white transition-all duration-300 flex-shrink-0">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-[#0F172A] dark:text-white">Phone</p>
+                                <a href="tel:<%= contactInfo.phone.replace(/\s/g, '') %>" class="text-sm text-[#64748B] dark:text-[#94A3B8] hover:text-[#2563EB] transition-colors">
+                                    <%= contactInfo.phone %>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3 group">
+                            <div class="w-10 h-10 rounded-xl bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white transition-all duration-300 flex-shrink-0">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-[#0F172A] dark:text-white">Email</p>
+                                <a href="mailto:<%= contactInfo.email %>" class="text-sm text-[#64748B] dark:text-[#94A3B8] hover:text-[#2563EB] transition-colors">
+                                    <%= contactInfo.email %>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3 group">
+                            <div class="w-10 h-10 rounded-xl bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white transition-all duration-300 flex-shrink-0">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-[#0F172A] dark:text-white">Working Hours</p>
+                                <p class="text-sm text-[#64748B] dark:text-[#94A3B8]"><%= contactInfo.workingHours %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Support Hours -->
+                <div class="reveal-up reveal-delay-2 bg-white dark:bg-[#111827] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#1E293B]">
+                    <h3 class="text-lg font-bold text-[#0F172A] dark:text-white mb-4">Support Hours</h3>
+                    <div class="space-y-2">
+                        <% supportHours.forEach(hour => { %>
+                            <div class="flex items-center justify-between py-1.5 border-b border-[#E2E8F0] dark:border-[#1E293B] last:border-0">
+                                <span class="text-sm text-[#64748B] dark:text-[#94A3B8]"><%= hour.day %></span>
+                                <span class="text-sm font-medium text-[#0F172A] dark:text-white <%= hour.hours === 'Closed' ? 'text-[#EF4444]' : '' %>">
+                                    <%= hour.hours %>
+                                </span>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+                
+                <!-- Social Links -->
+                <div class="reveal-up reveal-delay-3 bg-white dark:bg-[#111827] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#1E293B]">
+                    <h3 class="text-lg font-bold text-[#0F172A] dark:text-white mb-4">Connect With Us</h3>
+                    <div class="flex flex-wrap gap-3">
+                        <% socialLinks.forEach(social => { %>
+                            <a href="<%= social.url %>" 
+                               target="_blank"
+                               class="group w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg"
+                               style="background: <%= social.color %>15; color: <%= social.color %>;"
+                               onmouseover="this.style.background='<%= social.color %>'; this.style.color='white';"
+                               onmouseout="this.style.background='<%= social.color %>15'; this.style.color='<%= social.color %>';">
+                                <i class="fab <%= social.icon %> text-lg"></i>
+                            </a>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- OFFICE LOCATIONS                                              -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-white dark:bg-[#0F172A]/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 reveal-up">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Locations</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                Our <span class="text-[#2563EB]">Offices</span>
+            </h2>
+            <p class="mt-3 text-[#64748B] dark:text-[#94A3B8] max-w-2xl mx-auto">
+                We're growing! Find us at one of our locations across India
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <% offices.forEach((office, i) => { %>
+                <div class="reveal-up group bg-[#F8FAFC] dark:bg-[#111827] rounded-2xl p-6 border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl hover:shadow-[#2563EB]/10 hover:-translate-y-2 transition-all duration-400"
+                     style="transition-delay: <%= i * 80 %>ms">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="inline-block px-3 py-1 bg-[#2563EB]/10 text-[#2563EB] text-xs font-bold rounded-full">
+                                <%= office.city %>
+                            </span>
+                            <% if (office.isMain) { %>
+                                <span class="inline-block px-3 py-1 bg-[#C9A227]/10 text-[#C9A227] text-xs font-bold rounded-full ml-2">
+                                    <i class="fas fa-star mr-0.5"></i> Main
+                                </span>
+                            <% } %>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2563EB]/10 to-[#C9A227]/10 flex items-center justify-center text-[#2563EB] group-hover:scale-110 transition-all duration-300">
+                            <i class="fas fa-building"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 space-y-3 text-sm">
+                        <p class="flex items-start gap-2 text-[#64748B] dark:text-[#94A3B8]">
+                            <i class="fas fa-map-marker-alt text-[#2563EB] mt-0.5 flex-shrink-0"></i>
+                            <span><%= office.address %></span>
+                        </p>
+                        <p class="flex items-start gap-2 text-[#64748B] dark:text-[#94A3B8]">
+                            <i class="fas fa-phone text-[#2563EB] mt-0.5 flex-shrink-0"></i>
+                            <span><%= office.phone %></span>
+                        </p>
+                        <p class="flex items-start gap-2 text-[#64748B] dark:text-[#94A3B8]">
+                            <i class="fas fa-envelope text-[#2563EB] mt-0.5 flex-shrink-0"></i>
+                            <span><%= office.email %></span>
+                        </p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FAQ SECTION                                                   -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 reveal-up">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">FAQ</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                Frequently Asked <span class="text-[#2563EB]">Questions</span>
+            </h2>
+            <p class="mt-3 text-[#64748B] dark:text-[#94A3B8] max-w-2xl mx-auto">
+                Find answers to the most common questions about InstituteHub
+            </p>
+        </div>
+
+        <div class="space-y-4">
+            <% faqs.forEach((faq, i) => { %>
+                <div class="reveal-up bg-white dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-[#1E293B] overflow-hidden transition-all duration-300 hover:border-[#2563EB]/40"
+                     style="transition-delay: <%= i * 60 %>ms">
+                    <button class="faq-toggle w-full px-6 py-4 text-left flex items-center justify-between hover:bg-[#2563EB]/5 transition-colors duration-200 group" onclick="toggleFaq(this)">
+                        <span class="text-sm font-semibold text-[#0F172A] dark:text-white group-hover:text-[#2563EB] transition-colors">
+                            <%= faq.question %>
+                        </span>
+                        <span class="flex-shrink-0 w-8 h-8 rounded-full bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] transition-transform duration-300 group-hover:bg-[#2563EB] group-hover:text-white">
+                            <i class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
+                        </span>
+                    </button>
+                    <div class="faq-answer px-6 max-h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                        <div class="pb-4 text-sm text-[#64748B] dark:text-[#94A3B8] leading-relaxed border-t border-[#E2E8F0] dark:border-[#1E293B] pt-4">
+                            <%= faq.answer %>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- MAP SECTION (Static placeholder)                             -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-white dark:bg-[#0F172A]/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="reveal-up text-center mb-8">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Location</span>
+            <h2 class="mt-2 text-3xl sm:text-4xl font-extrabold text-[#0F172A] dark:text-white">
+                Find Us <span class="text-[#2563EB]">Here</span>
+            </h2>
+        </div>
+        
+        <div class="reveal-up reveal-delay-1 relative rounded-2xl overflow-hidden border border-[#E2E8F0] dark:border-[#1E293B] shadow-lg">
+            <!-- Static Map Placeholder -->
+            <div class="relative w-full h-[400px] bg-[#F8FAFC] dark:bg-[#111827] flex items-center justify-center">
+                <div class="text-center">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] text-3xl mb-4">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0F172A] dark:text-white">InstituteHub Headquarters</h3>
+                    <p class="text-sm text-[#64748B] dark:text-[#94A3B8] mt-2"><%= contactInfo.address %></p>
+                    <p class="text-sm text-[#64748B] dark:text-[#94A3B8]">
+                        <i class="fas fa-phone mr-1"></i> <%= contactInfo.phone %>
+                    </p>
+                    <div class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-[#2563EB] text-white text-sm font-semibold rounded-xl hover:bg-[#1D4ED8] transition-all duration-300 cursor-pointer">
+                        <i class="fas fa-directions"></i>
+                        Get Directions
+                    </div>
+                    <!-- Map placeholder note -->
+                    <p class="mt-4 text-xs text-[#94A3B8] dark:text-[#64748B]">
+                        <i class="fas fa-info-circle"></i> Interactive map coming soon
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- STYLES                                                        -->
+<!-- ============================================================ -->
+<style>
+    .reveal-up {
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), 
+                    transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .reveal-up.in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .reveal-delay-1.in-view { transition-delay: 0.1s; }
+    .reveal-delay-2.in-view { transition-delay: 0.2s; }
+    .reveal-delay-3.in-view { transition-delay: 0.3s; }
+
+    @keyframes pulse-slow {
+        0%, 100% { opacity: 0.1; }
+        50% { opacity: 0.2; }
+    }
+    .animate-pulse-slow {
+        animation: pulse-slow 3s ease-in-out infinite;
+    }
+
+    /* FAQ Styles */
+    .faq-toggle .fa-chevron-down {
+        transition: transform 0.3s ease;
+    }
+    .faq-toggle.active .fa-chevron-down {
+        transform: rotate(180deg);
+    }
+    .faq-toggle.active {
+        background: rgba(37, 99, 235, 0.05);
+    }
+
+    /* Form focus styles */
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+    }
+
+    /* Checkbox custom styling */
+    input[type="checkbox"]:checked {
+        accent-color: #2563EB;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .reveal-up {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .faq-toggle .fa-chevron-down {
+            font-size: 12px;
+        }
+    }
+</style>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS                                                       -->
+<!-- ============================================================ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        'use strict';
+
+        // ========== REVEAL ON SCROLL ==========
+        const revealEls = document.querySelectorAll('.reveal-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { 
+            threshold: 0.12,
+            rootMargin: '0px 0px -20px 0px'
+        });
+        revealEls.forEach(el => observer.observe(el));
+
+        // ========== FAQ TOGGLE ==========
+        window.toggleFaq = function(btn) {
+            const isActive = btn.classList.contains('active');
+            const answer = btn.nextElementSibling;
+            const icon = btn.querySelector('.fa-chevron-down');
+            
+            // Close all FAQs
+            document.querySelectorAll('.faq-toggle').forEach(t => {
+                if (t !== btn) {
+                    t.classList.remove('active');
+                    const ans = t.nextElementSibling;
+                    if (ans) ans.style.maxHeight = '0';
+                }
+            });
+            
+            if (isActive) {
+                btn.classList.remove('active');
+                answer.style.maxHeight = '0';
+            } else {
+                btn.classList.add('active');
+                answer.style.maxHeight = answer.scrollHeight + 'px';
+            }
+        };
+
+        // ========== CONTACT FORM HANDLER ==========
+        window.handleContactSubmit = function(event) {
+            event.preventDefault();
+            
+            const form = document.getElementById('contactForm');
+            const submitBtn = document.getElementById('contactSubmitBtn');
+            const response = document.getElementById('contactFormResponse');
+            
+            // Get form data
+            const name = document.getElementById('contactName').value.trim();
+            const email = document.getElementById('contactEmail').value.trim();
+            const phone = document.getElementById('contactPhone').value.trim();
+            const subject = document.getElementById('contactSubject').value;
+            const message = document.getElementById('contactMessage').value.trim();
+            const consent = document.getElementById('contactConsent').checked;
+            
+            // Validate
+            if (!name || !email || !subject || !message || !consent) {
+                response.classList.remove('hidden', 'text-[#22C55E]', 'bg-[#22C55E]/10', 'border-[#22C55E]/20');
+                response.classList.add('text-[#EF4444]', 'bg-[#EF4444]/10', 'border', 'border-[#EF4444]/20');
+                response.textContent = 'Please fill in all required fields and accept the privacy policy.';
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                response.classList.remove('hidden', 'text-[#22C55E]', 'bg-[#22C55E]/10', 'border-[#22C55E]/20');
+                response.classList.add('text-[#EF4444]', 'bg-[#EF4444]/10', 'border', 'border-[#EF4444]/20');
+                response.textContent = 'Please enter a valid email address.';
+                return;
+            }
+            
+            // Simulate sending
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Sending...';
+            response.classList.add('hidden');
+            
+            setTimeout(() => {
+                // Success
+                response.classList.remove('hidden', 'text-[#EF4444]', 'bg-[#EF4444]/10', 'border-[#EF4444]/20');
+                response.classList.add('text-[#22C55E]', 'bg-[#22C55E]/10', 'border', 'border-[#22C55E]/20');
+                response.textContent = '✅ Your message has been sent successfully! Our team will get back to you within 24 hours.';
+                
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+                
+                // Reset form after success
+                form.reset();
+                
+                // Auto-hide response after 5 seconds
+                setTimeout(() => {
+                    response.classList.add('hidden');
+                }, 5000);
+            }, 2000);
+            
+            return false;
+        };
+
+        // ========== SMOOTH SCROLL FOR ANCHOR LINKS ==========
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return;
+                
+                const target = document.querySelector(href);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    });
+</script>

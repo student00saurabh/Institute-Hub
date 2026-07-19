@@ -1,0 +1,305 @@
+<% layout("/layouts/boilerplate") -%>
+
+<!-- Individual Course Enrollment Page -->
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 py-8 transition-colors duration-200">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6 text-sm" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center flex-wrap gap-2">
+        <li class="inline-flex items-center">
+          <a href="/" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <i class="fas fa-home mr-1"></i> Home
+          </a>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <i class="fas fa-chevron-right text-gray-400 dark:text-gray-600 mx-2 text-xs"></i>
+            <a href="/courses" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">Courses</a>
+          </div>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <i class="fas fa-chevron-right text-gray-400 dark:text-gray-600 mx-2 text-xs"></i>
+            <a href="/courses/<%= course._id %>" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"><%= course.title %></a>
+          </div>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <i class="fas fa-chevron-right text-gray-400 dark:text-gray-600 mx-2 text-xs"></i>
+            <span class="text-gray-700 dark:text-gray-300 font-medium">Enroll Now</span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+      
+      <!-- Left Column - Course Information -->
+      <div class="lg:col-span-2">
+        <!-- Course Header -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden mb-6">
+          <% if(course.image && course.image.url) { %>
+          <div class="h-56 overflow-hidden">
+            <img src="<%= course.image.url %>" alt="<%= course.title %>" 
+                 class="w-full h-full object-cover">
+          </div>
+          <% } %>
+          
+          <div class="p-6">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-full">
+                <%= course.courceType %>
+              </span>
+              <% if(course.isPopular) { %>
+                <span class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 text-xs font-semibold rounded-full">
+                  <i class="fas fa-fire mr-1"></i> Popular
+                </span>
+              <% } %>
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                <i class="fas fa-star-half-alt text-yellow-400 text-sm"></i>
+                <span class="text-sm text-gray-500 ml-1">(4.8)</span>
+              </div>
+            </div>
+            
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+              <%= course.title %>
+            </h1>
+            
+            <p class="text-gray-600 dark:text-gray-300 mb-4">
+              <%= course.shortDescription %>
+            </p>
+            
+            <!-- Course Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-clock text-blue-500"></i>
+                <div>
+                  <p class="text-xs text-gray-500">Duration</p>
+                  <p class="font-semibold text-gray-800 dark:text-white"><%= course.duration || 6 %> weeks</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-users text-blue-500"></i>
+                <div>
+                  <p class="text-xs text-gray-500">Students</p>
+                  <p class="font-semibold text-gray-800 dark:text-white"><%= course.students?.length || 0 %> enrolled</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-signal text-blue-500"></i>
+                <div>
+                  <p class="text-xs text-gray-500">Level</p>
+                  <p class="font-semibold text-gray-800 dark:text-white"><%= course.courseLevel || 'Intermediate' %></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <i class="fas fa-certificate text-blue-500"></i>
+                <div>
+                  <p class="text-xs text-gray-500">Certificate</p>
+                  <p class="font-semibold text-gray-800 dark:text-white">Yes</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- What You'll Learn -->
+        <% if(course.learningOutcomes && course.learningOutcomes.length > 0) { %>
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-graduation-cap text-blue-600 mr-2"></i>
+            What You'll Learn
+          </h2>
+          <div class="grid md:grid-cols-2 gap-3">
+            <% course.learningOutcomes.forEach(outcome => { %>
+              <div class="flex items-start gap-2">
+                <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
+                <span class="text-gray-600 dark:text-gray-300"><%= outcome %></span>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+        <% } %>
+        
+        <!-- Course Content -->
+        <% if(course.tableOfContent && course.tableOfContent.length > 0) { %>
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
+            <i class="fas fa-book-open text-blue-600 mr-2"></i>
+            Course Content
+          </h2>
+          <div class="space-y-3">
+            <% course.tableOfContent.forEach((item, index) => { %>
+            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <span class="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold">
+                  <%= index + 1 %>
+                </span>
+                <span class="text-gray-800 dark:text-gray-200"><%= item.tile %></span>
+              </div>
+              <% if(item.duration) { %>
+                <span class="text-sm text-gray-500"><%= item.duration %> mins</span>
+              <% } %>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+        <% } %>
+      </div>
+      
+      <!-- Right Column - Enrollment Form -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-24">
+          <!-- Price Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden mb-6">
+            <div class="bg-gradient-to-r from-blue-600 to-cyan-600 p-6 text-white">
+              <p class="text-sm opacity-90 mb-1">Course Price</p>
+              <div class="flex items-baseline gap-2">
+                <% if (course.actualPrice && course.actualPrice < course.price) { %>
+                  <span class="text-4xl font-bold">₹<%= course.actualPrice %></span>
+                  <span class="text-lg line-through opacity-70">₹<%= course.price %></span>
+                  <span class="ml-2 px-2 py-0.5 bg-yellow-400 text-gray-900 text-xs rounded-full font-semibold">
+                    <%= Math.round(((course.price - course.actualPrice) / course.price) * 100) %>% OFF
+                  </span>
+                <% } else { %>
+                  <span class="text-4xl font-bold">₹<%= course.price %></span>
+                <% } %>
+              </div>
+              <p class="text-xs opacity-80 mt-1">Inclusive of all taxes</p>
+            </div>
+            
+            <div class="p-6">
+              <!-- Course Includes -->
+              <div class="mb-6">
+                <h3 class="font-semibold text-gray-800 dark:text-white mb-3">This course includes:</h3>
+                <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                  <li class="flex items-center"><i class="fas fa-video text-blue-500 w-5"></i> Full lifetime access</li>
+                  <li class="flex items-center"><i class="fas fa-mobile-alt text-blue-500 w-5"></i> Access on mobile and TV</li>
+                  <li class="flex items-center"><i class="fas fa-certificate text-blue-500 w-5"></i> Certificate of completion</li>
+                  <li class="flex items-center"><i class="fas fa-infinity text-blue-500 w-5"></i> Self-paced learning</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Enrollment Form -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
+            <div class="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4">
+              <h2 class="text-lg font-bold text-white flex items-center">
+                <i class="fas fa-edit mr-2"></i>
+                Complete Enrollment
+              </h2>
+            </div>
+            
+            <form id="enrollmentForm" action="/enroll/<%= course._id %>/submit" method="POST" class="p-6 space-y-4">
+              <!-- Personal Information -->
+              <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Full Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="name" name="name" value="<%= currUser ? currUser.name : '' %>" required
+                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+              
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Email Address <span class="text-red-500">*</span>
+                </label>
+                <input type="email" id="email" name="email" value="<%= currUser ? currUser.email : '' %>" required
+                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+              
+              <div>
+                <label for="mobile" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Mobile Number <span class="text-red-500">*</span>
+                </label>
+                <input type="tel" id="mobile" name="mobile" value="<%= currUser ? currUser.mobile : '' %>" required
+                       placeholder="+91 98765 43210"
+                       class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+              
+              <div>
+                <label for="profession" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Profession
+                </label>
+                <select id="profession" name="profession" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                  <option value="">Select Profession</option>
+                  <option value="student">Student</option>
+                  <option value="professional">IT Professional</option>
+                  <option value="business">Business Owner</option>
+                  <option value="fresher">Fresher</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              
+              <!-- Hidden Fields -->
+              <input type="hidden" name="courseId" value="<%= course._id %>">
+              <input type="hidden" name="paidPrice" value="<%= course.actualPrice || course.price %>">
+              
+              <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Any specific requirements?
+                </label>
+                <textarea id="description" name="description" rows="2"
+                          placeholder="Tell us about your goals or any questions..."
+                          class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+              </div>
+              
+              <!-- Payment Method -->
+              <div>
+                <label for="paymentMethod" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Payment Method
+                </label>
+                <select id="paymentMethod" name="paymentMethod" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                  <option value="online">Online Payment (UPI/Card/NetBanking)</option>
+                  <option value="bank_transfer">Bank Transfer</option>
+                  <option value="cash">Cash (In-person)</option>
+                </select>
+              </div>
+              
+              <!-- Terms -->
+              <div class="flex items-start">
+                <input type="checkbox" id="terms" required class="mt-1 w-4 h-4 border border-gray-300 rounded">
+                <label for="terms" class="ml-2 text-sm text-gray-600 dark:text-gray-400">
+                  I agree to the <a href="/terms" class="text-blue-600 hover:underline">Terms and Conditions</a>
+                </label>
+              </div>
+              
+              <!-- Submit Button -->
+              <button type="submit" 
+                      class="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg">
+                <i class="fas fa-check-circle mr-2"></i>
+                Complete Enrollment - ₹<%= course.actualPrice || course.price %>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Mobile number validation
+  document.getElementById('mobile')?.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 10) value = value.slice(0, 10);
+    e.target.value = value;
+  });
+  
+  // Form validation
+  document.getElementById('enrollmentForm')?.addEventListener('submit', function(e) {
+    const terms = document.getElementById('terms');
+    if (!terms.checked) {
+      e.preventDefault();
+      alert('Please agree to the Terms and Conditions');
+      return false;
+    }
+    return true;
+  });
+</script>

@@ -1,0 +1,785 @@
+<% layout("/layouts/boilerplate") %>
+
+<!-- Course Detail Page -->
+<div class="min-h-[90vh] py-8 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6 text-sm" aria-label="Breadcrumb" data-aos="fade-up">
+            <ol class="inline-flex items-center flex-wrap gap-2">
+                <li class="inline-flex items-center">
+                    <a href="/" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                        <i class="fas fa-home mr-1"></i> Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 dark:text-gray-600 mx-2 text-xs"></i>
+                        <a href="/courses" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Courses</a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 dark:text-gray-600 mx-2 text-xs"></i>
+                        <span class="text-gray-700 dark:text-gray-300 font-medium truncate max-w-[200px]"><%= course.title %></span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Course Header Card -->
+                <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden" data-aos="fade-up" data-aos-duration="600">
+                    
+                    <!-- Course Image -->
+                    <% if(course.image && course.image.url) { %>
+                        <div class="relative h-64 md:h-80 overflow-hidden">
+                            <img src="<%= course.image.url %>" alt="<%= course.title %>" 
+                                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-700">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                            
+                            <!-- Badges -->
+                            <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+                                <% if(course.isPopular) { %>
+                                    <span class="px-3 py-1.5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs font-semibold rounded-full shadow-lg">
+                                        <i class="fas fa-fire mr-1"></i> Most Popular
+                                    </span>
+                                <% } %>
+                                <% if(course.courseLevel) { %>
+                                    <span class="px-3 py-1.5 bg-blue-600/90 backdrop-blur-sm text-white text-xs font-semibold rounded-full shadow-lg">
+                                        <i class="fas fa-signal mr-1"></i> <%= course.courseLevel.charAt(0).toUpperCase() + course.courseLevel.slice(1) %>
+                                    </span>
+                                <% } %>
+                                <% if(course.isActive) { %>
+                                    <span class="px-3 py-1.5 bg-green-600/90 backdrop-blur-sm text-white text-xs font-semibold rounded-full shadow-lg">
+                                        <i class="fas fa-check-circle mr-1"></i> Active
+                                    </span>
+                                <% } else { %>
+                                    <span class="px-3 py-1.5 bg-red-600/90 backdrop-blur-sm text-white text-xs font-semibold rounded-full shadow-lg">
+                                        <i class="fas fa-clock mr-1"></i> Upcoming
+                                    </span>
+                                <% } %>
+                            </div>
+                            
+                            <!-- Price Badge -->
+                            <div class="absolute bottom-4 right-4">
+                                <div class="bg-black/70 backdrop-blur-sm rounded-xl px-5 py-3 text-right border border-white/10">
+                                    <% if (course.actualPrice && course.actualPrice < course.price) { %>
+                                        <span class="text-2xl font-bold text-white">₹<%= course.actualPrice %></span>
+                                        <span class="text-sm text-gray-300 line-through ml-2">₹<%= course.price %></span>
+                                        <span class="ml-2 px-2 py-0.5 bg-green-500 text-white text-xs rounded-full">
+                                            Save ₹<%= course.price - course.actualPrice %>
+                                        </span>
+                                    <% } else if(course.price > 0 ) { %>
+                                        <span class="text-2xl font-bold text-white">₹<%= course.price %></span>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                    
+                    <div class="p-6 md:p-8">
+                        <!-- Course Meta -->
+                        <div class="flex flex-wrap items-center gap-3 mb-4">
+                            <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-full">
+                                <i class="fas fa-tag mr-1"></i> <%= course.courceType || 'Course' %>
+                            </span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <i class="far fa-clock"></i> <%= course.duration ? course.duration + ' hours' : 'Self-paced' %>
+                            </span>
+                            <span class="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <i class="fas fa-users"></i> <%= (course.preStudents || 0) + (course.students?.length || 0) %> enrolled
+                            </span>
+                        </div>
+                        
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-4"><%= course.title %></h1>
+                        <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed"><%= course.shortDescription %></p>
+                        
+                        <!-- Instructor -->
+                        <% if(course.teacher) { %>
+                            <div class="mt-6 flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/30 rounded-xl border border-gray-200 dark:border-gray-700">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+                                    <%= course.teacher.name ? course.teacher.name.charAt(0).toUpperCase() : 'T' %>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Instructor</p>
+                                    <p class="font-semibold text-gray-900 dark:text-white"><%= course.teacher.name %></p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400"><%= course.teacher.email %></p>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- What You'll Learn -->
+                <% if(course.learningOutcomes && course.learningOutcomes.length > 0) { %>
+                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 md:p-8" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            What You'll Learn
+                        </h2>
+                        <div class="grid md:grid-cols-2 gap-3">
+                            <% course.learningOutcomes.forEach(outcome => { %>
+                                <div class="flex items-start gap-2 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                                    <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span class="text-gray-700 dark:text-gray-300"><%= outcome %></span>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>
+
+                <!-- Prerequisites -->
+                <% if(course.prerequisites && course.prerequisites.length > 0) { %>
+                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 md:p-8" data-aos="fade-up" data-aos-duration="600" data-aos-delay="150">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            Prerequisites
+                        </h2>
+                        <ul class="list-disc list-inside space-y-1 text-gray-600 dark:text-gray-300">
+                            <% course.prerequisites.forEach(prereq => { %>
+                                <li><%= prereq %></li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                <% } %>
+
+                <!-- Full Description -->
+                <% if(course.discription) { %>
+                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 md:p-8" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-600 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                </svg>
+                            </div>
+                            Course Description
+                        </h2>
+                        <div class="course-description prose prose-lg max-w-none dark:prose-invert">
+                            <%- course.discription %>
+                        </div>
+                    </div>
+                <% } %>
+
+                <!-- What's Included -->
+                <% if(course.includes && course.includes.length > 0) { %>
+                    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 md:p-8" data-aos="fade-up" data-aos-duration="600" data-aos-delay="250">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            </div>
+                            What's Included
+                        </h2>
+                        <ul class="space-y-2 text-gray-600 dark:text-gray-300">
+                            <% course.includes.forEach(item => { %>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span><%= item %></span>
+                                </li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                <% } %>
+
+
+                <!-- Course PDF Details (Drive Link) -->
+<% if(course.pdfDetails && course.pdfDetails.trim().length > 0) { %>
+    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 md:p-8" data-aos="fade-up" data-aos-duration="600" data-aos-delay="300">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-red-500 to-rose-500 flex items-center justify-center">
+                <i class="fas fa-file-pdf text-white text-sm"></i>
+            </div>
+            Course Details
+        </h2>
+        <div class="flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-file-pdf text-red-600 dark:text-red-400 text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
+                        Course Details PDF
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Click to view or download the complete course details
+                    </p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <a href="<%= course.pdfDetails %>" target="_blank" 
+                   class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-sm font-medium rounded-lg transition-all duration-200">
+                    <i class="fas fa-eye"></i> View
+                </a>
+                <a href="<%= course.pdfDetails %>" download
+                   class="inline-flex items-center gap-1.5 px-4 py-2 bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 text-sm font-medium rounded-lg transition-all duration-200">
+                    <i class="fas fa-download"></i> Download
+                </a>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+            </div>
+
+            
+
+            <!-- Right Column - Enrollment Card -->
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+    <!-- Price Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+        <% if(course.price > 0) { %>
+            <p class="text-sm opacity-80 mb-1">Course Price</p>
+            <div class="flex items-baseline gap-3">
+                <% if (course.actualPrice && course.actualPrice < course.price) { %>
+                    <span class="text-4xl font-bold">₹<%= course.actualPrice %></span>
+                    <span class="text-lg line-through opacity-60">₹<%= course.price %></span>
+                    <span class="ml-2 px-2 py-0.5 bg-yellow-400 text-gray-900 text-xs rounded-full font-semibold">
+                        <%= Math.round(((course.price - course.actualPrice) / course.price) * 100) %>% OFF
+                    </span>
+                <% } else { %>
+                    <span class="text-4xl font-bold">₹<%= course.price %></span>
+                <% } %>
+            </div>
+            <p class="text-xs opacity-70 mt-1">Inclusive of all taxes</p>
+        <% } else { %>
+            <div class="text-center py-2">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/20 mb-3">
+                    <i class="fas fa-headset text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Pricing Available on Request</h3>
+                <p class="text-sm text-white/90 mb-4">
+                    Contact our team to get detailed pricing, custom plans, and enrollment information for this course.
+                </p>
+                <a href="/contact" class="inline-flex items-center gap-2 bg-white text-blue-700 px-5 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition shadow-lg">
+                    <i class="fas fa-envelope"></i> Contact Us
+                </a>
+            </div>
+        <% } %>
+    </div>
+    
+    <div class="p-6">
+        <!-- Enrollment Status -->
+        <% if(isEnrolled) { %>
+            <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
+                <p class="text-green-800 dark:text-green-400 font-semibold flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    You're enrolled!
+                </p>
+                <p class="text-sm text-green-600 dark:text-green-500 mt-2">
+                    <i class="far fa-calendar-alt mr-1"></i> Enrolled on: <%= new Date(userEnrollment.enrolledAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                </p>
+            </div>
+            <a href="/courses/<%= course._id %>/access" class="block w-full text-center px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg">
+                <i class="fas fa-play-circle mr-2"></i> Continue Learning
+            </a>
+        <% } else { %>
+            <% if(currentUser) { %>
+                <button onclick="openEnrollmentModal()" 
+                        class="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-95">
+                    <i class="fas fa-shopping-cart mr-2"></i> Enroll Now
+                </button>
+            <% } else { %>
+                <a href="/login?redirect=/courses/<%= course._id %>" 
+                   class="block w-full text-center px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Login to Enroll
+                </a>
+            <% } %>
+        <% } %>
+        
+        <!-- Course Includes -->
+        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h3 class="font-semibold text-gray-900 dark:text-white mb-3">This course includes:</h3>
+            <ul class="space-y-2.5 text-sm text-gray-600 dark:text-gray-300">
+                <li class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    Full lifetime access
+                </li>
+                <li class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    Certificate of completion
+                </li>
+                <li class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    Self-paced learning
+                </li>
+                <li class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    Expert instructor
+                </li>
+                <li class="flex items-center gap-2">
+                    <i class="fas fa-lock-open text-blue-500 w-4"></i>
+                    Lifetime access
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+        </div>
+
+        <!-- Related Courses -->
+        <% if(relatedCourses && relatedCourses.length > 0) { %>
+            <div class="mt-12" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">You Might Also Like</h2>
+                        <p class="text-gray-500 dark:text-gray-400">Explore more courses in this category</p>
+                    </div>
+                    <a href="/courses" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors">
+                        View All →
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <% relatedCourses.forEach(related => { %>
+                        <div class="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+                            <a href="/courses/<%= related._id %>" class="block relative h-44 overflow-hidden">
+                                <img src="<%= related.image?.url || '/images/default-course.jpg' %>" alt="<%= related.title %>" 
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                            </a>
+                            <div class="p-4">
+                                <span class="text-xs text-blue-600 dark:text-blue-400 font-medium"><%= related.courceType %></span>
+                                <h3 class="font-semibold text-gray-900 dark:text-white mt-1 text-sm line-clamp-2"><%= related.title %></h3>
+                                <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                    <span class="text-lg font-bold text-blue-600 dark:text-blue-400">
+                                        ₹<%= related.actualPrice || related.price || 0 %>
+                                    </span>
+                                    <a href="/courses/<%= related._id %>" class="text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline">
+                                        View →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- Enrollment Modal -->
+<!-- Updated Enrollment Modal with Razorpay -->
+<div id="enrollmentModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
+        <!-- Modal Header -->
+        <div class="sticky top-0 bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4 rounded-t-2xl z-10">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold text-white">Complete Enrollment</h3>
+                    <p class="text-blue-100 text-sm mt-0.5 truncate max-w-[250px]"><%= course.title %></p>
+                </div>
+                <button onclick="closeEnrollmentModal()" class="text-white hover:text-gray-200 text-2xl transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Modal Body -->
+        <form id="enrollmentForm" class="p-6 space-y-5">
+            <input type="hidden" id="courseId" value="<%= course._id %>">
+            
+            <!-- Price -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Course Price</label>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">₹</span>
+                    <input type="number" id="paidPrice" value="<%= course.actualPrice || course.price || 0 %>" 
+                           class="w-full pl-8 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           readonly>
+                </div>
+            </div>
+            
+            <!-- Name -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Full Name <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="studentName" value="<%= currentUser ? currentUser.name : '' %>" required
+                       class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+            </div>
+            
+            <!-- Email -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Email Address <span class="text-red-500">*</span>
+                </label>
+                <input type="email" id="studentEmail" value="<%= currentUser ? currentUser.email : '' %>" required
+                       class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+            </div>
+            
+            <!-- Mobile -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Mobile Number <span class="text-red-500">*</span>
+                </label>
+                <input type="tel" id="studentMobile" value="<%= currentUser ? currentUser.mobile : '' %>" required
+                       placeholder="9876543210"
+                       class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+            </div>
+            
+            <!-- Description -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Any specific requirements or questions?
+                </label>
+                <textarea id="studentDescription" rows="3" 
+                          placeholder="Tell us about your goals or any questions you have..."
+                          class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 resize-none"></textarea>
+            </div>
+            
+            <!-- Terms -->
+            <div class="flex items-start gap-2">
+                <input type="checkbox" id="terms" required class="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400">
+                <label for="terms" class="text-sm text-gray-600 dark:text-gray-400">
+                    I agree to the <a href="/terms" class="text-blue-600 dark:text-blue-400 hover:underline">Terms and Conditions</a> and 
+                    <a href="/privacy" class="text-blue-600 dark:text-blue-400 hover:underline">Privacy Policy</a>
+                </label>
+            </div>
+            
+            <!-- Submit -->
+            <button type="button" onclick="initiatePayment()" 
+                    class="w-full px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-95">
+                <i class="fas fa-credit-card mr-2"></i>
+                Pay Now & Enroll
+            </button>
+            
+            <p class="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+                <i class="fas fa-lock mr-1"></i> Secure payment via Razorpay
+            </p>
+        </form>
+    </div>
+</div>
+
+<!-- Razorpay Script and Payment Logic -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+// Global variables
+let orderId = null;
+let razorpayKey = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal functions
+    const modal = document.getElementById('enrollmentModal');
+    const modalContent = document.getElementById('modalContent');
+    
+    window.openEnrollmentModal = function() {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        
+        setTimeout(() => {
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    };
+    
+    window.closeEnrollmentModal = function() {
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = '';
+        }, 300);
+    };
+    
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEnrollmentModal();
+        }
+    });
+    
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeEnrollmentModal();
+        }
+    });
+    
+    // Mobile number validation
+    document.getElementById('studentMobile')?.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 10) value = value.slice(0, 10);
+        e.target.value = value;
+    });
+});
+
+// Initiate Razorpay Payment
+async function initiatePayment() {
+    // Validate form
+    const name = document.getElementById('studentName').value.trim();
+    const email = document.getElementById('studentEmail').value.trim();
+    const mobile = document.getElementById('studentMobile').value.trim();
+    const terms = document.getElementById('terms').checked;
+    
+    if (!name) {
+        alert('Please enter your full name');
+        return;
+    }
+    if (!email || !email.includes('@') || !email.includes('.')) {
+        alert('Please enter a valid email address');
+        return;
+    }
+    if (!mobile || mobile.length < 10) {
+        alert('Please enter a valid 10-digit mobile number');
+        return;
+    }
+    if (!terms) {
+        alert('Please agree to the Terms and Conditions');
+        return;
+    }
+    
+    // Disable button to prevent double clicks
+    const btn = document.querySelector('#enrollmentForm button');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+    
+    try {
+        const courseId = document.getElementById('courseId').value;
+        
+        // Create order
+        const orderResponse = await fetch('/create-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ courseId })
+        });
+        
+        const orderData = await orderResponse.json();
+        
+        if (!orderData.success) {
+            throw new Error(orderData.message || 'Failed to create order');
+        }
+        
+        orderId = orderData.orderId;
+        razorpayKey = orderData.key;
+        
+        // Open Razorpay checkout
+        const options = {
+            key: razorpayKey,
+            amount: orderData.amount,
+            currency: orderData.currency,
+            name: 'CyberKavach',
+            description: `Enrollment in ${document.querySelector('.truncate')?.textContent || 'Course'}`,
+            image: '/images/logo.png',
+            order_id: orderId,
+            handler: function(response) {
+                verifyPayment(response);
+            },
+            prefill: {
+                name: name,
+                email: email,
+                contact: mobile
+            },
+            theme: {
+                color: '#1D4ED8'
+            },
+            modal: {
+                ondismiss: function() {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-credit-card mr-2"></i> Pay Now & Enroll';
+                }
+            }
+        };
+        
+        const razorpay = new Razorpay(options);
+        razorpay.open();
+        
+    } catch (error) {
+        console.error('Payment initiation error:', error);
+        alert(error.message || 'Failed to initiate payment. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-credit-card mr-2"></i> Pay Now & Enroll';
+    }
+}
+
+// Verify payment after successful transaction
+async function verifyPayment(response) {
+    try {
+        const courseId = document.getElementById('courseId').value;
+        const name = document.getElementById('studentName').value.trim();
+        const email = document.getElementById('studentEmail').value.trim();
+        const mobile = document.getElementById('studentMobile').value.trim();
+        const description = document.getElementById('studentDescription').value.trim();
+        
+        const verificationResponse = await fetch('/verify-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                courseId: courseId,
+                name: name,
+                email: email,
+                mobile: mobile,
+                description: description
+            })
+        });
+        
+        const data = await verificationResponse.json();
+        
+        if (data.success) {
+            // Show success message
+            alert('🎉 Enrollment successful! You now have access to the course content.');
+            
+            // Close modal
+            closeEnrollmentModal();
+            
+            // Redirect to course content
+            if (data.redirectUrl) {
+                window.location.href = data.redirectUrl;
+            } else {
+                window.location.href = `/courses/${courseId}/access`;
+            }
+        } else {
+            if (data.alreadyEnrolled) {
+                alert('You are already enrolled in this course!');
+                closeEnrollmentModal();
+                window.location.href = `/courses/${courseId}/access`;
+            } else {
+                alert(data.message || 'Payment verification failed. Please contact support.');
+            }
+        }
+        
+    } catch (error) {
+        console.error('Payment verification error:', error);
+        alert('Payment verification failed. Please contact support with your payment ID.');
+    }
+}
+</script>
+
+<style>
+    /* Course description styling */
+    .course-description {
+        color: #4b5563;
+        line-height: 1.8;
+    }
+    .dark .course-description {
+        color: #d1d5db;
+    }
+    .course-description h1, 
+    .course-description h2, 
+    .course-description h3 {
+        color: #1f2937;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+    .dark .course-description h1, 
+    .dark .course-description h2, 
+    .dark .course-description h3,
+    .dark .course-description h4,
+    .dark .course-description h5,
+    .dark .course-description h6 {
+        color: #ffffff;
+    }
+
+    .dark .course-description p {
+        color: #f3f4f6;
+    }
+    .course-description ul, 
+    .course-description ol {
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .dark .course-description ul, 
+    .dark .course-description ol {
+        color: #f3f4f6;
+    }
+    .course-description li {
+        margin-bottom: 0.25rem;
+    }
+    .dark .course-description li {
+        margin-bottom: 0.25rem;
+        color:#f3f4f6;
+    }
+    .course-description a {
+        color: #2563eb;
+        text-decoration: none;
+    }
+    .course-description a:hover {
+        text-decoration: underline;
+    }
+    .course-description pre {
+        background-color: #1f2937;
+        color: #f3f4f6;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        margin: 1rem 0;
+    }
+    .course-description code {
+        background-color: #f3f4f6;
+        padding: 0.125rem 0.375rem;
+        border-radius: 0.25rem;
+        font-size: 0.875em;
+        font-family: 'Courier New', monospace;
+    }
+    .dark .course-description code {
+        background-color: #374151;
+        color: #e5e7eb;
+    }
+
+    /* Line clamp */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Modal animation */
+    #modalContent {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+        background: #475569;
+    }
+</style>
+

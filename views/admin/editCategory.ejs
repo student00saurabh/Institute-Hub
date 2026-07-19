@@ -1,0 +1,435 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="min-h-[90vh] py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Page Header -->
+        <div class="mb-8" data-aos="fade-up">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </div>
+                        Edit Category
+                    </h1>
+                    <p class="mt-1 text-gray-600 dark:text-gray-400">
+                        Update category details and settings
+                    </p>
+                </div>
+                <div class="mt-4 md:mt-0 flex gap-3">
+                    <a href="/admin/categories" 
+                       class="px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 text-sm font-medium">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Categories
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 sm:p-8" data-aos="fade-up" data-aos-duration="600">
+            <form action="/admin/categories/<%= category._id %>?_method=PUT" method="POST" class="space-y-6">
+                
+                <!-- Category Name -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        Category Name <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="name" name="name" required
+                           value="<%= category.name %>"
+                           placeholder="e.g., Penetration Testing, Red Teaming, OSCP Preparation"
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200">
+                    <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i> Unique name for the category (2-50 characters)
+                    </p>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        Description
+                    </label>
+                    <textarea id="description" name="description" rows="3"
+                              placeholder="Brief description of this category..."
+                              class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 resize-none"><%= category.description || '' %></textarea>
+                    <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i> Short description (max 200 characters)
+                    </p>
+                </div>
+
+                <!-- Icon & Color -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Icon Dropdown -->
+                    <div>
+                        <label for="icon" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                            Icon <span class="text-red-500">*</span>
+                        </label>
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 text-xl flex-shrink-0" id="iconPreview">
+                                <i class="fas <%= category.icon || 'fa-shield-alt' %>"></i>
+                            </div>
+                            <select id="icon" name="icon" 
+                                    class="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer">
+                                <optgroup label="🛡️ Security Icons">
+                                    <option value="fa-shield-alt" <%= category.icon === 'fa-shield-alt' ? 'selected' : '' %>>🛡️ fa-shield-alt</option>
+                                    <option value="fa-shield" <%= category.icon === 'fa-shield' ? 'selected' : '' %>>🛡️ fa-shield</option>
+                                    <option value="fa-shield-halved" <%= category.icon === 'fa-shield-halved' ? 'selected' : '' %>>🛡️ fa-shield-halved</option>
+                                    <option value="fa-lock" <%= category.icon === 'fa-lock' ? 'selected' : '' %>>🔒 fa-lock</option>
+                                    <option value="fa-lock-open" <%= category.icon === 'fa-lock-open' ? 'selected' : '' %>>🔓 fa-lock-open</option>
+                                    <option value="fa-key" <%= category.icon === 'fa-key' ? 'selected' : '' %>>🔑 fa-key</option>
+                                    <option value="fa-fingerprint" <%= category.icon === 'fa-fingerprint' ? 'selected' : '' %>>🖐️ fa-fingerprint</option>
+                                    <option value="fa-user-secret" <%= category.icon === 'fa-user-secret' ? 'selected' : '' %>>🕵️ fa-user-secret</option>
+                                    <option value="fa-skull" <%= category.icon === 'fa-skull' ? 'selected' : '' %>>💀 fa-skull</option>
+                                    <option value="fa-bug" <%= category.icon === 'fa-bug' ? 'selected' : '' %>>🐛 fa-bug</option>
+                                </optgroup>
+                                <optgroup label="💻 Technology Icons">
+                                    <option value="fa-laptop-code" <%= category.icon === 'fa-laptop-code' ? 'selected' : '' %>>💻 fa-laptop-code</option>
+                                    <option value="fa-code" <%= category.icon === 'fa-code' ? 'selected' : '' %>>💻 fa-code</option>
+                                    <option value="fa-terminal" <%= category.icon === 'fa-terminal' ? 'selected' : '' %>>⌨️ fa-terminal</option>
+                                    <option value="fa-database" <%= category.icon === 'fa-database' ? 'selected' : '' %>>🗄️ fa-database</option>
+                                    <option value="fa-cloud" <%= category.icon === 'fa-cloud' ? 'selected' : '' %>>☁️ fa-cloud</option>
+                                    <option value="fa-server" <%= category.icon === 'fa-server' ? 'selected' : '' %>>🖥️ fa-server</option>
+                                    <option value="fa-network-wired" <%= category.icon === 'fa-network-wired' ? 'selected' : '' %>>🌐 fa-network-wired</option>
+                                    <option value="fa-wifi" <%= category.icon === 'fa-wifi' ? 'selected' : '' %>>📶 fa-wifi</option>
+                                    <option value="fa-globe" <%= category.icon === 'fa-globe' ? 'selected' : '' %>>🌍 fa-globe</option>
+                                </optgroup>
+                                <optgroup label="🎓 Education Icons">
+                                    <option value="fa-graduation-cap" <%= category.icon === 'fa-graduation-cap' ? 'selected' : '' %>>🎓 fa-graduation-cap</option>
+                                    <option value="fa-certificate" <%= category.icon === 'fa-certificate' ? 'selected' : '' %>>📜 fa-certificate</option>
+                                    <option value="fa-book" <%= category.icon === 'fa-book' ? 'selected' : '' %>>📚 fa-book</option>
+                                    <option value="fa-book-open" <%= category.icon === 'fa-book-open' ? 'selected' : '' %>>📖 fa-book-open</option>
+                                    <option value="fa-university" <%= category.icon === 'fa-university' ? 'selected' : '' %>>🏛️ fa-university</option>
+                                    <option value="fa-chalkboard-teacher" <%= category.icon === 'fa-chalkboard-teacher' ? 'selected' : '' %>>👨‍🏫 fa-chalkboard-teacher</option>
+                                    <option value="fa-pencil-alt" <%= category.icon === 'fa-pencil-alt' ? 'selected' : '' %>>✏️ fa-pencil-alt</option>
+                                    <option value="fa-award" <%= category.icon === 'fa-award' ? 'selected' : '' %>>🏆 fa-award</option>
+                                </optgroup>
+                                <optgroup label="🎯 Tools & Actions">
+                                    <option value="fa-bolt" <%= category.icon === 'fa-bolt' ? 'selected' : '' %>>⚡ fa-bolt</option>
+                                    <option value="fa-fire" <%= category.icon === 'fa-fire' ? 'selected' : '' %>>🔥 fa-fire</option>
+                                    <option value="fa-rocket" <%= category.icon === 'fa-rocket' ? 'selected' : '' %>>🚀 fa-rocket</option>
+                                    <option value="fa-cogs" <%= category.icon === 'fa-cogs' ? 'selected' : '' %>>⚙️ fa-cogs</option>
+                                    <option value="fa-tools" <%= category.icon === 'fa-tools' ? 'selected' : '' %>>🔧 fa-tools</option>
+                                    <option value="fa-search" <%= category.icon === 'fa-search' ? 'selected' : '' %>>🔍 fa-search</option>
+                                    <option value="fa-eye" <%= category.icon === 'fa-eye' ? 'selected' : '' %>>👁️ fa-eye</option>
+                                    <option value="fa-bullseye" <%= category.icon === 'fa-bullseye' ? 'selected' : '' %>>🎯 fa-bullseye</option>
+                                    <option value="fa-flag" <%= category.icon === 'fa-flag' ? 'selected' : '' %>>🚩 fa-flag</option>
+                                </optgroup>
+                                <optgroup label="📊 Analytics & Data">
+                                    <option value="fa-chart-line" <%= category.icon === 'fa-chart-line' ? 'selected' : '' %>>📈 fa-chart-line</option>
+                                    <option value="fa-chart-bar" <%= category.icon === 'fa-chart-bar' ? 'selected' : '' %>>📊 fa-chart-bar</option>
+                                    <option value="fa-chart-pie" <%= category.icon === 'fa-chart-pie' ? 'selected' : '' %>>📊 fa-chart-pie</option>
+                                    <option value="fa-brain" <%= category.icon === 'fa-brain' ? 'selected' : '' %>>🧠 fa-brain</option>
+                                    <option value="fa-robot" <%= category.icon === 'fa-robot' ? 'selected' : '' %>>🤖 fa-robot</option>
+                                    <option value="fa-microchip" <%= category.icon === 'fa-microchip' ? 'selected' : '' %>>💠 fa-microchip</option>
+                                </optgroup>
+                                <optgroup label="📁 Miscellaneous">
+                                    <option value="fa-folder" <%= category.icon === 'fa-folder' ? 'selected' : '' %>>📁 fa-folder</option>
+                                    <option value="fa-folder-open" <%= category.icon === 'fa-folder-open' ? 'selected' : '' %>>📂 fa-folder-open</option>
+                                    <option value="fa-tag" <%= category.icon === 'fa-tag' ? 'selected' : '' %>>🏷️ fa-tag</option>
+                                    <option value="fa-tags" <%= category.icon === 'fa-tags' ? 'selected' : '' %>>🏷️ fa-tags</option>
+                                    <option value="fa-star" <%= category.icon === 'fa-star' ? 'selected' : '' %>>⭐ fa-star</option>
+                                    <option value="fa-heart" <%= category.icon === 'fa-heart' ? 'selected' : '' %>>❤️ fa-heart</option>
+                                    <option value="fa-plus-circle" <%= category.icon === 'fa-plus-circle' ? 'selected' : '' %>>➕ fa-plus-circle</option>
+                                    <option value="fa-crown" <%= category.icon === 'fa-crown' ? 'selected' : '' %>>👑 fa-crown</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-1"></i> Select an icon that represents this category
+                        </p>
+                    </div>
+
+                    <!-- Color Dropdown with Preview -->
+                    <div>
+                        <label for="color" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                            Color <span class="text-red-500">*</span>
+                        </label>
+                        <select id="color" name="color"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer">
+                            <option value="blue" <%= category.color === 'blue' ? 'selected' : '' %> class="bg-blue-500 text-white">🔵 Blue</option>
+                            <option value="indigo" <%= category.color === 'indigo' ? 'selected' : '' %> class="bg-indigo-500 text-white">🟣 Indigo</option>
+                            <option value="purple" <%= category.color === 'purple' ? 'selected' : '' %> class="bg-purple-500 text-white">🟣 Purple</option>
+                            <option value="pink" <%= category.color === 'pink' ? 'selected' : '' %> class="bg-pink-500 text-white">🩷 Pink</option>
+                            <option value="red" <%= category.color === 'red' ? 'selected' : '' %> class="bg-red-500 text-white">🔴 Red</option>
+                            <option value="orange" <%= category.color === 'orange' ? 'selected' : '' %> class="bg-orange-500 text-white">🟠 Orange</option>
+                            <option value="yellow" <%= category.color === 'yellow' ? 'selected' : '' %> class="bg-yellow-500 text-white">🟡 Yellow</option>
+                            <option value="green" <%= category.color === 'green' ? 'selected' : '' %> class="bg-green-500 text-white">🟢 Green</option>
+                            <option value="teal" <%= category.color === 'teal' ? 'selected' : '' %> class="bg-teal-500 text-white">🟢 Teal</option>
+                            <option value="cyan" <%= category.color === 'cyan' ? 'selected' : '' %> class="bg-cyan-500 text-white">🟦 Cyan</option>
+                            <option value="gray" <%= category.color === 'gray' ? 'selected' : '' %> class="bg-gray-500 text-white">⚪ Gray</option>
+                        </select>
+                        <div class="mt-2 flex items-center gap-2">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Preview:</span>
+                            <span id="colorPreview" class="inline-block w-6 h-6 rounded-full bg-<%= category.color || 'blue' %>-500 border border-gray-300 dark:border-gray-600"></span>
+                            <span id="colorName" class="text-xs text-gray-600 dark:text-gray-400"><%= (category.color || 'blue').charAt(0).toUpperCase() + (category.color || 'blue').slice(1) %></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Display Order & Active -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="displayOrder" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                            Display Order
+                        </label>
+                        <input type="number" id="displayOrder" name="displayOrder" value="<%= category.displayOrder || 0 %>" min="0" step="1"
+                               class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200">
+                        <div class="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <p class="text-xs text-blue-800 dark:text-blue-300">
+                                <i class="fas fa-info-circle mr-1"></i> 
+                                <strong>Order Guide:</strong>
+                            </p>
+                            <ul class="text-xs text-blue-700 dark:text-blue-300 mt-1 space-y-0.5 list-disc list-inside">
+                                <li><strong>0</strong> - First position (appears at the top)</li>
+                                <li><strong>1, 2, 3...</strong> - Subsequent positions</li>
+                                <li><strong>Higher numbers</strong> - Appear later in the list</li>
+                                <li class="text-yellow-600 dark:text-yellow-400">💡 Tip: Use increments of 10 (e.g., 10, 20, 30) to easily insert new categories later</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                            Status
+                        </label>
+                        <div class="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+                            <input type="checkbox" id="isActive" name="isActive" <%= category.isActive ? 'checked' : '' %>
+                                   class="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-400">
+                            <label for="isActive" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Active
+                            </label>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                                Inactive categories won't appear in dropdowns
+                            </p>
+                        </div>
+                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-1"></i> Current status: <span class="font-medium <%= category.isActive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' %>"><%= category.isActive ? 'Active' : 'Inactive' %></span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Slug (Read-only) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        Slug (Auto-generated)
+                    </label>
+                    <div class="px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">
+                        <i class="fas fa-link mr-2"></i>
+                        <%= category.slug || 'Will be auto-generated' %>
+                    </div>
+                    <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i> Slug is automatically generated from the category name
+                    </p>
+                </div>
+
+                <!-- Created Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                            Created At
+                        </label>
+                        <div class="px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-sm">
+                            <i class="far fa-calendar-alt mr-2"></i>
+                            <%= new Date(category.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                            Last Updated
+                        </label>
+                        <div class="px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 text-sm">
+                            <i class="far fa-clock mr-2"></i>
+                            <%= new Date(category.updatedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button type="submit"
+                            class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-3.5 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Update Category
+                    </button>
+                    <a href="/admin/categories"
+                       class="flex-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-3.5 px-6 rounded-xl transition-colors duration-200 text-center">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="mt-6 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-200 dark:border-red-800 p-6" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+            <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-red-800 dark:text-red-300">Danger Zone</h3>
+                    <p class="text-sm text-red-700 dark:text-red-400 mt-1">
+                        Deleting this category will permanently remove it. This action cannot be undone.
+                    </p>
+                    <% 
+                        // Check if category has courses
+                        const courseCount = category.courseCount || 0;
+                    %>
+                    <% if (courseCount > 0) { %>
+                        <p class="text-sm text-red-600 dark:text-red-400 mt-2 font-medium">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            This category is currently used by <strong><%= courseCount %></strong> course(s). You must reassign or delete those courses first.
+                        </p>
+                        <button type="button" disabled
+                                class="mt-3 px-6 py-2 bg-gray-400 cursor-not-allowed text-white font-medium rounded-lg">
+                            <i class="fas fa-trash-alt mr-2"></i> Delete Category (Disabled)
+                        </button>
+                    <% } else { %>
+                        <form action="/admin/categories/<%= category._id %>?_method=DELETE" method="POST" class="inline-block">
+                            <button type="submit" 
+                                    onclick="return confirm('Are you sure you want to delete this category? This action cannot be undone.')"
+                                    class="mt-3 px-6 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-medium rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
+                                <i class="fas fa-trash-alt mr-2"></i> Delete Category
+                            </button>
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Tips -->
+        <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+            <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-blue-900 dark:text-blue-300">Editing Tips</h3>
+                    <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="text-sm text-blue-800 dark:text-blue-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Update Carefully</p>
+                            <p class="mt-0.5 text-xs opacity-80">Changing names may affect course organization</p>
+                        </div>
+                        <div class="text-sm text-blue-800 dark:text-blue-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Icon & Color</p>
+                            <p class="mt-0.5 text-xs opacity-80">Maintain visual consistency across categories</p>
+                        </div>
+                        <div class="text-sm text-blue-800 dark:text-blue-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Order Matters</p>
+                            <p class="mt-0.5 text-xs opacity-80">Adjust display order for better user experience</p>
+                        </div>
+                        <div class="text-sm text-blue-800 dark:text-blue-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Deactivate Instead</p>
+                            <p class="mt-0.5 text-xs opacity-80">Deactivate categories instead of deleting if unsure</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Icon preview on selection change
+    const iconSelect = document.getElementById('icon');
+    const iconPreview = document.querySelector('#iconPreview i');
+    
+    if (iconSelect && iconPreview) {
+        iconSelect.addEventListener('change', function() {
+            const iconClass = this.value || 'fa-shield-alt';
+            iconPreview.className = `fas ${iconClass}`;
+        });
+    }
+
+    // Color preview on selection change
+    const colorSelect = document.getElementById('color');
+    const colorPreview = document.getElementById('colorPreview');
+    const colorName = document.getElementById('colorName');
+    
+    const colorMap = {
+        'blue': { bg: 'bg-blue-500', name: 'Blue' },
+        'indigo': { bg: 'bg-indigo-500', name: 'Indigo' },
+        'purple': { bg: 'bg-purple-500', name: 'Purple' },
+        'pink': { bg: 'bg-pink-500', name: 'Pink' },
+        'red': { bg: 'bg-red-500', name: 'Red' },
+        'orange': { bg: 'bg-orange-500', name: 'Orange' },
+        'yellow': { bg: 'bg-yellow-500', name: 'Yellow' },
+        'green': { bg: 'bg-green-500', name: 'Green' },
+        'teal': { bg: 'bg-teal-500', name: 'Teal' },
+        'cyan': { bg: 'bg-cyan-500', name: 'Cyan' },
+        'gray': { bg: 'bg-gray-500', name: 'Gray' }
+    };
+
+    if (colorSelect && colorPreview && colorName) {
+        // Initial preview
+        const initialColor = colorSelect.value || 'blue';
+        const initialColorInfo = colorMap[initialColor] || colorMap['blue'];
+        colorPreview.className = `inline-block w-6 h-6 rounded-full ${initialColorInfo.bg} border border-gray-300 dark:border-gray-600`;
+        colorName.textContent = initialColorInfo.name;
+
+        // Update on change
+        colorSelect.addEventListener('change', function() {
+            const colorValue = this.value || 'blue';
+            const colorInfo = colorMap[colorValue] || colorMap['blue'];
+            colorPreview.className = `inline-block w-6 h-6 rounded-full ${colorInfo.bg} border border-gray-300 dark:border-gray-600`;
+            colorName.textContent = colorInfo.name;
+        });
+    }
+});
+</script>
+
+<style>
+    /* Custom select styling */
+    select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    .dark select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    }
+
+    /* Color option styling */
+    select option {
+        padding: 8px 12px;
+    }
+
+    /* Custom scrollbar for select dropdown */
+    select::-webkit-scrollbar {
+        width: 8px;
+    }
+    select::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+    select::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+    select::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    .dark select::-webkit-scrollbar-track {
+        background: #2d3748;
+    }
+    .dark select::-webkit-scrollbar-thumb {
+        background: #4a5568;
+    }
+    .dark select::-webkit-scrollbar-thumb:hover {
+        background: #718096;
+    }
+</style>

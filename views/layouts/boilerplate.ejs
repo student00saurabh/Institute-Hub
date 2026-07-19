@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <title><%= meta.title %></title>
+
+  <link rel="manifest" href="/manifest.json">
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="<%= meta.title %>" />
+  <meta
+    name="description"
+    content="<%= meta.description %>"
+  />
+  <meta
+    name="keywords"
+    content="<%= meta.keywords %>"
+  />
+  <meta name="author" content="CyberKavach Developers" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="<%= requestUrl %>" />
+  <meta property="og:title" content="<%= meta.title %>" />
+  <meta
+    property="og:description"
+    content="<%= meta.description %>"
+  />
+  <meta
+  property="og:image"
+  content="<%= meta.image
+    ? meta.image.replace('/upload/', '/upload/f_auto,q_auto/')
+    : '/images/logo.png' %>"
+/>
+  <meta property="og:site_name" content="CyberKavach" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="<%= requestUrl %>" />
+  <meta property="twitter:title" content="<%= meta.title %>" />
+  <meta
+    property="twitter:description"
+    content="<%= meta.description %>"
+  />
+  <meta
+  property="twitter:image"
+  content="<%= meta.image
+    ? meta.image.replace(
+        '/upload/',
+        '/upload/f_auto,q_auto,w_1200,h_630,c_fill/'
+      )
+    : '/images/logo.png' %>"
+/>
+
+
+
+  <!-- Favicons -->
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+  <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
+  <link rel="manifest" href="/images/site.webmanifest" />
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#10b981" />
+  <meta name="msapplication-TileColor" content="#1ecbe1" />
+  <meta name="theme-color" content="#1bb9cd" />
+
+  <link rel="canonical" href="<%= meta.canonical || requestUrl %>">
+
+  <!-- custom css -->
+  <link rel="stylesheet" href="/css/style.css" />
+  <!-- Tailwind CSS -->
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+  />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- AOS Animation -->
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+
+  <!-- Compiled CSS -->
+  <link rel="stylesheet" href="/css/output.css" />
+
+  <!-- Smooth Theme Transition -->
+  <style>
+    html, body {
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+  </style>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Dark Mode Detection -->
+  <script>
+    if (localStorage.theme === "dark") {
+      document.documentElement.classList.add("dark");
+    }
+  </script>
+  <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
+</script>
+
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YP04N0626F">
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-YP04N0626F');
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "CyberKavach",
+      "url": "<%= requestUrl.replace(currentPath, '') %>",
+      "logo": "<%= meta.image
+    ? meta.image.replace(
+        '/upload/',
+        '/upload/f_auto,q_auto,w_1200,h_630,c_fill/'
+      )
+    : '/images/logo.png' %>",
+      "sameAs": []
+    },
+    {
+      "@type": "WebSite",
+      "url": "<%= requestUrl.replace(currentPath, '') %>",
+      "name": "<%= meta.title %>",
+      "description": "<%= meta.description %>"
+    }
+  ]
+}
+</script>
+
+</head>
+
+<body class="font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+  <!-- Navbar -->
+  <%- include("../includes/navbar.ejs") %>
+
+  <!-- Flash Messages + Page Content -->
+  <main class="w-full min-h-screen">
+    <%- include("../includes/flash.ejs") %>
+    <%- body %>
+  </main>
+
+  <!-- Footer -->
+  <%- include("../includes/footer.ejs") %>
+
+  <!-- AOS -->
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init({ once: true, duration: 700, easing: "ease-out-cubic" });
+  </script>
+
+  <!-- App Script -->
+  <script src="/js/script.js"></script>
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("img").forEach(img => {
+
+    if (!img.hasAttribute("loading")) {
+      img.setAttribute("loading", "lazy");
+    }
+
+    if (!img.hasAttribute("decoding")) {
+      img.setAttribute("decoding", "async");
+    }
+
+  });
+});
+</script>
+
+</body>
+</html>

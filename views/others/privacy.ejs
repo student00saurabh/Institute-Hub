@@ -1,0 +1,621 @@
+<% layout("/layouts/boilerplate") %>
+
+<!-- ============================================================ -->
+<!--  INSTITUTEHUB — PRIVACY POLICY PAGE                          -->
+<!--  Horizontal Scrollable TOC | Scoped CSS                     -->
+<!-- ============================================================ -->
+
+<%
+  // ---------------------------------------------------------------
+  // DUMMY DATA
+  // ---------------------------------------------------------------
+  const lastUpdated = "July 18, 2026";
+  
+  const sections = [
+    {
+      id: "introduction",
+      title: "Introduction",
+      icon: "fa-file-alt",
+      content: `
+        <p>Welcome to InstituteHub ("we," "our," "us"). We are committed to protecting your privacy and ensuring that your personal information is handled in a safe and responsible manner. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.</p>
+        <p class="mt-3">Please read this Privacy Policy carefully. By using our website and services, you consent to the collection and use of your personal information as described in this policy.</p>
+      `
+    },
+    {
+      id: "information-collect",
+      title: "Information We Collect",
+      icon: "fa-database",
+      content: `
+        <p>We collect several types of information from and about users of our website and services:</p>
+        <ul class="privacy-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Personal Identification Information:</strong> Name, email address, phone number, date of birth, and other contact details you provide when registering for courses or contacting us.</li>
+          <li><strong>Academic Information:</strong> Course enrollment details, progress, grades, certificates earned, and learning preferences.</li>
+          <li><strong>Payment Information:</strong> Credit/debit card details, billing address, and transaction history when you make purchases.</li>
+          <li><strong>Technical Information:</strong> IP address, browser type, device information, operating system, and cookies for analytics and personalization.</li>
+          <li><strong>Usage Information:</strong> Pages visited, time spent on the platform, features used, and interactions with our content.</li>
+        </ul>
+      `
+    },
+    {
+      id: "how-use",
+      title: "How We Use Your Info",
+      icon: "fa-cog",
+      content: `
+        <p>We use the information we collect for the following purposes:</p>
+        <ul class="privacy-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Course Delivery:</strong> To provide, personalize, and improve our courses and learning experience.</li>
+          <li><strong>Account Management:</strong> To create and manage your account, process enrollments, and track your progress.</li>
+          <li><strong>Communication:</strong> To send you updates about courses, new offerings, promotions, and respond to your inquiries.</li>
+          <li><strong>Technical Support:</strong> To provide customer support and resolve technical issues.</li>
+          <li><strong>Analytics:</strong> To analyze usage patterns, improve our services, and develop new features.</li>
+          <li><strong>Legal Compliance:</strong> To comply with legal obligations and enforce our terms of service.</li>
+        </ul>
+      `
+    },
+    {
+      id: "sharing",
+      title: "Information Sharing",
+      icon: "fa-share-alt",
+      content: `
+        <p>We do not sell or rent your personal information to third parties. However, we may share your information in the following circumstances:</p>
+        <ul class="privacy-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Service Providers:</strong> We may share information with trusted third-party service providers who assist us in operating our platform, processing payments, and delivering services.</li>
+          <li><strong>Educational Partners:</strong> If you enroll through a partner institution, we may share your progress and completion data with them.</li>
+          <li><strong>Legal Requirements:</strong> We may disclose your information if required by law, court order, or governmental regulation.</li>
+          <li><strong>Business Transfers:</strong> In the event of a merger, acquisition, or sale of assets, your information may be transferred to the new entity.</li>
+          <li><strong>With Your Consent:</strong> We may share information with your explicit consent for specific purposes.</li>
+        </ul>
+      `
+    },
+    {
+      id: "cookies",
+      title: "Cookies & Tracking",
+      icon: "fa-cookie",
+      content: `
+        <p>We use cookies and similar tracking technologies to enhance your experience on our platform. Cookies are small text files stored on your device that help us:</p>
+        <ul class="privacy-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Remember Your Preferences:</strong> Keep you logged in and remember your settings.</li>
+          <li><strong>Analyze Usage:</strong> Understand how you interact with our platform and improve our services.</li>
+          <li><strong>Personalize Content:</strong> Provide relevant course recommendations and targeted content.</li>
+        </ul>
+        <p class="mt-3">You can control cookie settings through your browser preferences. However, disabling cookies may affect your ability to use certain features of our platform.</p>
+      `
+    },
+    {
+      id: "data-security",
+      title: "Data Security",
+      icon: "fa-lock",
+      content: `
+        <p>We implement appropriate technical and organizational measures to protect your personal information from unauthorized access, disclosure, alteration, and destruction. These measures include:</p>
+        <ul class="privacy-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Encryption:</strong> All data transmitted between your browser and our servers is encrypted using SSL/TLS protocols.</li>
+          <li><strong>Access Controls:</strong> Strict access controls and authentication mechanisms protect our databases and systems.</li>
+          <li><strong>Regular Audits:</strong> We conduct regular security audits and vulnerability assessments.</li>
+          <li><strong>Employee Training:</strong> Our team undergoes regular training on data protection and privacy practices.</li>
+        </ul>
+        <p class="mt-3">While we strive to protect your information, no method of transmission over the internet is 100% secure. We encourage you to take steps to protect your account credentials and personal information.</p>
+      `
+    },
+    {
+      id: "your-rights",
+      title: "Your Rights",
+      icon: "fa-user-shield",
+      content: `
+        <p>You have the following rights regarding your personal information:</p>
+        <ul class="privacy-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Access:</strong> Request a copy of the personal information we hold about you.</li>
+          <li><strong>Correction:</strong> Request corrections to inaccurate or incomplete information.</li>
+          <li><strong>Deletion:</strong> Request deletion of your personal information, subject to legal requirements.</li>
+          <li><strong>Data Portability:</strong> Request transfer of your data to another service provider.</li>
+          <li><strong>Objection:</strong> Object to processing of your data for marketing or other purposes.</li>
+          <li><strong>Withdraw Consent:</strong> Withdraw consent at any time for processing based on consent.</li>
+        </ul>
+        <p class="mt-3">To exercise these rights, please contact us at <a href="mailto:privacy@InstituteHub.org.in" class="text-[#2563EB] hover:underline">privacy@InstituteHub.org.in</a>. We will respond to your request within 30 days.</p>
+      `
+    },
+    {
+      id: "data-retention",
+      title: "Data Retention",
+      icon: "fa-clock",
+      content: `
+        <p>We retain your personal information for as long as necessary to fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required or permitted by law. Specifically:</p>
+        <ul class="privacy-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Account Information:</strong> Retained for as long as your account is active and for a reasonable period thereafter for record-keeping and legal purposes.</li>
+          <li><strong>Course History:</strong> Maintained to provide you with a learning history and certificate access.</li>
+          <li><strong>Transaction Data:</strong> Retained for financial record-keeping and compliance purposes.</li>
+        </ul>
+        <p class="mt-3">When we no longer need your personal information, we will securely delete or anonymize it.</p>
+      `
+    },
+    {
+      id: "third-party",
+      title: "Third-Party Services",
+      icon: "fa-link",
+      content: `
+        <p>Our platform may contain links to third-party websites, services, and tools. We are not responsible for the privacy practices or content of these third-party services. We encourage you to review the privacy policies of any third-party services you use.</p>
+        <p class="mt-3">We may also use third-party services such as payment processors, analytics providers, and cloud service providers. These providers have their own privacy policies and may process your data on our behalf.</p>
+      `
+    },
+    {
+      id: "children",
+      title: "Children's Privacy",
+      icon: "fa-child",
+      content: `
+        <p>InstituteHub is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us immediately.</p>
+        <p class="mt-3">For users between 13 and 18 years of age, we require parental consent before collecting personal information. We encourage parents to monitor their children's online activities.</p>
+      `
+    },
+    {
+      id: "gdpr",
+      title: "GDPR Compliance",
+      icon: "fa-flag-eu",
+      content: `
+        <p>If you are a resident of the European Union, you have additional rights under the General Data Protection Regulation (GDPR). These rights include:</p>
+        <ul class="privacy-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Right to Access:</strong> Obtain confirmation that we process your data and access your personal data.</li>
+          <li><strong>Right to Rectification:</strong> Request correction of inaccurate personal data.</li>
+          <li><strong>Right to Erasure:</strong> Request deletion of your personal data under certain circumstances.</li>
+          <li><strong>Right to Restrict Processing:</strong> Request restriction of processing your data.</li>
+          <li><strong>Right to Data Portability:</strong> Receive your data in a structured, machine-readable format.</li>
+          <li><strong>Right to Object:</strong> Object to processing of your data for specific purposes.</li>
+        </ul>
+        <p class="mt-3">To exercise these rights, contact us at <a href="mailto:gdpr@InstituteHub.org.in" class="text-[#2563EB] hover:underline">gdpr@InstituteHub.org.in</a>.</p>
+      `
+    },
+    {
+      id: "ccpa",
+      title: "CCPA Compliance",
+      icon: "fa-flag-us",
+      content: `
+        <p>If you are a California resident, you have rights under the California Consumer Privacy Act (CCPA), including:</p>
+        <ul class="privacy-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Right to Know:</strong> Request disclosure of categories and specific pieces of personal information we have collected.</li>
+          <li><strong>Right to Delete:</strong> Request deletion of your personal information.</li>
+          <li><strong>Right to Opt-Out:</strong> Opt-out of the sale of your personal information (we do not sell your data).</li>
+          <li><strong>Right to Non-Discrimination:</strong> You will not receive discriminatory treatment for exercising your rights.</li>
+        </ul>
+        <p class="mt-3">To exercise these rights, contact us at <a href="mailto:ccpa@InstituteHub.org.in" class="text-[#2563EB] hover:underline">ccpa@InstituteHub.org.in</a>.</p>
+      `
+    },
+    {
+      id: "changes",
+      title: "Policy Updates",
+      icon: "fa-edit",
+      content: `
+        <p>We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements. We will notify you of any material changes by:</p>
+        <ul class="privacy-list-disc pl-6 mt-3 space-y-2">
+          <li><strong>Email Notification:</strong> Sending an email to the address associated with your account.</li>
+          <li><strong>Website Notice:</strong> Posting a notice on our website.</li>
+          <li><strong>In-App Notification:</strong> Displaying a notice when you log in.</li>
+        </ul>
+        <p class="mt-3">We encourage you to review this Privacy Policy periodically to stay informed about how we protect your information.</p>
+      `
+    },
+    {
+      id: "contact",
+      title: "Contact Us",
+      icon: "fa-envelope",
+      content: `
+        <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
+        <div class="mt-4 space-y-2 text-sm bg-[#F8FAFC] dark:bg-[#111827] p-4 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B]">
+          <p><strong class="text-[#0F172A] dark:text-white">Email:</strong> <a href="mailto:privacy@InstituteHub.org.in" class="text-[#2563EB] hover:underline">privacy@InstituteHub.org.in</a></p>
+          <p><strong class="text-[#0F172A] dark:text-white">Phone:</strong> <a href="tel:+919310643303" class="text-[#2563EB] hover:underline">+91 9310643303</a></p>
+          <p><strong class="text-[#0F172A] dark:text-white">Address:</strong> 123, Tech Park, Sector 62, Noida, Uttar Pradesh 201301, India</p>
+          <p><strong class="text-[#0F172A] dark:text-white">Working Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM IST</p>
+        </div>
+      `
+    }
+  ];
+%>
+
+<!-- ============================================================ -->
+<!-- PAGE HEADER                                                   -->
+<!-- ============================================================ -->
+<section class="privacy-page relative overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-[#2563EB] py-16 lg:py-20 -mt-6">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-[#C9A227] rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#2563EB] rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+        <span class="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-white/90 mb-4 border border-white/20">
+            <i class="fas fa-shield-alt mr-2"></i> Privacy Policy
+        </span>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
+            Your <span class="text-[#C9A227]">Privacy</span> Matters
+        </h1>
+        <p class="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto">
+            We are committed to protecting your personal information and being transparent about how we use it.
+        </p>
+        <div class="mt-4 inline-flex items-center gap-2 text-sm text-white/60">
+            <i class="fas fa-clock"></i>
+            <span>Last Updated: <%= lastUpdated %></span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- HORIZONTAL SCROLLABLE TOC                                     -->
+<!-- ============================================================ -->
+<section class="privacy-toc-wrapper py-3 bg-white dark:bg-[#0B1120] border-b border-[#E2E8F0] dark:border-[#1E293B] sticky top-16 z-30 backdrop-blur-lg bg-white/95 dark:bg-[#0B1120]/95">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="privacy-toc-container relative">
+            <!-- Left Gradient Fade -->
+            <div class="privacy-toc-fade-left absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none"></div>
+            
+            <!-- Right Gradient Fade -->
+            <div class="privacy-toc-fade-right absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none"></div>
+            
+            <!-- Scrollable Container -->
+            <div id="privacyTocScroll" class="privacy-toc-scroll flex gap-2 overflow-x-auto scroll-smooth py-2">
+                <% sections.forEach((section, i) => { %>
+                    <a href="#privacy-<%= section.id %>" 
+                       class="privacy-toc-link flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap
+                              bg-[#F8FAFC] dark:bg-[#111827] text-[#64748B] dark:text-[#94A3B8] 
+                              hover:bg-[#2563EB]/10 hover:text-[#2563EB] dark:hover:bg-[#2563EB]/20 dark:hover:text-[#2563EB]
+                              border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40
+                              <%= i === 0 ? 'privacy-toc-active' : '' %>">
+                        <i class="fas <%= section.icon %> text-[10px] sm:text-xs"></i>
+                        <span class="hidden sm:inline"><%= section.title %></span>
+                        <span class="sm:hidden"><%= section.title.split(' ').slice(0, 2).join(' ') %></span>
+                    </a>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PRIVACY CONTENT                                               -->
+<!-- ============================================================ -->
+<section class="privacy-content-wrapper py-12 lg:py-16 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Last Updated Notice -->
+        <div class="privacy-reveal bg-white dark:bg-[#111827] rounded-2xl p-4 mb-8 border border-[#E2E8F0] dark:border-[#1E293B] text-center">
+            <p class="text-sm text-[#64748B] dark:text-[#94A3B8]">
+                <i class="fas fa-info-circle text-[#2563EB] mr-2"></i>
+                This Privacy Policy was last updated on <strong class="text-[#0F172A] dark:text-white"><%= lastUpdated %></strong>
+            </p>
+        </div>
+
+        <!-- Sections -->
+        <div class="privacy-sections space-y-6">
+            <% sections.forEach((section, i) => { %>
+                <div id="privacy-<%= section.id %>" class="privacy-reveal bg-white dark:bg-[#111827] rounded-2xl p-6 sm:p-8 border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 transition-all duration-300 scroll-mt-32"
+                     style="transition-delay: <%= i * 40 %>ms">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-[#2563EB]/10 to-[#C9A227]/10 flex items-center justify-center text-[#2563EB]">
+                            <i class="fas <%= section.icon %> text-lg"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h2 class="text-xl sm:text-2xl font-bold text-[#0F172A] dark:text-white mb-4">
+                                <%= section.title %>
+                            </h2>
+                            <div class="privacy-prose text-[#64748B] dark:text-[#94A3B8] leading-relaxed">
+                                <%- section.content %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+
+        <!-- Quick Summary -->
+        <div class="privacy-reveal mt-8 bg-gradient-to-br from-[#2563EB]/5 to-[#C9A227]/5 dark:from-[#2563EB]/10 dark:to-[#C9A227]/10 rounded-2xl p-6 sm:p-8 border border-[#2563EB]/20 dark:border-[#2563EB]/30">
+            <h3 class="text-lg font-bold text-[#0F172A] dark:text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-check-circle text-[#22C55E]"></i>
+                Quick Summary
+            </h3>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-[#22C55E]/10 flex items-center justify-center text-[#22C55E] flex-shrink-0 mt-0.5">
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-[#0F172A] dark:text-white text-sm">We Collect</p>
+                        <p class="text-xs text-[#64748B] dark:text-[#94A3B8]">Name, email, course data, usage, payment info</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-[#22C55E]/10 flex items-center justify-center text-[#22C55E] flex-shrink-0 mt-0.5">
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-[#0F172A] dark:text-white text-sm">We Use For</p>
+                        <p class="text-xs text-[#64748B] dark:text-[#94A3B8]">Course delivery, support, analytics, communication</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-[#22C55E]/10 flex items-center justify-center text-[#22C55E] flex-shrink-0 mt-0.5">
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-[#0F172A] dark:text-white text-sm">We Share</p>
+                        <p class="text-xs text-[#64748B] dark:text-[#94A3B8]">Only with service providers and legal requirements</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-[#22C55E]/10 flex items-center justify-center text-[#22C55E] flex-shrink-0 mt-0.5">
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-[#0F172A] dark:text-white text-sm">Your Rights</p>
+                        <p class="text-xs text-[#64748B] dark:text-[#94A3B8]">Access, correct, delete, portability, objection</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact CTA -->
+        <div class="privacy-reveal mt-8 text-center">
+            <div class="bg-[#0F172A] dark:bg-[#0B1120] rounded-2xl p-8 border border-[#1E293B]">
+                <h3 class="text-lg font-bold text-white mb-2">Questions About This Policy?</h3>
+                <p class="text-sm text-[#94A3B8] mb-4">
+                    Our privacy team is here to help. Contact us anytime.
+                </p>
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <a href="mailto:privacy@InstituteHub.org.in" class="inline-flex items-center gap-2 px-6 py-2.5 bg-[#2563EB] text-white font-semibold rounded-xl hover:bg-[#1D4ED8] transition-all duration-300">
+                        <i class="fas fa-envelope"></i>
+                        Email Privacy Team
+                    </a>
+                    <a href="/contact" class="inline-flex items-center gap-2 px-6 py-2.5 border-2 border-white/20 text-white font-semibold rounded-xl hover:bg-white/10 transition-all duration-300">
+                        <i class="fas fa-headset"></i>
+                        Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCOPED STYLES — Only affects this page                      -->
+<!-- ============================================================ -->
+<style>
+    /* ===== PRIVACY PAGE SPECIFIC STYLES ===== */
+    
+    /* Hide scrollbar for TOC */
+    .privacy-toc-scroll::-webkit-scrollbar { display: none; }
+    .privacy-toc-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* Reveal animations */
+    .privacy-reveal {
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), 
+                    transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .privacy-reveal.privacy-in-view {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Scroll margin for sticky TOC */
+    .scroll-mt-32 {
+        scroll-margin-top: 8rem;
+    }
+
+    /* TOC Link Active State */
+    .privacy-toc-link.privacy-toc-active {
+        background: rgba(37, 99, 235, 0.1) !important;
+        color: #2563EB !important;
+        border-color: rgba(37, 99, 235, 0.4) !important;
+    }
+    .dark .privacy-toc-link.privacy-toc-active {
+        background: rgba(37, 99, 235, 0.2) !important;
+        color: #2563EB !important;
+    }
+
+    /* TOC Scroll Animation */
+    #privacyTocScroll {
+        scroll-behavior: smooth;
+    }
+
+    /* Gradient fades for TOC */
+    .privacy-toc-fade-left {
+        background-image: linear-gradient(to right, rgba(255,255,255,0.95) 0%, transparent 100%);
+    }
+    .dark .privacy-toc-fade-left {
+        background-image: linear-gradient(to right, rgba(11, 17, 32, 0.95) 0%, transparent 100%);
+    }
+    .privacy-toc-fade-right {
+        background-image: linear-gradient(to left, rgba(255,255,255,0.95) 0%, transparent 100%);
+    }
+    .dark .privacy-toc-fade-right {
+        background-image: linear-gradient(to left, rgba(11, 17, 32, 0.95) 0%, transparent 100%);
+    }
+
+    /* Privacy prose styles - scoped to privacy page */
+    .privacy-prose ul.privacy-list-disc {
+        list-style-type: disc !important;
+        padding-left: 1.5rem !important;
+    }
+    .privacy-prose ul.privacy-list-disc li {
+        margin-bottom: 0.5rem !important;
+        line-height: 1.6 !important;
+    }
+    .privacy-prose strong {
+        color: #0F172A;
+    }
+    .dark .privacy-prose strong {
+        color: #FFFFFF;
+    }
+    .privacy-prose a {
+        color: #2563EB;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+    .privacy-prose a:hover {
+        color: #3B82F6;
+    }
+
+    /* Pulse animation for background blobs */
+    @keyframes privacyPulse {
+        0%, 100% { opacity: 0.1; }
+        50% { opacity: 0.2; }
+    }
+    .privacy-page .animate-pulse {
+        animation: privacyPulse 3s ease-in-out infinite;
+    }
+
+    /* Sticky TOC shadow */
+    .privacy-toc-wrapper {
+        transition: box-shadow 0.3s ease;
+    }
+    .privacy-toc-wrapper.privacy-scrolled {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .privacy-reveal {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+        #privacyTocScroll {
+            scroll-behavior: auto;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .privacy-toc-wrapper {
+            position: relative !important;
+            top: 0 !important;
+        }
+        .scroll-mt-32 {
+            scroll-margin-top: 4rem;
+        }
+        .privacy-prose ul.privacy-list-disc {
+            padding-left: 1rem !important;
+        }
+        .privacy-toc-link {
+            padding: 0.5rem 0.75rem !important;
+            font-size: 10px !important;
+        }
+        .privacy-toc-fade-left,
+        .privacy-toc-fade-right {
+            width: 1.5rem !important;
+        }
+    }
+</style>
+
+<!-- ============================================================ -->
+<!-- SCOPED SCRIPTS                                                -->
+<!-- ============================================================ -->
+<script>
+    (function() {
+        'use strict';
+
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        function init() {
+            // ========== REVEAL ON SCROLL ==========
+            const revealEls = document.querySelectorAll('.privacy-reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('privacy-in-view');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { 
+                threshold: 0.12,
+                rootMargin: '0px 0px -20px 0px'
+            });
+            revealEls.forEach(el => observer.observe(el));
+
+            // ========== STICKY TOC SHADOW ==========
+            const toc = document.querySelector('.privacy-toc-wrapper');
+            if (toc) {
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 80) {
+                        toc.classList.add('privacy-scrolled');
+                    } else {
+                        toc.classList.remove('privacy-scrolled');
+                    }
+                });
+            }
+
+            // ========== SMOOTH SCROLL FOR ANCHOR LINKS ==========
+            document.querySelectorAll('.privacy-toc-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    const target = document.querySelector(href);
+                    if (target) {
+                        // Update active state
+                        document.querySelectorAll('.privacy-toc-link').forEach(l => l.classList.remove('privacy-toc-active'));
+                        this.classList.add('privacy-toc-active');
+                        
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // ========== ACTIVE SECTION HIGHLIGHT IN TOC ==========
+            const sections = document.querySelectorAll('[id^="privacy-"]');
+            const tocLinks = document.querySelectorAll('.privacy-toc-link');
+            
+            if (tocLinks.length > 0) {
+                const observerToc = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const id = entry.target.id;
+                            tocLinks.forEach(link => {
+                                link.classList.remove('privacy-toc-active');
+                                if (link.getAttribute('href') === '#' + id) {
+                                    link.classList.add('privacy-toc-active');
+                                    
+                                    // Scroll the TOC to show the active link
+                                    const tocScroll = document.getElementById('privacyTocScroll');
+                                    if (tocScroll) {
+                                        const linkRect = link.getBoundingClientRect();
+                                        const containerRect = tocScroll.getBoundingClientRect();
+                                        const scrollLeft = link.offsetLeft - containerRect.width / 2 + linkRect.width / 2;
+                                        tocScroll.scrollTo({
+                                            left: scrollLeft,
+                                            behavior: 'smooth'
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }, { 
+                    threshold: 0.3,
+                    rootMargin: '-100px 0px -100px 0px'
+                });
+                
+                sections.forEach(section => {
+                    if (section.id) observerToc.observe(section);
+                });
+            }
+
+            // ========== KEYBOARD NAVIGATION FOR TOC ==========
+            document.addEventListener('keydown', function(e) {
+                const tocScroll = document.getElementById('privacyTocScroll');
+                if (!tocScroll) return;
+                
+                // Only if TOC is visible and in viewport
+                const rect = tocScroll.getBoundingClientRect();
+                if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+                
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    tocScroll.scrollBy({ left: 200, behavior: 'smooth' });
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    tocScroll.scrollBy({ left: -200, behavior: 'smooth' });
+                }
+            });
+        }
+    })();
+</script>

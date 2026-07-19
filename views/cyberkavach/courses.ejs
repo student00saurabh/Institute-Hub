@@ -1,0 +1,752 @@
+<% layout("/layouts/boilerplate") %>
+
+<!-- ============================================================ -->
+<!--  INSTITUTEHUB — COURSES PAGE                                 -->
+<!--  Complete Filter System | Upcoming Courses Slider            -->
+<!-- ============================================================ -->
+
+<%
+  // ---------------------------------------------------------------
+  // DUMMY DATA — All Courses
+  // ---------------------------------------------------------------
+  const allCourses = [
+    { id: 1, title: "Complete Web Development Bootcamp", instructor: "Aarav Mehta", category: "Web Development", price: 2499, oldPrice: 4999, rating: 4.8, reviews: 2140, students: 18500, lessons: 86, duration: "42h", level: "Beginner", img: "https://picsum.photos/seed/course1/640/420", tags: ["popular", "best-seller"] },
+    { id: 2, title: "Data Science & Machine Learning A-Z", instructor: "Priya Nair", category: "Data Science", price: 3199, oldPrice: 5999, rating: 4.9, reviews: 1870, students: 15200, lessons: 104, duration: "58h", level: "Intermediate", img: "https://picsum.photos/seed/course2/640/420", tags: ["trending"] },
+    { id: 3, title: "UI/UX Design Masterclass", instructor: "Kabir Sethi", category: "UI / UX Design", price: 1999, oldPrice: 3499, rating: 4.7, reviews: 980, students: 9800, lessons: 62, duration: "30h", level: "Beginner", img: "https://picsum.photos/seed/course3/640/420", tags: ["popular"] },
+    { id: 4, title: "Ethical Hacking & Cybersecurity", instructor: "Rohan Kapoor", category: "Cybersecurity", price: 2799, oldPrice: 4499, rating: 4.8, reviews: 1420, students: 11200, lessons: 74, duration: "36h", level: "Advanced", img: "https://picsum.photos/seed/course4/640/420", tags: ["trending"] },
+    { id: 5, title: "AWS Certified Solutions Architect", instructor: "Simran Kaur", category: "Cloud & DevOps", price: 2999, oldPrice: 5499, rating: 4.9, reviews: 1650, students: 13400, lessons: 91, duration: "48h", level: "Intermediate", img: "https://picsum.photos/seed/course5/640/420", tags: ["best-seller"] },
+    { id: 6, title: "React Native: Build Mobile Apps", instructor: "Dev Malhotra", category: "Mobile Apps", price: 2299, oldPrice: 3999, rating: 4.6, reviews: 760, students: 7300, lessons: 58, duration: "27h", level: "Intermediate", img: "https://picsum.photos/seed/course6/640/420", tags: [] },
+    { id: 7, title: "Deep Learning with PyTorch", instructor: "Ananya Rao", category: "AI & ML", price: 3499, oldPrice: 6499, rating: 4.9, reviews: 1120, students: 8900, lessons: 96, duration: "52h", level: "Advanced", img: "https://picsum.photos/seed/course7/640/420", tags: ["trending"] },
+    { id: 8, title: "Digital Marketing Complete Guide", instructor: "Ishaan Verma", category: "Marketing", price: 1799, oldPrice: 2999, rating: 4.5, reviews: 640, students: 6100, lessons: 45, duration: "22h", level: "Beginner", img: "https://picsum.photos/seed/course8/640/420", tags: [] },
+    { id: 9, title: "JavaScript: The Advanced Concepts", instructor: "Aarav Mehta", category: "Web Development", price: 1999, oldPrice: 3499, rating: 4.7, reviews: 890, students: 8200, lessons: 52, duration: "28h", level: "Intermediate", img: "https://picsum.photos/seed/course9/640/420", tags: ["popular"] },
+    { id: 10, title: "Python for Data Science", instructor: "Priya Nair", category: "Data Science", price: 2199, oldPrice: 3999, rating: 4.8, reviews: 1340, students: 11200, lessons: 68, duration: "34h", level: "Beginner", img: "https://picsum.photos/seed/course10/640/420", tags: [] },
+    { id: 11, title: "Figma Masterclass for UI/UX", instructor: "Kabir Sethi", category: "UI / UX Design", price: 1499, oldPrice: 2499, rating: 4.6, reviews: 720, students: 6800, lessons: 38, duration: "18h", level: "Beginner", img: "https://picsum.photos/seed/course11/640/420", tags: ["new"] },
+    { id: 12, title: "Cloud Computing with AWS & Azure", instructor: "Simran Kaur", category: "Cloud & DevOps", price: 3299, oldPrice: 5999, rating: 4.8, reviews: 980, students: 8900, lessons: 82, duration: "44h", level: "Intermediate", img: "https://picsum.photos/seed/course12/640/420", tags: ["trending"] },
+  ];
+
+  // Categories for filter
+  const filterCategories = [
+    "All Categories",
+    "Web Development",
+    "Data Science",
+    "UI / UX Design",
+    "Cybersecurity",
+    "Cloud & DevOps",
+    "Mobile Apps",
+    "AI & ML",
+    "Marketing"
+  ];
+
+  // Levels for filter
+  const filterLevels = ["All Levels", "Beginner", "Intermediate", "Advanced"];
+
+  // Upcoming Courses
+  const upcomingCourses = [
+    { title: "Full Stack AI Development", instructor: "Aarav Mehta", price: 3999, oldPrice: 6999, rating: 4.9, students: 540, duration: "56h", level: "Intermediate", img: "https://picsum.photos/seed/upcoming1/800/500", launchDate: "Coming Aug 2026", tag: "Highly Anticipated" },
+    { title: "Blockchain & Web3 Fundamentals", instructor: "Priya Nair", price: 3499, oldPrice: 5999, rating: 4.8, students: 320, duration: "42h", level: "Intermediate", img: "https://picsum.photos/seed/upcoming2/800/500", launchDate: "Coming Sep 2026", tag: "New Topic" },
+    { title: "DevOps Mastery with Kubernetes", instructor: "Simran Kaur", price: 3799, oldPrice: 6499, rating: 4.9, students: 280, duration: "48h", level: "Advanced", img: "https://picsum.photos/seed/upcoming3/800/500", launchDate: "Coming Oct 2026", tag: "Industry Focus" },
+    { title: "Mobile App Development with Flutter", instructor: "Dev Malhotra", price: 2699, oldPrice: 4499, rating: 4.7, students: 410, duration: "32h", level: "Beginner", img: "https://picsum.photos/seed/upcoming4/800/500", launchDate: "Coming Nov 2026", tag: "Trending" },
+    { title: "Advanced Cybersecurity & Ethical Hacking", instructor: "Rohan Kapoor", price: 4299, oldPrice: 7499, rating: 4.9, students: 190, duration: "64h", level: "Advanced", img: "https://picsum.photos/seed/upcoming5/800/500", launchDate: "Coming Dec 2026", tag: "Most Wanted" },
+  ];
+
+  // Page state (simulated)
+  const currentFilter = "All Categories";
+  const currentLevel = "All Levels";
+  const searchQuery = "";
+%>
+
+<!-- ============================================================ -->
+<!-- PAGE HEADER                                                   -->
+<!-- ============================================================ -->
+<section class="relative overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-[#2563EB] py-16 lg:py-24 -mt-6">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-[#C9A227] rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#2563EB] rounded-full blur-3xl"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
+            Explore Our <span class="text-[#C9A227]">Courses</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto">
+            Discover 500+ courses designed to help you master in-demand skills and advance your career.
+        </p>
+        <div class="mt-6 flex items-center justify-center gap-2 text-sm text-white/60">
+            <span><i class="fas fa-check-circle text-[#22C55E]"></i> 500+ Courses</span>
+            <span class="w-px h-4 bg-white/20"></span>
+            <span><i class="fas fa-check-circle text-[#22C55E]"></i> 120K+ Students</span>
+            <span class="w-px h-4 bg-white/20"></span>
+            <span><i class="fas fa-check-circle text-[#22C55E]"></i> 340+ Mentors</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- UPCOMING COURSES — Auto-Sliding Banner                      -->
+<!-- ============================================================ -->
+<section class="py-12 lg:py-16 bg-[#F8FAFC] dark:bg-[#0B1120] border-b border-[#E2E8F0] dark:border-[#1E293B]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-6 reveal-up">
+            <div>
+                <span class="inline-flex items-center gap-1.5 text-xs font-bold tracking-widest text-[#2563EB] uppercase">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#2563EB] pulse-dot"></span> Coming Soon
+                </span>
+                <h2 class="mt-2 text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white">
+                    Upcoming <span class="text-[#C9A227]">Courses</span>
+                </h2>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="scrollUpcoming(-1)" class="w-10 h-10 rounded-full border border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-center text-[#0F172A] dark:text-white hover:bg-[#2563EB] hover:text-white transition-all duration-300">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </button>
+                <button onclick="scrollUpcoming(1)" class="w-10 h-10 rounded-full border border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-center text-[#0F172A] dark:text-white hover:bg-[#2563EB] hover:text-white transition-all duration-300">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Upcoming Slider -->
+        <div class="relative overflow-hidden rounded-2xl">
+            <div id="upcomingTrack" class="flex transition-transform duration-700 ease-in-out">
+                <% upcomingCourses.forEach((course, index) => { %>
+                    <div class="min-w-full relative">
+                        <div class="relative rounded-2xl overflow-hidden">
+                            <img src="<%= course.img %>" alt="<%= course.title %>" class="w-full h-[280px] sm:h-[320px] object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A]/90 via-[#0F172A]/40 to-transparent"></div>
+                            
+                            <!-- Badges -->
+                            <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-[#2563EB] text-white text-xs font-bold rounded-full shadow-lg">
+                                    <i class="fas fa-clock mr-1"></i> <%= course.launchDate %>
+                                </span>
+                                <span class="px-3 py-1 bg-[#C9A227] text-white text-xs font-bold rounded-full shadow-lg">
+                                    <%= course.tag %>
+                                </span>
+                            </div>
+                            
+                            <!-- Content -->
+                            <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                                <div class="max-w-2xl">
+                                    <div class="flex items-center gap-2 text-sm text-white/70 mb-2">
+                                        <span><i class="fas fa-user-tie mr-1"></i> <%= course.instructor %></span>
+                                        <span class="w-px h-3 bg-white/30"></span>
+                                        <span><i class="fas fa-graduation-cap mr-1"></i> <%= course.level %></span>
+                                        <span class="w-px h-3 bg-white/30"></span>
+                                        <span><i class="fas fa-clock mr-1"></i> <%= course.duration %></span>
+                                    </div>
+                                    <h3 class="text-2xl sm:text-3xl font-bold text-white"><%= course.title %></h3>
+                                    <div class="flex items-center gap-3 mt-3">
+                                        <div class="flex items-center gap-1 text-[#C9A227]">
+                                            <i class="fas fa-star text-sm"></i>
+                                            <span class="text-white font-semibold"><%= course.rating %></span>
+                                        </div>
+                                        <span class="text-white/60 text-sm"><i class="fas fa-users mr-1"></i> <%= course.students %> interested</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 mt-4">
+                                        <span class="text-2xl font-extrabold text-[#C9A227]">₹<%= course.price.toLocaleString() %></span>
+                                        <span class="text-sm text-white/60 line-through">₹<%= course.oldPrice.toLocaleString() %></span>
+                                        <span class="px-2 py-0.5 bg-[#22C55E]/20 text-[#22C55E] text-xs font-bold rounded-full">
+                                            Notify Me
+                                        </span>
+                                    </div>
+                                    <button class="mt-4 px-6 py-2.5 bg-[#C9A227] text-[#0F172A] font-semibold rounded-xl hover:bg-[#E6C35A] transition-all duration-300 shadow-lg shadow-[#C9A227]/30 hover:shadow-[#C9A227]/50">
+                                        <i class="fas fa-bell mr-2"></i> Get Notified
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+            
+            <!-- Dots -->
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                <% upcomingCourses.forEach((_, index) => { %>
+                    <button onclick="goToUpcoming(<%= index %>)" 
+                            class="upcoming-dot w-2 h-2 rounded-full transition-all duration-300 <%= index === 0 ? 'w-8 bg-[#C9A227]' : 'bg-white/50 hover:bg-white/80' %>">
+                    </button>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FILTER SECTION                                                -->
+<!-- ============================================================ -->
+<section class="py-8 lg:py-10 bg-white dark:bg-[#0F172A]/40 border-b border-[#E2E8F0] dark:border-[#1E293B] sticky top-16 z-30 backdrop-blur-lg bg-white/90 dark:bg-[#0F172A]/90">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6">
+            
+            <!-- Search -->
+            <div class="relative flex-1 min-w-[200px]">
+                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                <input type="text" 
+                       id="courseSearch" 
+                       placeholder="Search courses..." 
+                       class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white placeholder-[#94A3B8] text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300">
+            </div>
+
+            <!-- Category Filter -->
+            <div class="relative min-w-[160px]">
+                <i class="fas fa-tag absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                <select id="categoryFilter" class="w-full pl-10 pr-8 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 cursor-pointer">
+                    <% filterCategories.forEach(cat => { %>
+                        <option value="<%= cat %>" <%= cat === currentFilter ? 'selected' : '' %>><%= cat %></option>
+                    <% }) %>
+                </select>
+                <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-xs pointer-events-none"></i>
+            </div>
+
+            <!-- Level Filter -->
+            <div class="relative min-w-[140px]">
+                <i class="fas fa-signal absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                <select id="levelFilter" class="w-full pl-10 pr-8 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 cursor-pointer">
+                    <% filterLevels.forEach(level => { %>
+                        <option value="<%= level %>" <%= level === currentLevel ? 'selected' : '' %>><%= level %></option>
+                    <% }) %>
+                </select>
+                <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-xs pointer-events-none"></i>
+            </div>
+
+            <!-- Sort -->
+            <div class="relative min-w-[140px]">
+                <i class="fas fa-arrow-up-wide-short absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                <select id="sortFilter" class="w-full pl-10 pr-8 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 cursor-pointer">
+                    <option value="popular">Most Popular</option>
+                    <option value="newest">Newest First</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="rating">Highest Rated</option>
+                </select>
+                <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-xs pointer-events-none"></i>
+            </div>
+
+            <!-- Reset Filters -->
+            <button id="resetFilters" class="px-4 py-2.5 text-sm font-medium text-[#2563EB] border border-[#2563EB]/30 rounded-xl hover:bg-[#2563EB]/10 transition-all duration-300 whitespace-nowrap">
+                <i class="fas fa-rotate-right mr-1.5"></i> Reset
+            </button>
+
+            <!-- Results Count -->
+            <span id="resultsCount" class="text-sm text-[#64748B] dark:text-[#94A3B8] whitespace-nowrap font-medium">
+                <span id="courseCount"><%= allCourses.length %></span> courses
+            </span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- COURSES GRID                                                  -->
+<!-- ============================================================ -->
+<section class="py-12 lg:py-16 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Active Filters Display -->
+        <div id="activeFilters" class="flex flex-wrap items-center gap-2 mb-6 reveal-up">
+            <span class="text-sm text-[#64748B] dark:text-[#94A3B8]">Active filters:</span>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2563EB]/10 text-[#2563EB] text-xs font-medium rounded-full">
+                All Categories
+                <button class="hover:text-[#EF4444] transition-colors"><i class="fas fa-times text-[10px]"></i></button>
+            </span>
+            <span class="text-xs text-[#64748B] dark:text-[#94A3B8]">+</span>
+        </div>
+
+        <!-- Course Grid -->
+        <div id="courseGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <% allCourses.forEach((c, i) => { %>
+                <div class="group reveal-up rounded-2xl overflow-hidden bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl hover:shadow-[#2563EB]/10 hover:-translate-y-2 transition-all duration-400 course-card"
+                     data-id="<%= c.id %>"
+                     data-category="<%= c.category %>"
+                     data-level="<%= c.level %>"
+                     data-title="<%= c.title.toLowerCase() %>"
+                     data-price="<%= c.price %>"
+                     data-rating="<%= c.rating %>"
+                     style="transition-delay: <%= (i % 4) * 60 %>ms">
+                    
+                    <div class="relative overflow-hidden h-44">
+                        <img src="<%= c.img %>" alt="<%= c.title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white/90 dark:bg-[#0B1120]/90 text-[#0F172A] dark:text-white backdrop-blur">
+                            <%= c.level %>
+                        </span>
+                        <% if (c.tags.includes('best-seller')) { %>
+                            <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#C9A227] text-white shadow">
+                                <i class="fas fa-crown mr-0.5"></i> Best Seller
+                            </span>
+                        <% } else if (c.tags.includes('popular')) { %>
+                            <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#2563EB] text-white shadow">
+                                <i class="fas fa-fire mr-0.5"></i> Popular
+                            </span>
+                        <% } else if (c.tags.includes('trending')) { %>
+                            <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#7C3AED] text-white shadow">
+                                <i class="fas fa-chart-line mr-0.5"></i> Trending
+                            </span>
+                        <% } else if (c.tags.includes('new')) { %>
+                            <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#22C55E] text-white shadow">
+                                <i class="fas fa-sparkles mr-0.5"></i> New
+                            </span>
+                        <% } %>
+                        <button type="button" onclick="toggleSave(this, event)" class="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/90 dark:bg-[#0B1120]/90 backdrop-blur flex items-center justify-center text-[#64748B] hover:text-[#EF4444] shadow transition-all duration-300">
+                            <i class="far fa-heart text-xs"></i>
+                        </button>
+                        <div class="absolute bottom-3 left-3 flex items-center gap-2 text-white text-[10px] bg-black/40 backdrop-blur px-2.5 py-1 rounded-lg w-fit">
+                            <span><i class="fas fa-play-circle mr-1"></i><%= c.lessons %> lessons</span>
+                            <span class="w-px h-3 bg-white/30"></span>
+                            <span><i class="fas fa-clock mr-1"></i><%= c.duration %></span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-5">
+                        <span class="text-[10px] font-bold tracking-wider text-[#2563EB] uppercase"><%= c.category %></span>
+                        <h3 class="mt-1.5 text-sm font-bold text-[#0F172A] dark:text-white leading-snug line-clamp-2 min-h-[2.5rem]"><%= c.title %></h3>
+                        <p class="mt-1.5 text-xs text-[#64748B] dark:text-[#94A3B8]">by <%= c.instructor %></p>
+
+                        <div class="mt-3 flex items-center gap-1.5 text-xs">
+                            <span class="font-bold text-[#C9A227]"><%= c.rating %></span>
+                            <div class="flex text-[#C9A227] text-[10px]">
+                                <% for (let s = 0; s < 5; s++) { %>
+                                    <i class="fa-star <%= s < Math.round(c.rating) ? 'fas' : 'far' %>"></i>
+                                <% } %>
+                            </div>
+                            <span class="text-[#94A3B8]">(<%= c.reviews.toLocaleString() %>)</span>
+                        </div>
+
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span class="text-base font-extrabold text-[#0F172A] dark:text-white">₹<%= c.price.toLocaleString() %></span>
+                            <span class="text-xs text-[#94A3B8] line-through">₹<%= c.oldPrice.toLocaleString() %></span>
+                            <span class="ml-auto text-xs font-bold text-[#22C55E]">
+                                <%= Math.round((1 - c.price / c.oldPrice) * 100) %>% OFF
+                            </span>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-[#E2E8F0] dark:border-[#1E293B] flex items-center gap-2">
+                            <a href="/courses/<%= c.id %>" class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-semibold border border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:border-[#2563EB]/50 hover:text-[#2563EB] transition-all duration-300">
+                                View Details
+                            </a>
+                            <button type="button" onclick="handleEnroll(this)" class="enroll-btn flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-md shadow-[#2563EB]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+                                Enroll Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+
+        <!-- No Results -->
+        <div id="noResults" class="hidden text-center py-16">
+            <div class="w-24 h-24 mx-auto rounded-full bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] text-4xl mb-4">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3 class="text-xl font-bold text-[#0F172A] dark:text-white">No courses found</h3>
+            <p class="text-sm text-[#64748B] dark:text-[#94A3B8] mt-2">Try adjusting your filters or search query</p>
+            <button id="clearAllFilters" class="mt-4 px-6 py-2.5 bg-[#2563EB] text-white rounded-xl hover:bg-[#1D4ED8] transition-all duration-300">
+                Clear all filters
+            </button>
+        </div>
+
+        <!-- Load More -->
+        <div class="text-center mt-12 reveal-up">
+            <button id="loadMoreBtn" class="px-8 py-3.5 rounded-xl border-2 border-[#2563EB] text-[#2563EB] font-semibold hover:bg-[#2563EB] hover:text-white transition-all duration-300 hover:shadow-lg hover:shadow-[#2563EB]/25">
+                <i class="fas fa-spinner hidden animate-spin mr-2"></i>
+                Load More Courses
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- STYLES                                                        -->
+<!-- ============================================================ -->
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .reveal-up { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+    .reveal-up.in-view { opacity: 1; transform: translateY(0); }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    @keyframes pulseDot {
+        0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.5); }
+        70% { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+        100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); }
+    }
+    .pulse-dot { animation: pulseDot 1.8s infinite; }
+
+    @keyframes savePop {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.25); }
+        100% { transform: scale(1); }
+    }
+    .save-pop i { animation: savePop 0.35s ease; }
+
+    .btn-shine::after {
+        content: '';
+        position: absolute; top: 0; left: -75%;
+        width: 50%; height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+        transform: skewX(-20deg);
+        transition: left 0.6s ease;
+    }
+    .btn-shine:hover::after { left: 130%; }
+
+    /* Sticky filter bar */
+    .sticky {
+        transition: box-shadow 0.3s ease;
+    }
+    .sticky.scrolled {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Course card transition */
+    .course-card {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Filter select custom styling */
+    select {
+        cursor: pointer;
+    }
+    select option {
+        padding: 8px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .reveal-up { opacity: 1 !important; transform: none !important; transition: none !important; }
+        .pulse-dot { animation: none !important; }
+        .save-pop i { animation: none !important; }
+    }
+
+    @media (max-width: 640px) {
+        .sticky {
+            position: relative !important;
+            top: 0 !important;
+        }
+    }
+</style>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS                                                       -->
+<!-- ============================================================ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        'use strict';
+
+        // ========== FILTER SYSTEM ==========
+        const searchInput = document.getElementById('courseSearch');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const levelFilter = document.getElementById('levelFilter');
+        const sortFilter = document.getElementById('sortFilter');
+        const resetBtn = document.getElementById('resetFilters');
+        const courseGrid = document.getElementById('courseGrid');
+        const noResults = document.getElementById('noResults');
+        const courseCountSpan = document.getElementById('courseCount');
+        const loadMoreBtn = document.getElementById('loadMoreBtn');
+        const clearAllFiltersBtn = document.getElementById('clearAllFilters');
+
+        let visibleCourses = [];
+        let currentPage = 1;
+        const coursesPerPage = 8;
+        let allCourseElements = [];
+
+        function getFilteredCourses() {
+            const search = searchInput.value.toLowerCase().trim();
+            const category = categoryFilter.value;
+            const level = levelFilter.value;
+            const sort = sortFilter.value;
+
+            const cards = document.querySelectorAll('.course-card');
+            let visible = [];
+
+            cards.forEach(card => {
+                const title = card.dataset.title || '';
+                const cardCategory = card.dataset.category || '';
+                const cardLevel = card.dataset.level || '';
+                const cardPrice = parseFloat(card.dataset.price) || 0;
+                const cardRating = parseFloat(card.dataset.rating) || 0;
+
+                let show = true;
+
+                // Search filter
+                if (search && !title.includes(search)) {
+                    show = false;
+                }
+
+                // Category filter
+                if (category !== 'All Categories' && cardCategory !== category) {
+                    show = false;
+                }
+
+                // Level filter
+                if (level !== 'All Levels' && cardLevel !== level) {
+                    show = false;
+                }
+
+                if (show) {
+                    visible.push({
+                        element: card,
+                        price: cardPrice,
+                        rating: cardRating,
+                        title: card.dataset.title || ''
+                    });
+                }
+            });
+
+            // Sort
+            switch(sort) {
+                case 'popular':
+                    visible.sort((a, b) => b.rating - a.rating);
+                    break;
+                case 'newest':
+                    // Just keep as is (would need date in real app)
+                    break;
+                case 'price-low':
+                    visible.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    visible.sort((a, b) => b.price - a.price);
+                    break;
+                case 'rating':
+                    visible.sort((a, b) => b.rating - a.rating);
+                    break;
+                default:
+                    break;
+            }
+
+            return visible;
+        }
+
+        function updateCourseDisplay() {
+            const filtered = getFilteredCourses();
+            visibleCourses = filtered;
+
+            // Hide all cards first
+            document.querySelectorAll('.course-card').forEach(card => {
+                card.style.display = 'none';
+            });
+
+            // Show filtered cards
+            const start = 0;
+            const end = currentPage * coursesPerPage;
+            const toShow = filtered.slice(start, end);
+
+            toShow.forEach(item => {
+                item.element.style.display = 'block';
+            });
+
+            // Update count
+            courseCountSpan.textContent = filtered.length;
+
+            // Show/hide no results
+            if (filtered.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+
+            // Show/hide load more
+            if (filtered.length > currentPage * coursesPerPage) {
+                loadMoreBtn.classList.remove('hidden');
+            } else {
+                loadMoreBtn.classList.add('hidden');
+            }
+
+            // Update active filters display
+            updateActiveFilters();
+        }
+
+        function updateActiveFilters() {
+            const container = document.getElementById('activeFilters');
+            const filters = [];
+
+            if (categoryFilter.value !== 'All Categories') {
+                filters.push(categoryFilter.value);
+            }
+            if (levelFilter.value !== 'All Levels') {
+                filters.push(levelFilter.value);
+            }
+            if (searchInput.value.trim()) {
+                filters.push(`"${searchInput.value.trim()}"`);
+            }
+
+            let html = '<span class="text-sm text-[#64748B] dark:text-[#94A3B8]">Active filters:</span>';
+            if (filters.length === 0) {
+                html += '<span class="text-sm text-[#64748B] dark:text-[#94A3B8]">None</span>';
+            } else {
+                filters.forEach(filter => {
+                    html += `
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2563EB]/10 text-[#2563EB] text-xs font-medium rounded-full">
+                            ${filter}
+                            <button class="hover:text-[#EF4444] transition-colors" onclick="removeFilter('${filter}')">
+                                <i class="fas fa-times text-[10px]"></i>
+                            </button>
+                        </span>
+                    `;
+                });
+            }
+            container.innerHTML = html;
+        }
+
+        // Remove filter (called from active filter chips)
+        window.removeFilter = function(filter) {
+            if (categoryFilter.value === filter) {
+                categoryFilter.value = 'All Categories';
+            }
+            if (levelFilter.value === filter) {
+                levelFilter.value = 'All Levels';
+            }
+            if (searchInput.value.trim() === filter.replace(/"/g, '')) {
+                searchInput.value = '';
+            }
+            currentPage = 1;
+            updateCourseDisplay();
+        };
+
+        // Event listeners
+        searchInput.addEventListener('input', function() {
+            currentPage = 1;
+            updateCourseDisplay();
+        });
+
+        categoryFilter.addEventListener('change', function() {
+            currentPage = 1;
+            updateCourseDisplay();
+        });
+
+        levelFilter.addEventListener('change', function() {
+            currentPage = 1;
+            updateCourseDisplay();
+        });
+
+        sortFilter.addEventListener('change', function() {
+            currentPage = 1;
+            updateCourseDisplay();
+        });
+
+        resetBtn.addEventListener('click', function() {
+            searchInput.value = '';
+            categoryFilter.value = 'All Categories';
+            levelFilter.value = 'All Levels';
+            sortFilter.value = 'popular';
+            currentPage = 1;
+            updateCourseDisplay();
+        });
+
+        clearAllFiltersBtn.addEventListener('click', function() {
+            resetBtn.click();
+        });
+
+        // Load More
+        loadMoreBtn.addEventListener('click', function() {
+            currentPage++;
+            updateCourseDisplay();
+        });
+
+        // ========== UPCOMING COURSES SLIDER ==========
+        let currentUpcoming = 0;
+        const totalUpcoming = <%= upcomingCourses.length %>;
+        const upcomingTrack = document.getElementById('upcomingTrack');
+        let autoUpcomingInterval;
+
+        function updateUpcomingSlider() {
+            if (!upcomingTrack) return;
+            upcomingTrack.style.transform = `translateX(-${currentUpcoming * 100}%)`;
+            
+            document.querySelectorAll('.upcoming-dot').forEach((dot, index) => {
+                if (index === currentUpcoming) {
+                    dot.classList.add('w-8', 'bg-[#C9A227]');
+                    dot.classList.remove('w-2', 'bg-white/50');
+                } else {
+                    dot.classList.remove('w-8', 'bg-[#C9A227]');
+                    dot.classList.add('w-2', 'bg-white/50');
+                }
+            });
+        }
+
+        window.scrollUpcoming = function(direction) {
+            currentUpcoming = (currentUpcoming + direction + totalUpcoming) % totalUpcoming;
+            updateUpcomingSlider();
+            resetUpcomingAutoSlide();
+        };
+
+        window.goToUpcoming = function(index) {
+            currentUpcoming = index;
+            updateUpcomingSlider();
+            resetUpcomingAutoSlide();
+        };
+
+        function startUpcomingAutoSlide() {
+            autoUpcomingInterval = setInterval(() => {
+                currentUpcoming = (currentUpcoming + 1) % totalUpcoming;
+                updateUpcomingSlider();
+            }, 5000);
+        }
+
+        function resetUpcomingAutoSlide() {
+            clearInterval(autoUpcomingInterval);
+            startUpcomingAutoSlide();
+        }
+
+        // ========== SAVE/BUTTON FUNCTIONS ==========
+        window.toggleSave = function(btn, evt) {
+            if (evt) { evt.preventDefault(); evt.stopPropagation(); }
+            const icon = btn.querySelector('i');
+            const isSaved = icon.classList.contains('fas');
+
+            icon.classList.toggle('fas', !isSaved);
+            icon.classList.toggle('far', isSaved);
+            btn.style.color = isSaved ? '' : '#EF4444';
+            
+            btn.classList.remove('save-pop');
+            void btn.offsetWidth;
+            btn.classList.add('save-pop');
+        };
+
+        window.handleEnroll = function(btn) {
+            if (btn.dataset.enrolled === 'true') return;
+            btn.dataset.enrolled = 'true';
+            btn.innerHTML = '<i class="fas fa-check mr-1"></i> Enrolled';
+            btn.classList.remove('bg-[#2563EB]', 'hover:bg-[#1D4ED8]', 'shadow-[#2563EB]/25');
+            btn.classList.add('bg-[#22C55E]', 'shadow-[#22C55E]/25', 'cursor-default');
+        };
+
+        // ========== REVEAL ON SCROLL ==========
+        const revealEls = document.querySelectorAll('.reveal-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        revealEls.forEach(el => observer.observe(el));
+
+        // ========== INIT ==========
+        // Store all course elements for filtering
+        document.querySelectorAll('.course-card').forEach(card => {
+            allCourseElements.push(card);
+        });
+
+        // Initialize display
+        updateCourseDisplay();
+
+        // Start upcoming auto-slide
+        startUpcomingAutoSlide();
+
+        // Sticky filter bar shadow on scroll
+        const filterBar = document.querySelector('.sticky');
+        if (filterBar) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 80) {
+                    filterBar.classList.add('scrolled');
+                } else {
+                    filterBar.classList.remove('scrolled');
+                }
+            });
+        }
+    });
+</script>

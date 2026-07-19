@@ -1,0 +1,885 @@
+<% layout("/layouts/boilerplate") %>
+
+<!-- ============================================================ -->
+<!--  INSTITUTEHUB — HOME PAGE (Enhanced)                         -->
+<!--  Consistent Card Design | Scrollable Offer Slider            -->
+<!-- ============================================================ -->
+
+<%
+  // ---------------------------------------------------------------
+  // DUMMY DATA
+  // ---------------------------------------------------------------
+  const categories = [
+    { name: "Web Development", icon: "fa-code", count: 128 },
+    { name: "Data Science", icon: "fa-chart-line", count: 76 },
+    { name: "UI / UX Design", icon: "fa-pen-ruler", count: 54 },
+    { name: "Cybersecurity", icon: "fa-shield-halved", count: 41 },
+    { name: "Cloud & DevOps", icon: "fa-cloud", count: 63 },
+    { name: "Mobile Apps", icon: "fa-mobile-screen", count: 39 },
+    { name: "AI & ML", icon: "fa-brain", count: 58 },
+    { name: "Business", icon: "fa-briefcase", count: 47 },
+  ];
+
+  const popularCourses = [
+    { title: "Complete Web Development Bootcamp", instructor: "Aarav Mehta", category: "Web Development", price: 2499, oldPrice: 4999, rating: 4.8, reviews: 2140, students: 18500, lessons: 86, duration: "42h", level: "Beginner", img: "https://picsum.photos/seed/course1/640/420" },
+    { title: "Data Science & Machine Learning A-Z", instructor: "Priya Nair", category: "Data Science", price: 3199, oldPrice: 5999, rating: 4.9, reviews: 1870, students: 15200, lessons: 104, duration: "58h", level: "Intermediate", img: "https://picsum.photos/seed/course2/640/420" },
+    { title: "UI/UX Design Masterclass", instructor: "Kabir Sethi", category: "UI / UX Design", price: 1999, oldPrice: 3499, rating: 4.7, reviews: 980, students: 9800, lessons: 62, duration: "30h", level: "Beginner", img: "https://picsum.photos/seed/course3/640/420" },
+    { title: "Ethical Hacking & Cybersecurity", instructor: "Rohan Kapoor", category: "Cybersecurity", price: 2799, oldPrice: 4499, rating: 4.8, reviews: 1420, students: 11200, lessons: 74, duration: "36h", level: "Advanced", img: "https://picsum.photos/seed/course4/640/420" },
+    { title: "AWS Certified Solutions Architect", instructor: "Simran Kaur", category: "Cloud & DevOps", price: 2999, oldPrice: 5499, rating: 4.9, reviews: 1650, students: 13400, lessons: 91, duration: "48h", level: "Intermediate", img: "https://picsum.photos/seed/course5/640/420" },
+    { title: "React Native: Build Mobile Apps", instructor: "Dev Malhotra", category: "Mobile Apps", price: 2299, oldPrice: 3999, rating: 4.6, reviews: 760, students: 7300, lessons: 58, duration: "27h", level: "Intermediate", img: "https://picsum.photos/seed/course6/640/420" },
+    { title: "Deep Learning with PyTorch", instructor: "Ananya Rao", category: "AI & ML", price: 3499, oldPrice: 6499, rating: 4.9, reviews: 1120, students: 8900, lessons: 96, duration: "52h", level: "Advanced", img: "https://picsum.photos/seed/course7/640/420" },
+    { title: "Digital Marketing Complete Guide", instructor: "Ishaan Verma", category: "Marketing", price: 1799, oldPrice: 2999, rating: 4.5, reviews: 640, students: 6100, lessons: 45, duration: "22h", level: "Beginner", img: "https://picsum.photos/seed/course8/640/420" },
+  ];
+
+  const offers = [
+    { title: "Web Development Bootcamp", discount: "40% OFF", price: "₹2,499", original: "₹4,999", tag: "Best Seller", color: "from-[#2563EB] to-[#1D4ED8]", img: "https://picsum.photos/seed/offer1/800/500" },
+    { title: "Data Science Masterclass", discount: "35% OFF", price: "₹3,199", original: "₹4,999", tag: "Trending", color: "from-[#7C3AED] to-[#6D28D9]", img: "https://picsum.photos/seed/offer2/800/500" },
+    { title: "UI/UX Design Pro", discount: "45% OFF", price: "₹1,999", original: "₹3,499", tag: "Popular", color: "from-[#C9A227] to-[#B8901E]", img: "https://picsum.photos/seed/offer3/800/500" },
+    { title: "Cybersecurity Bundle", discount: "50% OFF", price: "₹2,799", original: "₹5,599", tag: "Limited", color: "from-[#EF4444] to-[#DC2626]", img: "https://picsum.photos/seed/offer4/800/500" },
+    { title: "Cloud Architect Path", discount: "30% OFF", price: "₹2,999", original: "₹4,299", tag: "New", color: "from-[#06B6D4] to-[#0891B2]", img: "https://picsum.photos/seed/offer5/800/500" },
+  ];
+
+  const newCourses = [
+    { title: "Next.js 15 Full Stack Development", instructor: "Aarav Mehta", price: 2699, rating: 4.9, students: 420, duration: "34h", img: "https://picsum.photos/seed/new1/640/420", launched: "3 days ago" },
+    { title: "Prompt Engineering for Developers", instructor: "Meera Iyer", price: 1499, rating: 4.8, students: 310, duration: "16h", img: "https://picsum.photos/seed/new2/640/420", launched: "5 days ago" },
+    { title: "Advanced Figma for Product Teams", instructor: "Kabir Sethi", price: 1899, rating: 4.7, students: 265, duration: "19h", img: "https://picsum.photos/seed/new3/640/420", launched: "1 week ago" },
+    { title: "Kubernetes for Production", instructor: "Simran Kaur", price: 2899, rating: 4.9, students: 198, duration: "29h", img: "https://picsum.photos/seed/new4/640/420", launched: "1 week ago" },
+    { title: "Generative AI with LangChain", instructor: "Ananya Rao", price: 3099, rating: 4.8, students: 372, duration: "31h", img: "https://picsum.photos/seed/new5/640/420", launched: "2 weeks ago" },
+    { title: "iOS 18 App Development with Swift", instructor: "Dev Malhotra", price: 2599, rating: 4.6, students: 154, duration: "26h", img: "https://picsum.photos/seed/new6/640/420", launched: "2 weeks ago" },
+  ];
+
+  const features = [
+    { icon: "fa-video", title: "HD Video Lessons", desc: "Crisp, structured video lectures you can learn from at your own pace, anytime." },
+    { icon: "fa-certificate", title: "Verified Certificates", desc: "Earn shareable certificates recognized by employers on completion." },
+    { icon: "fa-infinity", title: "Lifetime Access", desc: "Pay once, learn forever — including all future course updates." },
+    { icon: "fa-user-tie", title: "Industry Mentors", desc: "Learn directly from working professionals and subject-matter experts." },
+    { icon: "fa-comments", title: "1:1 Doubt Support", desc: "Get your questions answered by mentors within 24 hours, guaranteed." },
+    { icon: "fa-mobile-screen-button", title: "Learn On Any Device", desc: "Seamless experience across desktop, tablet and mobile — even offline." },
+  ];
+
+  const reviews = [
+    { name: "Ritika Sharma", role: "Frontend Developer", rating: 5, text: "The web development bootcamp completely changed my career path. The mentors actually respond, and the projects felt real." },
+    { name: "Aman Gupta", role: "Data Analyst", rating: 5, text: "I've tried three other platforms before this one. InstituteHub's data science course is by far the most structured and practical." },
+    { name: "Neha Joshi", role: "UI/UX Designer", rating: 4, text: "Loved the Figma masterclass. Clear explanations, downloadable resources, and the certificate actually helped me land freelance gigs." },
+    { name: "Karan Malhotra", role: "Security Analyst", rating: 5, text: "The cybersecurity course is intense but incredibly rewarding. Labs are hands-on and the instructor breaks down complex topics well." },
+  ];
+
+  const stats = [
+    { value: 500, suffix: "+", label: "Courses" },
+    { value: 120, suffix: "K+", label: "Students" },
+    { value: 340, suffix: "+", label: "Mentors" },
+    { value: 98, suffix: "%", label: "Satisfaction" },
+  ];
+
+  const blogs = [
+    { title: "10 Habits of Highly Effective Self-Taught Developers", category: "Career", author: "Aarav Mehta", authorImg: "AM", date: "Jul 12, 2026", readTime: "6 min read", img: "https://picsum.photos/seed/blog1/640/420", comments: 34, views: 2840 },
+    { title: "How to Choose Your First Programming Language in 2026", category: "Web Development", author: "Priya Nair", authorImg: "PN", date: "Jul 8, 2026", readTime: "8 min read", img: "https://picsum.photos/seed/blog2/640/420", comments: 21, views: 1970 },
+    { title: "Portfolio Projects That Actually Get You Hired", category: "Career", author: "Kabir Sethi", authorImg: "KS", date: "Jul 3, 2026", readTime: "5 min read", img: "https://picsum.photos/seed/blog3/640/420", comments: 47, views: 3620 },
+    { title: "A Beginner's Guide to Cloud Certifications", category: "Cloud & DevOps", author: "Simran Kaur", authorImg: "SK", date: "Jun 27, 2026", readTime: "7 min read", img: "https://picsum.photos/seed/blog4/640/420", comments: 18, views: 1540 },
+    { title: "Why Every Designer Should Learn Basic Front-End Code", category: "UI / UX Design", author: "Neha Joshi", authorImg: "NJ", date: "Jun 20, 2026", readTime: "4 min read", img: "https://picsum.photos/seed/blog5/640/420", comments: 29, views: 2210 },
+    { title: "Cybersecurity Basics Every Developer Should Know", category: "Cybersecurity", author: "Rohan Kapoor", authorImg: "RK", date: "Jun 14, 2026", readTime: "9 min read", img: "https://picsum.photos/seed/blog6/640/420", comments: 52, views: 4130 },
+  ];
+%>
+
+<!-- ============================================================ -->
+<!-- HERO SECTION WITH OFFER SLIDER                               -->
+<!-- ============================================================ -->
+<section class="relative overflow-hidden bg-[#F8FAFC] dark:bg-[#0B1120] transition-colors duration-300">
+
+    <!-- Background blobs -->
+    <div class="pointer-events-none absolute inset-0 overflow-hidden">
+        <div class="absolute -top-32 -left-24 w-[420px] h-[420px] rounded-full bg-[#2563EB]/10 dark:bg-[#2563EB]/20 blur-3xl"></div>
+        <div class="absolute top-40 -right-24 w-[380px] h-[380px] rounded-full bg-[#C9A227]/10 dark:bg-[#C9A227]/20 blur-3xl"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,#0F172A08_1px,transparent_0)] dark:bg-[radial-gradient(circle_at_1px_1px,#ffffff08_1px,transparent_0)] [background-size:26px_26px]"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-20 lg:pt-24 lg:pb-28">
+        <div class="grid lg:grid-cols-2 gap-14 items-start">
+
+            <!-- Left: Content -->
+            <div class="reveal-up">
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide bg-[#2563EB]/10 text-[#2563EB] dark:bg-[#2563EB]/15 border border-[#2563EB]/20">
+                    <i class="fas fa-graduation-cap"></i> #1 Course Management Platform
+                </span>
+
+                <h1 class="mt-6 text-4xl sm:text-5xl lg:text-[3.4rem] font-extrabold leading-[1.08] tracking-tight text-[#0F172A] dark:text-white">
+                    Learn Skills That
+                    <span class="relative inline-block whitespace-nowrap">
+                        <span class="relative z-10 bg-gradient-to-r from-[#2563EB] to-[#C9A227] bg-clip-text text-transparent">Actually Matter</span>
+                    </span>
+                    — Taught by Experts
+                </h1>
+
+                <p class="mt-6 text-base sm:text-lg text-[#334155] dark:text-[#94A3B8] max-w-xl leading-relaxed">
+                    Master in-demand skills with structured, project-based courses in tech, design and business — built for real careers, not just certificates.
+                </p>
+
+                <!-- Search Bar -->
+                <form class="mt-8 flex flex-col sm:flex-row gap-3 max-w-xl" onsubmit="return false;">
+                    <div class="relative flex-1">
+                        <i class="fas fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#94A3B8]"></i>
+                        <input type="text" placeholder="Search for courses, e.g. 'React'"
+                               class="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-[#E2E8F0] dark:border-[#1E293B] bg-white dark:bg-[#111827] text-[#0F172A] dark:text-white placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 shadow-sm">
+                    </div>
+                    <button type="submit" class="btn-shine relative overflow-hidden px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] text-white font-semibold shadow-lg shadow-[#2563EB]/25 hover:shadow-xl hover:shadow-[#2563EB]/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+                        Explore Courses
+                    </button>
+                </form>
+
+                <!-- Trust Row -->
+                <div class="mt-8 flex items-center gap-4">
+                    <div class="flex -space-x-3">
+                        <% ["A","P","K","R","S"].forEach((letter, i) => { %>
+                            <div class="w-9 h-9 rounded-full border-2 border-white dark:border-[#0B1120] flex items-center justify-center text-xs font-bold text-white shadow-sm"
+                                 style="background: linear-gradient(135deg, <%= i % 2 === 0 ? '#2563EB, #1D4ED8' : '#C9A227, #B8901E' %>);">
+                                <%= letter %>
+                            </div>
+                        <% }) %>
+                    </div>
+                    <div class="text-sm">
+                        <div class="flex items-center gap-1 text-[#C9A227]">
+                            <i class="fas fa-star text-xs"></i>
+                            <i class="fas fa-star text-xs"></i>
+                            <i class="fas fa-star text-xs"></i>
+                            <i class="fas fa-star text-xs"></i>
+                            <i class="fas fa-star-half-stroke text-xs"></i>
+                            <span class="ml-1.5 font-semibold text-[#0F172A] dark:text-white">4.8/5</span>
+                        </div>
+                        <p class="text-[#64748B] dark:text-[#94A3B8]">from 25,000+ learners</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Offer Slider -->
+            <div class="relative reveal-up reveal-delay-1">
+                <div class="relative rounded-2xl overflow-hidden border border-[#E2E8F0] dark:border-[#1E293B] shadow-2xl shadow-[#2563EB]/10 bg-white dark:bg-[#111827]">
+                    
+                    <!-- Slider Container -->
+                    <div id="offerSlider" class="relative overflow-hidden">
+                        <div id="offerTrack" class="flex transition-transform duration-700 ease-in-out">
+                            <% offers.forEach((offer, index) => { %>
+                                <div class="min-w-full relative">
+                                    <img src="<%= offer.img %>" alt="<%= offer.title %>" class="w-full h-[300px] sm:h-[380px] object-cover">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A]/90 via-[#0F172A]/40 to-transparent"></div>
+                                    
+                                    <!-- Offer Content -->
+                                    <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="px-2.5 py-0.5 bg-[#C9A227] text-white text-[10px] font-bold rounded-full">
+                                                <%= offer.tag %>
+                                            </span>
+                                            <span class="px-2.5 py-0.5 bg-[#EF4444] text-white text-[10px] font-bold rounded-full animate-pulse">
+                                                <%= offer.discount %>
+                                            </span>
+                                        </div>
+                                        <h3 class="text-xl sm:text-2xl font-bold text-white"><%= offer.title %></h3>
+                                        <div class="flex items-center gap-3 mt-2">
+                                            <span class="text-2xl font-extrabold text-[#C9A227]"><%= offer.price %></span>
+                                            <span class="text-sm text-white/60 line-through"><%= offer.original %></span>
+                                        </div>
+                                        <div class="mt-4 flex items-center gap-3">
+                                            <a href="/courses" class="px-6 py-2.5 bg-[#2563EB] text-white text-sm font-semibold rounded-xl hover:bg-[#1D4ED8] transition-all duration-300 hover:scale-105 shadow-lg shadow-[#2563EB]/30">
+                                                Enroll Now
+                                            </a>
+                                            <span class="text-white/60 text-sm"><i class="fas fa-users mr-1"></i> 2.4k+ enrolled</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                        
+                        <!-- Slider Controls -->
+                        <button onclick="changeOffer(-1)" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/40 transition-all duration-300 flex items-center justify-center">
+                            <i class="fas fa-chevron-left text-sm"></i>
+                        </button>
+                        <button onclick="changeOffer(1)" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm text-white hover:bg-white/40 transition-all duration-300 flex items-center justify-center">
+                            <i class="fas fa-chevron-right text-sm"></i>
+                        </button>
+                        
+                        <!-- Dots -->
+                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                            <% offers.forEach((_, index) => { %>
+                                <button onclick="goToOffer(<%= index %>)" 
+                                        class="offer-dot w-2 h-2 rounded-full transition-all duration-300 <%= index === 0 ? 'w-6 bg-[#C9A227]' : 'bg-white/50 hover:bg-white/80' %>">
+                                </button>
+                            <% }) %>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Floating Stats Card -->
+                <div class="absolute -bottom-4 -left-4 bg-white/95 dark:bg-[#111827]/95 backdrop-blur-xl rounded-2xl px-4 py-3 shadow-xl border border-[#E2E8F0]/60 dark:border-[#1E293B]/60 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-[#22C55E]/10 flex items-center justify-center text-[#22C55E]">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-bold text-[#0F172A] dark:text-white">Coming Soon</p>
+                        <p class="text-xs text-[#64748B] dark:text-[#94A3B8]">Offers ending soon</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="mt-16 lg:mt-20 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 reveal-up reveal-delay-2">
+            <% stats.forEach(s => { %>
+                <div class="text-center p-5 rounded-2xl bg-white/70 dark:bg-[#111827]/60 border border-[#E2E8F0]/60 dark:border-[#1E293B]/60 backdrop-blur-sm">
+                    <p class="counter text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white" data-target="<%= s.value %>" data-suffix="<%= s.suffix %>">0<%= s.suffix %></p>
+                    <p class="mt-1 text-xs sm:text-sm text-[#64748B] dark:text-[#94A3B8] font-medium"><%= s.label %></p>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CATEGORIES — scrollable strip                                 -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-white dark:bg-[#0F172A]/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-end justify-between mb-6 sm:mb-8 reveal-up">
+            <div>
+                <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Browse</span>
+                <h2 class="mt-2 text-xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white">Popular Categories</h2>
+            </div>
+            <!-- Mobile-only swipe hint -->
+            <div id="catSwipeHint" class="sm:hidden inline-flex items-center gap-1.5 text-[10px] font-semibold text-[#2563EB] bg-[#2563EB]/10 px-2.5 py-1.5 rounded-full">
+                <span>Swipe</span>
+                <i class="fas fa-arrow-right swipe-hint-arrow"></i>
+            </div>
+            <div class="hidden sm:flex items-center gap-2">
+                <button onclick="scrollByAmount('catScroll', -320)" class="scroll-btn w-10 h-10 rounded-full border border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-center text-[#0F172A] dark:text-white hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all duration-300">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </button>
+                <button onclick="scrollByAmount('catScroll', 320)" class="scroll-btn w-10 h-10 rounded-full border border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-center text-[#0F172A] dark:text-white hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all duration-300">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Scroller wrapper with edge fades to signal "more content" instead of a scrollbar -->
+        <div class="relative -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div class="pointer-events-none absolute left-0 top-0 bottom-2 w-8 sm:w-14 bg-gradient-to-r from-white dark:from-[#0F172A] to-transparent z-10"></div>
+            <div class="pointer-events-none absolute right-0 top-0 bottom-2 w-10 sm:w-14 bg-gradient-to-l from-white dark:from-[#0F172A] to-transparent z-10"></div>
+
+            <div id="catScroll" class="flex gap-2.5 sm:gap-4 overflow-x-auto  overflow-y-hidden no-scrollbar scroll-smooth snap-x snap-mandatory pb-2">
+                <% categories.forEach((cat, i) => { %>
+                    <a href="/courses?category=<%= encodeURIComponent(cat.name) %>"
+                       class="reveal-up snap-start shrink-0 w-[104px] sm:w-[190px] group rounded-xl sm:rounded-2xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] p-3 sm:p-5 hover:border-[#2563EB]/40 hover:shadow-lg hover:shadow-[#2563EB]/10 hover:-translate-y-1.5 active:scale-95 transition-all duration-300"
+                       style="transition-delay: <%= i * 40 %>ms">
+                        <div class="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#2563EB]/10 to-[#C9A227]/10 flex items-center justify-center text-[#2563EB] group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                            <i class="fas <%= cat.icon %> text-xs sm:text-lg"></i>
+                        </div>
+                        <h3 class="mt-2 sm:mt-4 font-semibold text-[11px] sm:text-sm text-[#0F172A] dark:text-white leading-snug line-clamp-2"><%= cat.name %></h3>
+                        <p class="mt-0.5 sm:mt-1 text-[9px] sm:text-xs text-[#64748B] dark:text-[#94A3B8]"><%= cat.count %> courses</p>
+                    </a>
+                <% }) %>
+                <!-- Trailing peek spacer so the last real card doesn't sit flush against the fade -->
+                <div class="shrink-0 w-1 sm:hidden" aria-hidden="true"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- POPULAR COURSES - Consistent Card Design                     -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-10 reveal-up">
+            <div>
+                <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Handpicked</span>
+                <h2 class="mt-2 text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white">Popular Courses</h2>
+                <p class="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8] max-w-md">Courses loved most by our learners this month.</p>
+            </div>
+            <a href="/courses" class="inline-flex items-center gap-2 text-sm font-semibold text-[#2563EB] hover:gap-3 transition-all duration-300">
+                View all <i class="fas fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <% popularCourses.forEach((c, i) => { %>
+                <div class="group reveal-up rounded-2xl overflow-hidden bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl hover:shadow-[#2563EB]/10 hover:-translate-y-2 transition-all duration-400"
+                     style="transition-delay: <%= (i % 4) * 60 %>ms">
+                    <div class="relative overflow-hidden h-44">
+                        <img src="<%= c.img %>" alt="<%= c.title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white/90 dark:bg-[#0B1120]/90 text-[#0F172A] dark:text-white backdrop-blur">
+                            <%= c.level %>
+                        </span>
+                        <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#C9A227] text-white shadow">
+                            <%= Math.round((1 - c.price / c.oldPrice) * 100) %>% OFF
+                        </span>
+                        <button type="button" onclick="toggleSave(this, event)"
+                                aria-label="Save course for later"
+                                class="save-btn absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/90 dark:bg-[#0B1120]/90 backdrop-blur flex items-center justify-center text-[#64748B] hover:text-[#EF4444] shadow transition-all duration-300">
+                            <i class="far fa-heart text-xs"></i>
+                        </button>
+                        <div class="absolute bottom-3 left-3 flex items-center gap-2 text-white text-[10px] bg-black/40 backdrop-blur px-2.5 py-1 rounded-lg w-fit">
+                            <span><i class="fas fa-play-circle mr-1"></i><%= c.lessons %> lessons</span>
+                            <span class="w-px h-3 bg-white/30"></span>
+                            <span><i class="fas fa-clock mr-1"></i><%= c.duration %></span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <span class="text-[10px] font-bold tracking-wider text-[#2563EB] uppercase"><%= c.category %></span>
+                        <h3 class="mt-1.5 text-sm font-bold text-[#0F172A] dark:text-white leading-snug line-clamp-2 min-h-[2.5rem]"><%= c.title %></h3>
+                        <p class="mt-1.5 text-xs text-[#64748B] dark:text-[#94A3B8]">by <%= c.instructor %></p>
+
+                        <div class="mt-3 flex items-center gap-1.5 text-xs">
+                            <span class="font-bold text-[#C9A227]"><%= c.rating %></span>
+                            <div class="flex text-[#C9A227] text-[10px]">
+                                <% for (let s = 0; s < 5; s++) { %>
+                                    <i class="fa-star <%= s < Math.round(c.rating) ? 'fas' : 'far' %>"></i>
+                                <% } %>
+                            </div>
+                            <span class="text-[#94A3B8]">(<%= c.reviews.toLocaleString() %>)</span>
+                        </div>
+
+                        <div class="mt-3 flex items-baseline gap-2">
+                            <span class="text-base font-extrabold text-[#0F172A] dark:text-white">₹<%= c.price.toLocaleString() %></span>
+                            <span class="text-xs text-[#94A3B8] line-through">₹<%= c.oldPrice.toLocaleString() %></span>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-[#E2E8F0] dark:border-[#1E293B] flex items-center gap-2">
+                            <a href="/courses/<%= i + 1 %>"
+                               class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-semibold border border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:border-[#2563EB]/50 hover:text-[#2563EB] transition-all duration-300">
+                                View Details
+                            </a>
+                            <button type="button" onclick="handleEnroll(this)"
+                                    class="enroll-btn flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-md shadow-[#2563EB]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+                                Enroll Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- NEWLY LAUNCHED - Same Card Design                            -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-white dark:bg-[#0F172A]/40 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-10 reveal-up">
+            <div>
+                <span class="inline-flex items-center gap-1.5 text-xs font-bold tracking-widest text-[#2563EB] uppercase">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#2563EB] pulse-dot"></span> Fresh Drop
+                </span>
+                <h2 class="mt-2 text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white">Newly Launched</h2>
+            </div>
+            <div class="hidden sm:flex items-center gap-2">
+                <button onclick="scrollByAmount('newScroll', -340)" class="scroll-btn w-10 h-10 rounded-full border border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-center text-[#0F172A] dark:text-white hover:bg-[#C9A227] hover:text-white hover:border-[#C9A227] transition-all duration-300">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </button>
+                <button onclick="scrollByAmount('newScroll', 340)" class="scroll-btn w-10 h-10 rounded-full border border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-center text-[#0F172A] dark:text-white hover:bg-[#C9A227] hover:text-white hover:border-[#C9A227] transition-all duration-300">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="newScroll" class="flex gap-6 overflow-x-auto  overflow-y-hidden no-scrollbar scroll-smooth snap-x snap-mandatory pb-2">
+            <% newCourses.forEach((c, i) => { %>
+                <div class="group reveal-up shrink-0 w-[280px] sm:w-[320px] snap-start rounded-2xl overflow-hidden bg-[#F8FAFC] dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl hover:shadow-[#2563EB]/10 hover:-translate-y-2 transition-all duration-400"
+                     style="transition-delay: <%= i * 50 %>ms">
+                    <div class="relative h-44 overflow-hidden">
+                        <img src="<%= c.img %>" alt="<%= c.title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#2563EB] text-white shadow">NEW</span>
+                        <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#22C55E] text-white shadow"><%= c.launched %></span>
+                        <button type="button" onclick="toggleSave(this, event)"
+                                aria-label="Save course for later"
+                                class="save-btn absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/90 dark:bg-[#0B1120]/90 backdrop-blur flex items-center justify-center text-[#64748B] hover:text-[#EF4444] shadow transition-all duration-300">
+                            <i class="far fa-heart text-xs"></i>
+                        </button>
+                        <div class="absolute bottom-3 left-3 flex items-center gap-2 text-white text-[10px] bg-black/40 backdrop-blur px-2.5 py-1 rounded-lg w-fit">
+                            <span><i class="fas fa-users mr-1"></i><%= c.students %> enrolled</span>
+                            <span class="w-px h-3 bg-white/30"></span>
+                            <span><i class="fas fa-clock mr-1"></i><%= c.duration %></span>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-sm font-bold text-[#0F172A] dark:text-white leading-snug line-clamp-2 min-h-[2.5rem]"><%= c.title %></h3>
+                        <p class="mt-1.5 text-xs text-[#64748B] dark:text-[#94A3B8]">by <%= c.instructor %></p>
+                        
+                        <div class="mt-3 flex items-center gap-1.5 text-xs">
+                            <span class="font-bold text-[#C9A227]"><%= c.rating %></span>
+                            <div class="flex text-[#C9A227] text-[10px]">
+                                <% for (let s = 0; s < 5; s++) { %>
+                                    <i class="fa-star <%= s < Math.round(c.rating) ? 'fas' : 'far' %>"></i>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 text-base font-extrabold text-[#0F172A] dark:text-white">₹<%= c.price.toLocaleString() %></div>
+
+                        <div class="mt-4 pt-4 border-t border-[#E2E8F0] dark:border-[#1E293B] flex items-center gap-2">
+                            <a href="/courses/new-<%= i + 1 %>"
+                               class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-semibold border border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:border-[#C9A227]/50 hover:text-[#C9A227] transition-all duration-300">
+                                View Details
+                            </a>
+                            <button type="button" onclick="handleEnroll(this)"
+                                    class="enroll-btn flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-[#C9A227] text-white hover:bg-[#B8901E] shadow-md shadow-[#C9A227]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+                                Enroll Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHY CHOOSE US                                                 -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-[#0F172A] relative overflow-hidden">
+    <div class="pointer-events-none absolute inset-0">
+        <div class="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-[#2563EB]/10 blur-[100px]"></div>
+        <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] rounded-full bg-[#C9A227]/10 blur-[100px]"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-14 reveal-up">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Why InstituteHub</span>
+            <h2 class="mt-2 text-2xl sm:text-3xl font-extrabold text-white">Everything You Need to Learn Better</h2>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% features.forEach((f, i) => { %>
+                <div class="reveal-up group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-[#2563EB]/40 hover:bg-white/[0.07] transition-all duration-300"
+                     style="transition-delay: <%= i * 60 %>ms">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#2563EB] to-[#C9A227] flex items-center justify-center text-white shadow-lg shadow-[#2563EB]/20 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300">
+                        <i class="fas <%= f.icon %>"></i>
+                    </div>
+                    <h3 class="mt-4 font-bold text-white"><%= f.title %></h3>
+                    <p class="mt-2 text-sm text-[#94A3B8] leading-relaxed"><%= f.desc %></p>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FROM THE BLOG                                                 -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-10 reveal-up">
+            <div>
+                <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Insights</span>
+                <h2 class="mt-2 text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white">From the Blog</h2>
+                <p class="mt-2 text-sm text-[#64748B] dark:text-[#94A3B8] max-w-md">Career tips, tutorials and industry insights from our mentors.</p>
+            </div>
+            <a href="/blogs" class="inline-flex items-center gap-2 text-sm font-semibold text-[#2563EB] hover:gap-3 transition-all duration-300">
+                View all articles <i class="fas fa-arrow-right text-xs"></i>
+            </a>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% blogs.forEach((b, i) => { %>
+                <article class="group reveal-up rounded-2xl overflow-hidden bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl hover:shadow-[#2563EB]/10 hover:-translate-y-2 transition-all duration-400"
+                         style="transition-delay: <%= (i % 3) * 70 %>ms">
+                    <div class="relative overflow-hidden h-44">
+                        <a href="/blogs/<%= i + 1 %>" class="block w-full h-full">
+                            <img src="<%= b.img %>" alt="<%= b.title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        </a>
+                        <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white/90 dark:bg-[#0B1120]/90 text-[#2563EB] backdrop-blur pointer-events-none">
+                            <%= b.category %>
+                        </span>
+                        <button type="button" onclick="toggleSave(this, event)"
+                                aria-label="Save article for later"
+                                class="save-btn absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 dark:bg-[#0B1120]/90 backdrop-blur flex items-center justify-center text-[#64748B] hover:text-[#C9A227] shadow transition-all duration-300">
+                            <i class="far fa-bookmark text-xs"></i>
+                        </button>
+                    </div>
+
+                    <div class="p-5">
+                        <div class="flex items-center gap-2 text-[11px] text-[#64748B] dark:text-[#94A3B8]">
+                            <span><%= b.date %></span>
+                            <span class="w-1 h-1 rounded-full bg-[#CBD5E1] dark:bg-[#334155]"></span>
+                            <span><i class="far fa-clock mr-1"></i><%= b.readTime %></span>
+                        </div>
+
+                        <h3 class="mt-2 text-sm font-bold text-[#0F172A] dark:text-white leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-[#2563EB] transition-colors duration-300">
+                            <a href="/blogs/<%= i + 1 %>"><%= b.title %></a>
+                        </h3>
+
+                        <div class="mt-4 flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold shadow"
+                                 style="background: linear-gradient(135deg, <%= i % 2 === 0 ? '#2563EB, #1D4ED8' : '#C9A227, #B8901E' %>);">
+                                <%= b.authorImg %>
+                            </div>
+                            <span class="text-xs font-medium text-[#0F172A] dark:text-white"><%= b.author %></span>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-between text-xs text-[#64748B] dark:text-[#94A3B8]">
+                            <span class="flex items-center gap-1.5">
+                                <i class="far fa-eye"></i> <%= b.views.toLocaleString() %>
+                            </span>
+                            <span class="flex items-center gap-1.5">
+                                <i class="far fa-comment"></i> <span class="comment-count"><%= b.comments %></span> Comments
+                            </span>
+                            <a href="/blogs/<%= i + 1 %>#comments" class="font-semibold text-[#2563EB] hover:underline">
+                                Read <i class="fas fa-arrow-right text-[10px] ml-0.5"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            <% }) %>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- TESTIMONIALS                                                  -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20 bg-[#F8FAFC] dark:bg-[#0B1120] overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12 reveal-up">
+            <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Testimonials</span>
+            <h2 class="mt-2 text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white">Loved by Learners</h2>
+        </div>
+    </div>
+
+    <div class="relative">
+        <div class="absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-[#F8FAFC] dark:from-[#0B1120] to-transparent z-10"></div>
+        <div class="absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-[#F8FAFC] dark:from-[#0B1120] to-transparent z-10"></div>
+
+        <div id="reviewTrack" class="flex gap-6 w-max marquee">
+            <% [...reviews, ...reviews].forEach((r, i) => { %>
+                <div class="w-[300px] sm:w-[360px] shrink-0 p-6 rounded-2xl bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] shadow-sm">
+                    <div class="flex items-center gap-1 text-[#C9A227] text-xs mb-3">
+                        <% for (let s = 0; s < 5; s++) { %>
+                            <i class="fa-star <%= s < r.rating ? 'fas' : 'far' %>"></i>
+                        <% } %>
+                    </div>
+                    <p class="text-sm text-[#334155] dark:text-[#CBD5E1] leading-relaxed">"<%= r.text %>"</p>
+                    <div class="mt-5 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow"
+                             style="background: linear-gradient(135deg, <%= i % 2 === 0 ? '#2563EB, #1D4ED8' : '#C9A227, #B8901E' %>);">
+                            <%= r.name[0] %>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-[#0F172A] dark:text-white"><%= r.name %></p>
+                            <p class="text-xs text-[#64748B] dark:text-[#94A3B8]"><%= r.role %></p>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 flex items-center justify-center gap-2" id="reviewDots">
+        <% reviews.forEach((r, i) => { %>
+            <button data-index="<%= i %>" onclick="jumpToReview(`<%= i %>`)"
+                    class="review-dot h-2 rounded-full transition-all duration-300 <%= i === 0 ? 'w-8 bg-[#2563EB]' : 'w-2 bg-[#CBD5E1] dark:bg-[#334155]' %>">
+            </button>
+        <% }) %>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CTA BANNER                                                    -->
+<!-- ============================================================ -->
+<section class="py-16 lg:py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="reveal-up relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#2563EB] via-[#1D4ED8] to-[#0F172A] px-8 py-14 sm:px-16 sm:py-16 text-center">
+            <div class="pointer-events-none absolute -top-16 -right-16 w-64 h-64 rounded-full bg-[#C9A227]/20 blur-3xl"></div>
+            <div class="pointer-events-none absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="relative">
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white">Ready to start learning today?</h2>
+                <p class="mt-4 text-sm sm:text-base text-white/80 max-w-xl mx-auto">Join 120,000+ learners already building real skills on InstituteHub. New courses added every week.</p>
+                <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="/courses" class="px-8 py-3.5 rounded-2xl bg-white text-[#0F172A] font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
+                        Browse Courses
+                    </a>
+                    <a href="/signup" class="px-8 py-3.5 rounded-2xl border-2 border-white/30 text-white font-bold hover:bg-white/10 hover:-translate-y-0.5 transition-all duration-300">
+                        Create Free Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- STYLES                                                        -->
+<!-- ============================================================ -->
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .reveal-up { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+    .reveal-up.in-view { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1.in-view { transition-delay: 0.1s; }
+    .reveal-delay-2.in-view { transition-delay: 0.2s; }
+
+    @keyframes blobFloat {
+        0%, 100% { transform: translate(0,0) scale(1); }
+        50% { transform: translate(20px,-20px) scale(1.08); }
+    }
+    .blob { animation: blobFloat 10s ease-in-out infinite; }
+    .blob-delay { animation-delay: 3s; }
+
+    @keyframes floatY {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    .float-anim { animation: floatY 4s ease-in-out infinite; }
+    .float-anim-delay { animation-delay: 1.5s; }
+
+    @keyframes pulseDot {
+        0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.5); }
+        70% { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+        100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); }
+    }
+    .pulse-dot { animation: pulseDot 1.8s infinite; }
+
+    @keyframes marqueeScroll {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+    }
+    .marquee { animation: marqueeScroll 38s linear infinite; }
+    .marquee:hover { animation-play-state: paused; }
+
+    .btn-shine::after {
+        content: '';
+        position: absolute; top: 0; left: -75%;
+        width: 50%; height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+        transform: skewX(-20deg);
+        transition: left 0.6s ease;
+    }
+    .btn-shine:hover::after { left: 130%; }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Swipe hint on mobile categories */
+    @keyframes swipeNudge {
+        0%, 100% { transform: translateX(0); opacity: 1; }
+        50% { transform: translateX(4px); opacity: 0.6; }
+    }
+    .swipe-hint-arrow { animation: swipeNudge 1.2s ease-in-out infinite; }
+    #catSwipeHint { transition: opacity 0.4s ease; }
+
+    /* Save / bookmark button tactile feedback */
+    @keyframes savePop {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.25); }
+        100% { transform: scale(1); }
+    }
+    .save-pop i { animation: savePop 0.35s ease; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .swipe-hint-arrow, .save-pop i { animation: none !important; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .blob, .float-anim, .marquee, .pulse-dot { animation: none !important; }
+        .reveal-up { opacity: 1 !important; transform: none !important; transition: none !important; }
+    }
+
+    @media (max-width: 640px) {
+        .marquee { animation-duration: 26s; }
+    }
+</style>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS                                                       -->
+<!-- ============================================================ -->
+<script>
+    // Horizontal scroll
+    function scrollByAmount(id, amount) {
+        const el = document.getElementById(id);
+        if (el) el.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+
+    // Save / bookmark toggle — used on course cards (heart) and blog cards (bookmark)
+    function toggleSave(btn, evt) {
+        if (evt) { evt.preventDefault(); evt.stopPropagation(); }
+        const icon = btn.querySelector('i');
+        const isSaved = icon.classList.contains('fas');
+
+        icon.classList.toggle('fas', !isSaved);
+        icon.classList.toggle('far', isSaved);
+
+        const activeColor = icon.classList.contains('fa-bookmark') ? '#C9A227' : '#EF4444';
+        btn.style.color = isSaved ? '' : activeColor;
+
+        // Small pop animation for tactile feedback
+        btn.classList.remove('save-pop');
+        void btn.offsetWidth; // restart animation
+        btn.classList.add('save-pop');
+    }
+
+    // Enroll button — flips to a confirmed "Enrolled" state
+    function handleEnroll(btn) {
+        if (btn.dataset.enrolled === 'true') return;
+        btn.dataset.enrolled = 'true';
+        btn.innerHTML = '<i class="fas fa-check mr-1"></i> Enrolled';
+        btn.classList.remove('bg-[#2563EB]', 'hover:bg-[#1D4ED8]', 'shadow-[#2563EB]/25', 'bg-[#C9A227]', 'hover:bg-[#B8901E]', 'shadow-[#C9A227]/25');
+        btn.classList.add('bg-[#22C55E]', 'shadow-[#22C55E]/25', 'cursor-default');
+    }
+
+    // Hide the mobile "Swipe" hint on categories once the user has scrolled
+    document.addEventListener('DOMContentLoaded', () => {
+        const catScroll = document.getElementById('catScroll');
+        const swipeHint = document.getElementById('catSwipeHint');
+        if (catScroll && swipeHint) {
+            catScroll.addEventListener('scroll', () => {
+                swipeHint.style.opacity = '0';
+                swipeHint.style.pointerEvents = 'none';
+            }, { once: true, passive: true });
+        }
+    });
+
+    // Offer Slider
+    let currentOffer = 0;
+    const totalOffers = `<%= offers.length %>`;
+
+    function updateOfferSlider() {
+        const track = document.getElementById('offerTrack');
+        const dots = document.querySelectorAll('.offer-dot');
+        if (!track) return;
+        
+        track.style.transform = `translateX(-${currentOffer * 100}%)`;
+        
+        dots.forEach((dot, index) => {
+            if (index === currentOffer) {
+                dot.classList.add('w-6', 'bg-[#C9A227]');
+                dot.classList.remove('w-2', 'bg-white/50');
+            } else {
+                dot.classList.remove('w-6', 'bg-[#C9A227]');
+                dot.classList.add('w-2', 'bg-white/50');
+            }
+        });
+    }
+
+    function changeOffer(direction) {
+        currentOffer = (currentOffer + direction + totalOffers) % totalOffers;
+        updateOfferSlider();
+        resetAutoSlide();
+    }
+
+    function goToOffer(index) {
+        currentOffer = index;
+        updateOfferSlider();
+        resetAutoSlide();
+    }
+
+    // Auto-slide
+    let autoSlideInterval;
+
+    function startAutoSlide() {
+        autoSlideInterval = setInterval(() => {
+            currentOffer = (currentOffer + 1) % totalOffers;
+            updateOfferSlider();
+        }, 5000);
+    }
+
+    function resetAutoSlide() {
+        clearInterval(autoSlideInterval);
+        startAutoSlide();
+    }
+
+    // Reveal on scroll
+    document.addEventListener('DOMContentLoaded', () => {
+        // Start auto-slide
+        startAutoSlide();
+
+        // Reveal observer
+        const revealEls = document.querySelectorAll('.reveal-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        revealEls.forEach(el => observer.observe(el));
+
+        // Counters
+        const counters = document.querySelectorAll('.counter');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const el = entry.target;
+                const target = parseInt(el.dataset.target, 10);
+                const suffix = el.dataset.suffix || '';
+                const duration = 1400;
+                const start = performance.now();
+                function tick(now) {
+                    const progress = Math.min((now - start) / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    el.textContent = Math.floor(eased * target) + suffix;
+                    if (progress < 1) requestAnimationFrame(tick);
+                    else el.textContent = target + suffix;
+                }
+                requestAnimationFrame(tick);
+                counterObserver.unobserve(el);
+            });
+        }, { threshold: 0.4 });
+        counters.forEach(el => counterObserver.observe(el));
+    });
+
+    // Testimonial pagination
+    const reviewTrack = document.getElementById('reviewTrack');
+    const totalReviews = `<%= reviews.length %>`;
+    let reviewCardWidth = 0;
+
+    function computeCardWidth() {
+        const firstCard = reviewTrack?.children[0];
+        if (firstCard) {
+            const style = getComputedStyle(reviewTrack);
+            const gap = parseFloat(style.columnGap || style.gap || 24);
+            reviewCardWidth = firstCard.getBoundingClientRect().width + gap;
+        }
+    }
+    window.addEventListener('load', computeCardWidth);
+    window.addEventListener('resize', computeCardWidth);
+
+    function jumpToReview(index) {
+        if (!reviewTrack) return;
+        reviewTrack.style.animation = 'none';
+        reviewTrack.style.transform = `translateX(-${index * reviewCardWidth}px)`;
+
+        document.querySelectorAll('.review-dot').forEach((dot, i) => {
+            if (i === index) {
+                dot.classList.add('w-8', 'bg-[#2563EB]');
+                dot.classList.remove('w-2', 'bg-[#CBD5E1]', 'dark:bg-[#334155]');
+            } else {
+                dot.classList.remove('w-8', 'bg-[#2563EB]');
+                dot.classList.add('w-2', 'bg-[#CBD5E1]', 'dark:bg-[#334155]');
+            }
+        });
+
+        clearTimeout(window.__reviewResume);
+        window.__reviewResume = setTimeout(() => {
+            reviewTrack.style.transform = '';
+            reviewTrack.style.animation = '';
+        }, 3500);
+    }
+
+    // Auto-advance dots
+    (function autoCycleDots() {
+        let current = 0;
+        setInterval(() => {
+            current = (current + 1) % totalReviews;
+            document.querySelectorAll('.review-dot').forEach((dot, i) => {
+                if (i === current) {
+                    dot.classList.add('w-8', 'bg-[#2563EB]');
+                    dot.classList.remove('w-2', 'bg-[#CBD5E1]', 'dark:bg-[#334155]');
+                } else {
+                    dot.classList.remove('w-8', 'bg-[#2563EB]');
+                    dot.classList.add('w-2', 'bg-[#CBD5E1]', 'dark:bg-[#334155]');
+                }
+            });
+        }, 38000 / totalReviews);
+    })();
+</script>

@@ -1,0 +1,491 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="min-h-[90vh] py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8" data-aos="fade-up">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                    Manage Users
+                </h1>
+                <p class="mt-1 text-gray-600 dark:text-gray-400">
+                    View, manage, and control all users on the platform
+                </p>
+            </div>
+            <div class="mt-4 md:mt-0 flex flex-wrap gap-3">
+                <a href="/admin/dashboard" class="px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 text-sm font-medium">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6" data-aos="fade-up" data-aos-duration="600">
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Total Users</p>
+                <p class="text-xl font-bold text-gray-900 dark:text-white"><%= totalUsers || 0 %></p>
+            </div>
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Admins</p>
+                <p class="text-xl font-bold text-purple-600 dark:text-purple-400">
+                    <%= users ? users.filter(u => u.role === 'admin').length : 0 %>
+                </p>
+            </div>
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Teachers</p>
+                <p class="text-xl font-bold text-blue-600 dark:text-blue-400">
+                    <%= users ? users.filter(u => u.role === 'teacher').length : 0 %>
+                </p>
+            </div>
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Verified</p>
+                <p class="text-xl font-bold text-green-600 dark:text-green-400">
+                    <%= users ? users.filter(u => u.isVerified).length : 0 %>
+                </p>
+            </div>
+            <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Blocked</p>
+                <p class="text-xl font-bold text-red-600 dark:text-red-400">
+                    <%= users ? users.filter(u => u.isBlocked).length : 0 %>
+                </p>
+            </div>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-700 p-4 mb-6" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+            <form action="/admin/users" method="GET" class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" 
+                               name="search" 
+                               value="<%= search %>"
+                               placeholder="Search users by name or email..." 
+                               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all duration-200">
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <select name="role" class="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-all duration-200">
+                        <option value="all" <%= role === 'all' ? 'selected' : '' %>>All Roles</option>
+                        <option value="admin" <%= role === 'admin' ? 'selected' : '' %>>Admin</option>
+                        <option value="teacher" <%= role === 'teacher' ? 'selected' : '' %>>Teacher</option>
+                        <option value="user" <%= role === 'user' ? 'selected' : '' %>>User</option>
+                    </select>
+                    <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg">
+                        <i class="fas fa-search mr-1"></i> Filter
+                    </button>
+                    <a href="/admin/users" class="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 text-sm font-medium">
+                        Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Info -->
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                Showing <span class="font-medium text-gray-700 dark:text-gray-300"><%= users ? users.length : 0 %></span> users
+                <span class="text-gray-400">of</span>
+                <span class="font-medium text-gray-700 dark:text-gray-300"><%= totalUsers || 0 %></span>
+                total
+            </p>
+            <% if (search) { %>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Search: "<span class="font-medium text-gray-700 dark:text-gray-300"><%= search %></span>"
+                </p>
+            <% } %>
+            <% if (role && role !== 'all') { %>
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    Role: <span class="font-medium text-gray-700 dark:text-gray-300"><%= role %></span>
+                </p>
+            <% } %>
+        </div>
+
+        <!-- Users Table -->
+        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">User</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Role</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Review</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Joined</th>
+                            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+    <% if (users && users.length > 0) { %>
+        <% users.forEach(user => { 
+            // Check if user has a review (any status)
+            const userReview = userReviews ? userReviews.find(r => r.email === user.email) : null;
+            const hasReview = !!userReview;
+            const isApproved = userReview && userReview.isApproved;
+            const isVerified = userReview && userReview.isVerified;
+            const isPending = userReview && !isVerified && !isApproved;
+        %>
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center text-white text-sm font-bold">
+                            <%= user.name?.charAt(0).toUpperCase() || 'U' %>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900 dark:text-white text-sm"><%= user.name || 'Unknown' %></p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400"><%= user.email %></p>
+                            <% if (user.googleId) { %>
+                                <span class="text-[10px] text-red-500 dark:text-red-400">
+                                    <i class="fab fa-google mr-0.5"></i>Google
+                                </span>
+                            <% } %>
+                        </div>
+                    </div>
+                </td>
+                
+                <td class="px-6 py-4">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full 
+                        <% if (user.role === 'admin') { %>
+                            bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300
+                        <% } else if (user.role === 'teacher') { %>
+                            bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300
+                        <% } else { %>
+                            bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400
+                        <% } %>">
+                        <%= user.role || 'User' %>
+                    </span>
+                </td>
+                
+                <td class="px-6 py-4">
+                    <div class="flex flex-wrap gap-1">
+                        <!-- Verified Badge -->
+                        <span class="px-2 py-1 text-xs font-medium rounded-full <%= user.isVerified ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' %>">
+                            <%= user.isVerified ? 'Verified' : 'Pending' %>
+                        </span>
+                        
+                        <!-- Active/Inactive Badge -->
+                        <span class="px-2 py-1 text-xs font-medium rounded-full <%= user.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' %>">
+                            <%= user.isActive ? 'Active' : 'Inactive' %>
+                        </span>
+                        
+                        <!-- Blocked Badge -->
+                        <% if (user.isBlocked) { %>
+                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300">
+                                <i class="fas fa-ban mr-0.5"></i>Blocked
+                            </span>
+                        <% } %>
+                    </div>
+                </td>
+                
+                <!-- Review Column -->
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                        <% if (hasReview) { %>
+                            <% if (isApproved) { %>
+                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                                    <i class="fas fa-check-circle mr-0.5"></i><%= userReview.rating %>/5
+                                </span>
+                            <% } else if (isVerified) { %>
+                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300">
+                                    <i class="fas fa-clock mr-0.5"></i>Pending
+                                </span>
+                            <% } else { %>
+                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                                    <i class="fas fa-envelope mr-0.5"></i>Invited
+                                </span>
+                            <% } %>
+                            <button onclick="deleteUserReview('<%= user._id %>', '<%= userReview._id %>')" 
+                                    class="text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
+                                    title="Delete Review">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        <% } else { %>
+                            <span class="text-xs text-gray-400 dark:text-gray-500">No review</span>
+                        <% } %>
+                    </div>
+                </td>
+                
+                <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                    <%= moment(user.createdAt).format('DD MMM YYYY') %>
+                </td>
+                
+                <td class="px-6 py-4">
+                    <div class="flex items-center justify-end gap-1">
+                        <!-- View Details -->
+                        <a href="/admin/users/<%= user._id %>" 
+                           class="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 transition-colors" 
+                           title="View Details">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </a>
+                        
+                        <div class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                        
+                        <!-- Send Review - Only show if no review exists -->
+                        <% if (!hasReview) { %>
+                            <form action="/admin/send-review" method="POST" class="inline">
+                                <input type="hidden" name="userId" value="<%= user._id %>">
+                                <button type="submit" 
+                                        class="p-1.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 text-amber-600 dark:text-amber-400 transition-colors"
+                                        title="Send Review Invitation">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                            <div class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                        <% } %>
+                        
+                        <!-- Toggle Block -->
+                        <form action="/admin/users/<%= user._id %>/toggle-block?_method=PATCH" method="POST" class="inline" onsubmit="return confirm(`Are you sure you want to <%= user.isBlocked ? 'unblock' : 'block' %> this user?`)">
+                            <input type="hidden" name="_method" value="PATCH">
+                            <button type="submit" 
+                                    class="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors <%= user.isBlocked ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' %>"
+                                    title="<%= user.isBlocked ? 'Unblock' : 'Block' %> User">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<%= user.isBlocked ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636' %>"></path>
+                                </svg>
+                            </button>
+                        </form>
+                        
+                        <!-- Toggle Role -->
+                        <form action="/admin/users/<%= user._id %>/toggle-role?_method=PATCH" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to change this user\'s role?')">
+                            <button type="submit" 
+                                    class="p-1.5 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 text-purple-600 dark:text-purple-400 transition-colors"
+                                    title="Toggle Role">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                            </button>
+                        </form>
+                        
+                        <div class="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                        
+                        <!-- Delete User -->
+                        <form action="/admin/users/<%= user._id %>?_method=DELETE" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete user `<%= user.name %>`? This action cannot be undone.')">
+                            <button type="submit" 
+                                    class="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 transition-colors"
+                                    title="Delete User">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        <% }) %>
+    <% } else { %>
+        <tr>
+            <td colspan="6" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </div>
+                <p class="text-sm font-medium">No users found</p>
+                <p class="text-xs mt-1">Try adjusting your search or filter</p>
+            </td>
+        </tr>
+    <% } %>
+</tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <% if (totalPages > 1) { %>
+            <div class="mt-6 flex items-center justify-center gap-2 flex-wrap" data-aos="fade-up" data-aos-duration="600" data-aos-delay="300">
+                <% if (currentPage > 1) { %>
+                    <a href="?page=<%= currentPage - 1 %><%= search ? '&search=' + search : '' %><%= role && role !== 'all' ? '&role=' + role : '' %>" 
+                       class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-all duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </a>
+                <% } %>
+
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <% if (i === currentPage) { %>
+                        <span class="px-4 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 text-white font-semibold"><%= i %></span>
+                    <% } else if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2) { %>
+                        <a href="?page=<%= i %><%= search ? '&search=' + search : '' %><%= role && role !== 'all' ? '&role=' + role : '' %>" 
+                           class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-all duration-200">
+                            <%= i %>
+                        </a>
+                    <% } else if (i === 2 && currentPage > 4) { %>
+                        <span class="px-2 text-gray-400">...</span>
+                    <% } else if (i === totalPages - 1 && currentPage < totalPages - 3) { %>
+                        <span class="px-2 text-gray-400">...</span>
+                    <% } %>
+                <% } %>
+
+                <% if (currentPage < totalPages) { %>
+                    <a href="?page=<%= currentPage + 1 %><%= search ? '&search=' + search : '' %><%= role && role !== 'all' ? '&role=' + role : '' %>" 
+                       class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400 transition-all duration-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- ============ NOTIFICATION SYSTEM ============ -->
+<% if (success && success.length) { %>
+    <div class="notification-toast fixed top-4 right-4 z-50 px-5 py-3.5 rounded-xl shadow-xl border bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 transform transition-all duration-300 translate-x-0">
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="font-medium"><%= success %></span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-auto text-green-600 hover:text-green-800">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+<% } %>
+
+<% if (error && error.length) { %>
+    <div class="notification-toast fixed top-4 right-4 z-50 px-5 py-3.5 rounded-xl shadow-xl border bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 transform transition-all duration-300 translate-x-0">
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span class="font-medium"><%= error %></span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-auto text-red-600 hover:text-red-800">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+<% } %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ============ AUTO-SUBMIT ON FILTER CHANGE ============
+    const filterSelect = document.querySelector('select[name="role"]');
+    if (filterSelect) {
+        filterSelect.addEventListener('change', function() {
+            this.closest('form').submit();
+        });
+    }
+
+// ============ DELETE USER REVIEW ============
+window.deleteUserReview = async function(userId, reviewId) {
+    if (!confirm('Are you sure you want to delete this user\'s review? This will allow the user to submit a new review.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/admin/reviews/${reviewId}/toggle`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action: 'delete' })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // ✅ Reset user's hasReviewed flag
+            await fetch(`/admin/users/${userId}/reset-review`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            // Show success message
+            showNotification('Review deleted successfully. User can now submit a new review.', 'success');
+            
+            // Reload page after short delay
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            alert(data.message || 'Failed to delete review');
+        }
+    } catch (error) {
+        console.error('Error deleting review:', error);
+        alert('An error occurred while deleting the review');
+    }
+};
+
+// ============ SHOW NOTIFICATION ============
+function showNotification(message, type) {
+    const colors = {
+        success: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200',
+        error: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200',
+        warning: 'bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200',
+        info: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200'
+    };
+
+    const icon = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle',
+        info: 'fa-info-circle'
+    };
+
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 px-5 py-3.5 rounded-xl shadow-xl border transform transition-all duration-300 translate-x-0 ${colors[type] || colors.info}`;
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <i class="fas ${icon[type] || icon.info}"></i>
+            <span class="font-medium">${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-auto hover:opacity-70">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    document.body.appendChild(notification);
+
+    // Auto dismiss after 5 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100px)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.remove();
+            }
+        }, 300);
+    }, 5000);
+}
+});
+</script>
+
+<style>
+    /* Notification animation */
+    .notification-toast {
+        animation: slideIn 0.3s ease forwards;
+    }
+    
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+</style>

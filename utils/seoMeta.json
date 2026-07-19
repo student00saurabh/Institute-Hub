@@ -1,0 +1,109 @@
+{
+  "/": { 
+    "title": "CyberKavach | Cybersecurity Training, Penetration Testing & Security Services",
+    "description": "CyberKavach provides industry-leading cybersecurity training, ethical hacking courses, and professional security services. Get OSCP, CEH v13, CPENT, RHCSA certifications with hands-on labs and expert instructors.",
+    "keywords": "cybersecurity training, ethical hacking course, penetration testing, OSCP certification, CEH v13 training, CPENT course, RHCSA certification, Red Hat training, vulnerability assessment, VAPT services, red teaming, incident response, digital forensics, OSINT training, web application security, network security, CyberKavach, cybersecurity institute India, cybersecurity certification"
+  },
+
+  "/login": {
+    "title": "Login | CyberKavach Cybersecurity Training Account",
+    "description": "Sign in to your CyberKavach account to access premium cybersecurity courses, track certification progress, and continue your learning journey.",
+    "keywords": "CyberKavach login, cybersecurity account access, student portal, certification dashboard, ethical hacking course login, OSCP training access"
+  },
+
+  "/signup": {
+    "title": "Sign Up | Start Your Cybersecurity Career with CyberKavach",
+    "description": "Create your CyberKavach account and begin your path to becoming a certified cybersecurity professional with world-class training and hands-on labs.",
+    "keywords": "CyberKavach signup, cybersecurity registration, create account, OSCP training enrollment, ethical hacking course registration, certification program join"
+  },
+
+  "/courses": {
+    "title": "Cybersecurity Courses | OSCP, CEH, CPENT, RHCSA | CyberKavach",
+    "description": "Explore comprehensive cybersecurity certification courses including OSCP, CEH v13, CPENT, RHCSA, and more. Start your training with expert instructors today.",
+    "keywords": "cybersecurity courses, OSCP certification, CEH v13 training, CPENT course, RHCSA certification, Red Hat training, ethical hacking classes, penetration testing course, web security training, network security courses, best cybersecurity courses India"
+  },
+
+  "/services": {
+    "title": "Cybersecurity Services | VAPT, Red Teaming & Incident Response | CyberKavach",
+    "description": "Professional cybersecurity services including vulnerability assessment, penetration testing, red team operations, incident response, and digital forensics for enterprise clients.",
+    "keywords": "penetration testing services, vulnerability assessment, VAPT services, red teaming, incident response, digital forensics, security auditing, enterprise cybersecurity, web application security testing, network security assessment"
+  },
+
+  "/about": {
+    "title": "About CyberKavach | Cybersecurity Training & Certification Experts",
+    "description": "CyberKavach is a premier cybersecurity training institute offering industry-recognized certifications and hands-on learning since 2026. Train with certified security professionals.",
+    "keywords": "about CyberKavach, cybersecurity training institute, ethical hacking instructors, OSCP trainers, CEH certified trainers, red team specialists, cybersecurity education India"
+  },
+
+  "/contact": {
+    "title": "Contact CyberKavach | Training Inquiries & Support",
+    "description": "Reach out to CyberKavach for course inquiries, corporate training, security services, or technical support. Our team is ready to assist you.",
+    "keywords": "contact CyberKavach, cybersecurity training support, course inquiry, corporate training request, security services consultation, technical support, help desk"
+  },
+
+  "/blogs": {
+    "title": "Cybersecurity Blog | Training Tips & Industry Insights | CyberKavach",
+    "description": "Stay updated with the latest cybersecurity trends, certification preparation tips, and career advice from industry experts at CyberKavach.",
+    "keywords": "cybersecurity blog, OSCP preparation tips, CEH exam guide, red teaming articles, ethical hacking tutorials, security news, cybersecurity career advice, penetration testing guides"
+  },
+
+  "/careers": {
+    "title": "Careers at CyberKavach | Join Our Cybersecurity Training Team",
+    "description": "Join the CyberKavach team! We're hiring cybersecurity trainers, security professionals, and education experts passionate about developing future security leaders.",
+    "keywords": "cybersecurity careers, ethical hacking jobs, security trainer positions, OSCP certified trainers, cybersecurity employment, join CyberKavach team, security jobs India"
+  },
+
+  "/privacy": {
+    "title": "Privacy Policy | Data Protection at CyberKavach",
+    "description": "Read CyberKavach's privacy policy to understand how we collect, use, and protect your personal information on our cybersecurity training platform.",
+    "keywords": "privacy policy, data protection, user privacy, information security, personal data handling, secure platform, CyberKavach privacy"
+  },
+
+  "/terms": {
+    "title": "Terms of Service | CyberKavach Platform Agreement",
+    "description": "Review CyberKavach's terms of service for course access, certification policies, payment terms, and user responsibilities on our training platform.",
+    "keywords": "terms of service, user agreement, course terms, certification policies, payment terms, refund policy, platform usage rules"
+  },
+
+  "/user/dashboard": {
+    "title": "Dashboard | Track Your Cybersecurity Learning Progress",
+    "description": "Access your personalized dashboard to track course progress, view certifications, and manage your cybersecurity training journey at CyberKavach.",
+    "keywords": "user dashboard, course progress tracking, certification status, learning analytics, student dashboard, CyberKavach account"
+  },
+
+  "/profile": {
+    "title": "Profile Settings | Manage Your CyberKavach Account",
+    "description": "Update your profile information, change password, and manage account preferences for your cybersecurity training account.",
+    "keywords": "profile settings, account management, update profile, change password, user preferences, CyberKavach account settings"
+  },
+
+  "/my-courses": {
+    "title": "My Courses | Your Cybersecurity Training Enrollments",
+    "description": "View all your enrolled cybersecurity courses, track completion progress, and access course materials from your CyberKavach learning portal.",
+    "keywords": "my courses, enrolled courses, course progress, learning materials, certification preparation, student courses, OSCP training progress"
+  },
+
+  "/certificates": {
+    "title": "My Certifications | Earned Cybersecurity Credentials",
+    "description": "View and download your earned cybersecurity certifications from CyberKavach. Share verified credentials with employers and professional networks.",
+    "keywords": "my certificates, earned certifications, cybersecurity credentials, verify certificate, download certificate, OSCP certificate, CEH certification, CPENT credential"
+  },
+
+  "/corporate": {
+    "title": "Corporate Training | Enterprise Cybersecurity Solutions",
+    "description": "Enterprise cybersecurity training solutions for organizations. Custom programs, team dashboards, and dedicated support for corporate clients.",
+    "keywords": "corporate training, enterprise cybersecurity, team training programs, organizational training, company upskilling, business security training, corporate certification programs"
+  },
+
+  "/verify-email": {
+    "title": "Email Verification | Secure Your CyberKavach Account",
+    "description": "Verify your email address to activate your CyberKavach account and access cybersecurity training courses and certification resources.",
+    "keywords": "email verification, account activation, OTP verification, secure account, verify email, complete registration"
+  },
+
+  "/reset-password": {
+    "title": "Reset Password | Recover Your CyberKavach Account",
+    "description": "Reset your password to regain access to your CyberKavach cybersecurity training account and continue your certification journey.",
+    "keywords": "reset password, account recovery, forgot password, password reset, regain account access, secure password change"
+  }
+}
