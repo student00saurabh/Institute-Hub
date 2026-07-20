@@ -11,333 +11,341 @@ module.exports.welComeEmail = async ({ name, email }) => {
     process.env.BREVO_API_KEY,
   );
 
-  // CyberKavach Professional Welcome Email
+  const domain = process.env.DOMAIN || "https://institute-hub-7wsi.onrender.com";
+
+  // InstituteHub Professional Welcome Email for Google Login
   const htmlContent = `
   <!DOCTYPE html>
   <html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to CyberKavach</title>
+    <title>Welcome to InstituteHub</title>
     <style>
-      body {
+      * {
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
+      }
+      body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        background-color: #f8fafc;
-        color: #1e293b;
-        -webkit-font-smoothing: antialiased;
+        background: #F8FAFC;
+        padding: 40px 0;
+        color: #0F172A;
       }
-      .container {
-        max-width: 600px;
+      .email-container {
+        max-width: 560px;
         margin: 0 auto;
-        background-color: #ffffff;
+        background: #FFFFFF;
         border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
         overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid #E2E8F0;
       }
-      .header {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        padding: 40px 40px 32px;
+      
+      /* Header */
+      .email-header {
+        background: linear-gradient(135deg, #0F172A 0%, #2563EB 100%);
+        padding: 32px 40px 28px;
         text-align: center;
-        position: relative;
+        border-bottom: 3px solid #22C55E;
       }
-      .header::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
-      }
-      .header .logo {
-        font-size: 32px;
-        font-weight: 800;
-        color: #ffffff;
-        letter-spacing: -0.5px;
-        margin-bottom: 8px;
-      }
-      .header .logo span {
-        color: #93c5fd;
-      }
-      .header .badge {
-        display: inline-block;
-        background: rgba(255, 255, 255, 0.15);
-        color: #ffffff;
-        font-size: 12px;
-        font-weight: 600;
-        padding: 4px 16px;
-        border-radius: 20px;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        margin-top: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-      .header .subtitle {
-        color: #93c5fd;
-        font-size: 14px;
-        margin-top: 8px;
-        font-weight: 400;
-      }
-      .content {
-        padding: 40px 40px 32px;
-      }
-      .greeting {
-        font-size: 22px;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 8px;
-      }
-      .greeting span {
-        color: #2563eb;
-      }
-      .message {
-        font-size: 15px;
-        line-height: 1.7;
-        color: #475569;
-        margin-bottom: 16px;
-      }
-      .message strong {
-        color: #1e293b;
-      }
-      .highlight-box {
-        background: linear-gradient(135deg, #f1f5f9, #eef2ff);
-        border-radius: 12px;
-        padding: 24px;
-        margin: 24px 0;
-        border-left: 4px solid #2563eb;
-      }
-      .highlight-box .title {
-        font-size: 14px;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 8px;
-      }
-      .highlight-box ul {
-        margin: 0;
-        padding-left: 20px;
-        color: #475569;
-        font-size: 14px;
-        line-height: 1.8;
-      }
-      .highlight-box ul li {
-        margin-bottom: 4px;
-      }
-      .cta-container {
-        text-align: center;
-        margin: 32px 0;
-      }
-      .cta-button {
-        display: inline-block;
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        color: #ffffff !important;
-        font-size: 16px;
-        font-weight: 600;
-        padding: 14px 48px;
-        border-radius: 10px;
+      .email-header .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #FFFFFF;
         text-decoration: none;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-        transition: all 0.3s ease;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
       }
-      .cta-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
-      }
-      .security-badge {
-        display: flex;
+      .email-header .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #2563EB, #C9A227);
+        border-radius: 12px;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
-        background-color: #f0fdf4;
-        border-radius: 8px;
-        padding: 12px 20px;
-        margin: 24px 0;
+        font-size: 20px;
+      }
+      .email-header .logo span {
+        color: #C9A227;
+      }
+      .email-header .subtitle {
+        color: #93C5FD;
         font-size: 13px;
-        color: #065f46;
-        border: 1px solid #bbf7d0;
+        margin-top: 6px;
+        font-weight: 400;
+        letter-spacing: 0.3px;
       }
-      .security-badge svg {
-        flex-shrink: 0;
+      
+      /* Content */
+      .email-body {
+        padding: 40px 40px 32px;
       }
+      .email-body .greeting {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0F172A;
+        margin-bottom: 16px;
+      }
+      .email-body .greeting span {
+        color: #2563EB;
+      }
+      .email-body .message {
+        font-size: 15px;
+        line-height: 1.7;
+        color: #334155;
+        margin-bottom: 16px;
+      }
+      .email-body .message strong {
+        color: #0F172A;
+      }
+      
+      /* Welcome Icon */
+      .welcome-icon {
+        text-align: center;
+        font-size: 56px;
+        margin-bottom: 16px;
+      }
+      
+      /* Features Grid */
+      .features-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 20px 0;
+      }
+      .feature-item {
+        background: #F8FAFC;
+        border-radius: 10px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: #0F172A;
+        border: 1px solid #E2E8F0;
+      }
+      .feature-item .icon {
+        color: #2563EB;
+        font-size: 16px;
+      }
+      
+      /* Button */
+      .btn-wrapper {
+        text-align: center;
+        margin: 28px 0;
+      }
+      .btn-primary {
+        display: inline-block;
+        padding: 14px 44px;
+        background: linear-gradient(135deg, #2563EB, #1D4ED8);
+        color: #FFFFFF !important;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.30);
+        transition: all 0.3s ease;
+      }
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #3B82F6, #2563EB);
+        box-shadow: 0 12px 32px rgba(37, 99, 235, 0.40);
+        transform: translateY(-2px);
+      }
+      
+      /* Divider */
       .divider {
         border: none;
-        border-top: 1px solid #e2e8f0;
-        margin: 32px 0 24px;
-      }
-      .support-section {
-        background-color: #f8fafc;
-        border-radius: 12px;
-        padding: 20px 24px;
+        border-top: 1px solid #E2E8F0;
         margin: 24px 0;
-        text-align: center;
+      }
+      
+      /* Support Section */
+      .support-section {
+        background: #F8FAFC;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 16px 0 0;
+        border: 1px solid #E2E8F0;
       }
       .support-section p {
+        font-size: 13px;
+        color: #64748B;
+        line-height: 1.6;
         margin: 4px 0;
-        font-size: 14px;
-        color: #475569;
       }
       .support-section a {
-        color: #2563eb;
+        color: #2563EB;
         text-decoration: none;
-        font-weight: 500;
       }
       .support-section a:hover {
         text-decoration: underline;
       }
-      .footer {
-        padding: 0 40px 32px;
+      
+      /* Footer */
+      .email-footer {
+        background: #F8FAFC;
+        padding: 24px 40px;
         text-align: center;
-        border-top: 1px solid #f1f5f9;
-        padding-top: 24px;
+        border-top: 1px solid #E2E8F0;
       }
-      .footer .brand {
+      .email-footer .brand {
+        font-size: 15px;
         font-weight: 700;
-        color: #1e293b;
-        font-size: 16px;
+        color: #0F172A;
       }
-      .footer .brand span {
-        color: #2563eb;
+      .email-footer .brand span {
+        color: #C9A227;
       }
-      .footer .tagline {
-        color: #94a3b8;
-        font-size: 13px;
-        margin-top: 4px;
+      .email-footer .tagline {
+        font-size: 12px;
+        color: #94A3B8;
+        margin-top: 2px;
       }
-      .footer .contact {
-        color: #64748b;
-        font-size: 13px;
+      .email-footer .contact {
         margin-top: 8px;
-        line-height: 1.6;
+        font-size: 12px;
+        color: #94A3B8;
       }
-      .footer .contact a {
-        color: #2563eb;
+      .email-footer .contact a {
+        color: #2563EB;
         text-decoration: none;
       }
-      .footer .contact a:hover {
+      .email-footer .contact a:hover {
         text-decoration: underline;
       }
-      .footer .copyright {
-        color: #94a3b8;
-        font-size: 12px;
-        margin-top: 16px;
-        line-height: 1.6;
+      .email-footer .copyright {
+        font-size: 11px;
+        color: #94A3B8;
+        margin-top: 10px;
       }
-      .footer .copyright a {
-        color: #94a3b8;
+      .email-footer .copyright a {
+        color: #2563EB;
+        text-decoration: none;
+      }
+      .email-footer .copyright a:hover {
         text-decoration: underline;
       }
-      @media only screen and (max-width: 600px) {
-        .header {
+      
+      /* Responsive */
+      @media (max-width: 600px) {
+        body {
+          padding: 16px;
+        }
+        .email-header {
+          padding: 24px 20px 20px;
+        }
+        .email-body {
           padding: 28px 20px 24px;
         }
-        .header .logo {
-          font-size: 26px;
+        .email-footer {
+          padding: 20px 20px;
         }
-        .content {
-          padding: 28px 20px 24px;
-        }
-        .greeting {
+        .email-header .logo {
           font-size: 20px;
         }
-        .cta-button {
+        .email-header .logo-icon {
+          width: 36px;
+          height: 36px;
+          font-size: 16px;
+        }
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+        .btn-primary {
           padding: 12px 32px;
           font-size: 15px;
-          width: 100%;
-          box-sizing: border-box;
-        }
-        .highlight-box {
-          padding: 16px 20px;
-        }
-        .support-section {
-          padding: 16px 20px;
-        }
-        .footer {
-          padding: 0 20px 24px;
         }
       }
     </style>
   </head>
-  <body style="margin:0;padding:20px;background-color:#f8fafc;">
-    <div style="max-width:600px;margin:0 auto;">
-      <div class="container">
-        <!-- Header -->
-        <div class="header">
-          <div class="logo">Cyber<span>Kavach</span></div>
-          <div class="badge">✅ Account Verified</div>
-          <div class="subtitle">Cybersecurity Training &amp; Certification</div>
+  <body>
+    <div class="email-container">
+      
+      <!-- HEADER -->
+      <div class="email-header">
+        <a href="${domain}" class="logo">
+          Institute<span>Hub</span>
+        </a>
+        <div class="subtitle">✅ Welcome Aboard!</div>
+      </div>
+      
+      <!-- BODY -->
+      <div class="email-body">
+        <div class="welcome-icon">👋</div>
+        
+        <div class="greeting">
+          Welcome, <span>${name || "User"}</span>!
         </div>
         
-        <!-- Content -->
-        <div class="content">
-          <div class="greeting">
-            Welcome, <span>${name || "Security Professional"}</span>! 👋
+        <div class="message">
+          Thank you for joining <strong>InstituteHub</strong> – India's premier training and certification platform. We're thrilled to have you as part of our community of professionals and enthusiasts.
+        </div>
+        
+        <div class="message">
+          Your account has been successfully created and verified. You now have full access to our learning resources, courses, and community features.
+        </div>
+        
+        <!-- Features -->
+        <div class="features-grid">
+          <div class="feature-item">
+            <span class="icon">📚</span> 500+ Courses
           </div>
-          
-          <div class="message">
-            Thank you for joining <strong>CyberKavach</strong> – India's premier cybersecurity training and certification platform. We're thrilled to have you as part of our community of security professionals and enthusiasts.
+          <div class="feature-item">
+            <span class="icon">🏅</span> Verified Certificates
           </div>
-          
-          <div class="message">
-            Your account has been successfully created and verified. You now have full access to our learning resources, courses, and community features.
+          <div class="feature-item">
+            <span class="icon">👨‍🏫</span> 340+ Expert Mentors
           </div>
-          
-          <div class="highlight-box">
-            <div class="title">🚀 What's Next?</div>
-            <ul>
-              <li><strong>Explore Courses:</strong> Browse our industry-leading cybersecurity programs</li>
-              <li><strong>Connect with Mentors:</strong> Learn from certified security professionals</li>
-              <li><strong>Earn Certifications:</strong> Get globally recognized credentials</li>
-              <li><strong>Join Community:</strong> Network with like-minded security enthusiasts</li>
-            </ul>
-          </div>
-          
-          <div class="cta-container">
-            <a href="${process.env.DOMAIN || "https://cyberkavach.org.in"}/" class="cta-button">
-              Access Your Dashboard
-            </a>
-          </div>
-          
-          <div class="security-badge">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              <path d="M9 12l2 2 4-4"/>
-            </svg>
-            <span>✓ Account secured via Google OAuth authentication</span>
-          </div>
-          
-          <div class="support-section">
-            <p style="font-weight:600;color:#1e293b;">📞 Need Assistance?</p>
-            <p>
-              Our support team is here to help you get started.
-              <br>
-              📧 <a href="mailto:info@cyberkavach.org.in">info@cyberkavach.org.in</a>
-              &nbsp;|&nbsp; 🌐 <a href="${process.env.DOMAIN || "https://cyberkavach.org.in"}">cyberkavach.org.in</a>
-            </p>
+          <div class="feature-item">
+            <span class="icon">💼</span> Career Support
           </div>
         </div>
         
-        <!-- Footer -->
-        <div class="footer">
-          <div class="brand">Cyber <span>Kavach</span></div>
-          <div class="tagline">Securing Digital Futures</div>
-          <div class="contact">
-             Delhi, India<br>
-             <a href="mailto:info@cyberkavach.org.in">info@cyberkavach.org.in</a><br>
-             <a href="${process.env.DOMAIN || "https://cyberkavach.org.in"}">www.cyberkavach.org.in</a>
-          </div>
-          <div class="copyright">
-            This is an automated welcome email. Please do not reply directly.
+        <!-- CTA Button -->
+        <div class="btn-wrapper">
+          <a href="${domain}/" class="btn-primary">
+            🚀 Access Your Dashboard
+          </a>
+        </div>
+        
+        <hr class="divider">
+        
+        <!-- Support Section -->
+        <div class="support-section">
+          <p style="font-weight:600; color:#0F172A; margin-bottom:6px;">
+            📞 Need Assistance?
+          </p>
+          <p>
+            Our support team is here to help you get started.
             <br>
-            Protecting your data is our priority. Read our 
-            <a href="${process.env.DOMAIN || "https://cyberkavach.org.in"}/privacy">Privacy Policy</a>.
-            <br><br>
-            © ${new Date().getFullYear()} CyberKavach. All rights reserved.
-            <br>
-            MSME Registered • GST Compliant
-          </div>
+            📧 <a href="mailto:student001599@gmail.com">student001599@gmail.com</a>
+            &nbsp;|&nbsp; 🌐 <a href="${domain}">InstituteHub.org.in</a>
+          </p>
         </div>
       </div>
+      
+      <!-- FOOTER -->
+      <div class="email-footer">
+        <div class="brand">Institute<span>Hub</span></div>
+        <div class="tagline">Empowering the next generation of professionals</div>
+        <div class="contact">
+          📧 <a href="mailto:student001599@gmail.com">student001599@gmail.com</a>
+        </div>
+        <div class="copyright">
+          This is an automated welcome email. Please do not reply directly.
+          <br>
+          Protecting your data is our priority. Read our 
+          <a href="${domain}/privacy">Privacy Policy</a>.
+          <br><br>
+          © ${new Date().getFullYear()} InstituteHub. All rights reserved.
+        </div>
+      </div>
+      
     </div>
   </body>
   </html>
@@ -345,68 +353,67 @@ module.exports.welComeEmail = async ({ name, email }) => {
 
   // Professional Plain Text Version
   const textContent = `
-  ========================================
-  WELCOME TO CYBERKAVACH
-  ========================================
-  
-  Hello ${name || "Security Professional"},
-  
-  Welcome to CyberKavach – India's premier cybersecurity training and certification platform!
-  
+  ════════════════════════════════════════════════
+    🎉 WELCOME TO INSTITUTEHUB
+  ════════════════════════════════════════════════
+
+  Hello ${name || "User"},
+
+  Welcome to InstituteHub – India's premier training and certification platform!
+
   Your account has been successfully created and verified. You now have full access to our learning resources, courses, and community features.
-  
-  ─────────────────────────────────────
-  🚀 WHAT'S NEXT?
-  ─────────────────────────────────────
-  
-  • Explore Courses: Browse our industry-leading cybersecurity programs
-  • Connect with Mentors: Learn from certified security professionals
-  • Earn Certifications: Get globally recognized credentials
-  • Join Community: Network with like-minded security enthusiasts
-  
-  ─────────────────────────────────────
-  ACCESS YOUR DASHBOARD
-  ─────────────────────────────────────
-  
-  ${process.env.DOMAIN || "https://cyberkavach.org.in"}/dashboard
-  
-  ─────────────────────────────────────
-  NEED ASSISTANCE?
-  ─────────────────────────────────────
-  
+
+  ────────────────────────────────────────────────
+  🚀 ACCESS YOUR DASHBOARD
+  ────────────────────────────────────────────────
+
+  ${domain}/
+
+  ────────────────────────────────────────────────
+  📚 WHAT YOU GET
+  ────────────────────────────────────────────────
+
+  • 500+ Courses across 10+ categories
+  • Verified Certificates recognized by employers
+  • 340+ Expert Mentors and instructors
+  • Career Support and guidance
+
+  ────────────────────────────────────────────────
+  📞 NEED ASSISTANCE?
+  ────────────────────────────────────────────────
+
   Our support team is here to help you get started.
-  
-  📧 Email: info@cyberkavach.org.in
-  🌐 Website: ${process.env.DOMAIN || "https://cyberkavach.org.in"}
-  
-  ─────────────────────────────────────
-  
-  CyberKavach | Securing Digital Futures
+
+  📧 Email: student001599@gmail.com
+  🌐 Website: ${domain}
+
+  ────────────────────────────────────────────────
+
+  InstituteHub | Empowering the next generation of professionals
   Delhi, India
-  
+
   This is an automated welcome email. Please do not reply directly.
   Protecting your data is our priority. Read our Privacy Policy at:
-  ${process.env.DOMAIN || "https://cyberkavach.org.in"}/privacy
-  
-  © ${new Date().getFullYear()} CyberKavach. All rights reserved.
-  MSME Registered • GST Compliant
+  ${domain}/privacy
+
+  © ${new Date().getFullYear()} InstituteHub. All rights reserved.
   `;
 
   try {
     await apiInstance.sendTransacEmail({
       sender: {
-        email: "info@cyberkavach.org.in",
-        name: "CyberKavach Welcome Team",
+        email: "student001599@gmail.com",
+        name: "InstituteHub Welcome Team",
       },
-      to: [{ email, name: name || "Security Professional" }],
-      subject: "🎉 Welcome to CyberKavach! Your Cybersecurity Journey Begins",
+      to: [{ email, name: name || "Professional" }],
+      subject: "🎉 Welcome to InstituteHub! Your Journey Begins",
       htmlContent: htmlContent,
       textContent: textContent,
     });
 
-    console.log("Welcome email sent to:", email);
+    console.log("✅ Welcome email sent to:", email);
   } catch (emailErr) {
-    console.error("Failed to send welcome email:", emailErr);
+    console.error("❌ Failed to send welcome email:", emailErr);
     // Don't fail user creation if email fails
   }
 };

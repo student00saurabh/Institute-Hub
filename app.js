@@ -343,5 +343,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(8080, () => {
-  console.log(`cyberkavach.org.in is working at ${8080}`);
+  console.log(`institute-hub is working at ${8080}`);
 });

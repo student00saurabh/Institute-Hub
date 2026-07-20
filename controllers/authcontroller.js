@@ -20,7 +20,7 @@ module.exports.forgotPassword = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.render("emailer/emailSent.ejs", {
-        message: "This email address is not registered with CyberKavach. Please verify your email and try again.",
+        message: "This email address is not registered with InstituteHub. Please verify your email and try again.",
         alertmsg: true,
       });
     }
@@ -35,7 +35,7 @@ module.exports.forgotPassword = async (req, res) => {
     const domain =
       process.env.DOMAIN ||
       (process.env.NODE_ENV === "production"
-        ? "https://cyberkavach.org.in"
+        ? "https://institute-hub-7wsi.onrender.com"
         : "http://localhost:8080");
     const resetLink = `${domain}/reset-password/${token}`;
 
@@ -46,278 +46,339 @@ module.exports.forgotPassword = async (req, res) => {
       process.env.BREVO_API_KEY,
     );
 
-    // Professional Email HTML - Enhanced with CyberKavach branding
+    // ================================================================
+    // PASSWORD RESET EMAIL — Enhanced with InstituteHub Theme
+    // ================================================================
     const htmlContent = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Reset Your Password | CyberKavach</title>
-        <style>
-          body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
-          }
-          .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-          }
-          .header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-            padding: 32px 40px;
-            text-align: center;
-          }
-          .header h1 {
-            color: #ffffff;
-            font-size: 28px;
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: -0.5px;
-          }
-          .header .subtitle {
-            color: #93c5fd;
-            font-size: 14px;
-            margin-top: 8px;
-            font-weight: 400;
-          }
-          .content {
-            padding: 40px 40px 32px;
-          }
-          .greeting {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 16px;
-          }
-          .message {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #475569;
-            margin-bottom: 24px;
-          }
-          .button-container {
-            text-align: center;
-            margin: 32px 0;
-          }
-          .reset-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-            color: #ffffff !important;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 14px 40px;
-            border-radius: 8px;
-            text-decoration: none;
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-            transition: all 0.3s ease;
-          }
-          .reset-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
-          }
-          .link-container {
-            background-color: #f1f5f9;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin: 24px 0;
-            word-break: break-all;
-          }
-          .link-container .label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-          }
-          .link-container a {
-            color: #2563eb;
-            font-size: 14px;
-            text-decoration: none;
-            word-break: break-all;
-          }
-          .link-container a:hover {
-            text-decoration: underline;
-          }
-          .warning-box {
-            background-color: #fefce8;
-            border-left: 4px solid #eab308;
-            padding: 16px 20px;
-            border-radius: 4px;
-            margin: 24px 0;
-          }
-          .warning-box .title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #854d0e;
-            margin-bottom: 4px;
-          }
-          .warning-box .text {
-            font-size: 13px;
-            color: #854d0e;
-            line-height: 1.5;
-          }
-          .divider {
-            border: none;
-            border-top: 1px solid #e2e8f0;
-            margin: 32px 0 24px;
-          }
-          .footer {
-            padding: 0 40px 32px;
-            text-align: center;
-          }
-          .footer .brand {
-            font-weight: 700;
-            color: #1e293b;
-            font-size: 16px;
-          }
-          .footer .brand span {
-            color: #2563eb;
-          }
-          .footer .tagline {
-            color: #94a3b8;
-            font-size: 13px;
-            margin-top: 4px;
-          }
-          .footer .contact {
-            color: #64748b;
-            font-size: 13px;
-            margin-top: 8px;
-          }
-          .footer .contact a {
-            color: #2563eb;
-            text-decoration: none;
-          }
-          .footer .contact a:hover {
-            text-decoration: underline;
-          }
-          .footer .copyright {
-            color: #94a3b8;
-            font-size: 12px;
-            margin-top: 16px;
-          }
-          @media only screen and (max-width: 600px) {
-            .header {
-              padding: 24px 20px;
-            }
-            .header h1 {
-              font-size: 22px;
-            }
-            .content {
-              padding: 24px 20px;
-            }
-            .reset-button {
-              padding: 12px 32px;
-              font-size: 15px;
-            }
-            .footer {
-              padding: 0 20px 24px;
-            }
-          }
-        </style>
-      </head>
-      <body style="margin:0;padding:20px;background-color:#f8fafc;">
-        <div style="max-width:600px;margin:0 auto;">
-          <div class="container">
-            <!-- Header -->
-            <div class="header">
-              <h1>CyberKavach</h1>
-              <div class="subtitle">Cybersecurity Training &amp; Certification</div>
-            </div>
-            
-            <!-- Content -->
-            <div class="content">
-              <div class="greeting">
-                Hello ${user.name || user.username || "CyberKavach User"},
-              </div>
-              
-              <div class="message">
-                We received a request to reset the password for your CyberKavach account. 
-                If you initiated this request, please click the button below to securely reset your password.
-              </div>
-              
-              <div class="button-container">
-                <a href="${resetLink}" class="reset-button">Reset Your Password</a>
-              </div>
-              
-              <div class="link-container">
-                <div class="label">Alternative Method</div>
-                <a href="${resetLink}">${resetLink}</a>
-              </div>
-              
-              <div class="warning-box">
-                <div class="title">⏱️ Security Notice</div>
-                <div class="text">
-                  This password reset link is valid for <strong>1 hour</strong> from the time it was requested.
-                  For your security, the link will expire after this time.
-                </div>
-              </div>
-              
-              <div class="message" style="font-size:14px;color:#94a3b8;margin-bottom:0;">
-                If you did not request this password reset, please ignore this email. 
-                No changes have been made to your account.
-              </div>
-            </div>
-            
-            <hr class="divider">
-            
-            <!-- Footer -->
-            <div class="footer">
-              <div class="brand">Cyber <span>Kavach</span></div>
-              <div class="tagline">Securing Digital Futures</div>
-              <div class="contact">
-                📧 <a href="mailto:info@cyberkavach.org.in">info@cyberkavach.org.in</a>
-              </div>
-              <div class="copyright">
-                &copy; ${new Date().getFullYear()} CyberKavach. All rights reserved.
-              </div>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Reset Your Password | InstituteHub</title>
+      <style>
+        /* ===== EMAIL STYLES ===== */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          background: #F8FAFC;
+          padding: 40px 0;
+          color: #0F172A;
+        }
+        .email-container {
+          max-width: 560px;
+          margin: 0 auto;
+          background: #FFFFFF;
+          border-radius: 16px;
+          box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+          overflow: hidden;
+          border: 1px solid #E2E8F0;
+        }
+        
+        /* Header */
+        .email-header {
+          background: linear-gradient(135deg, #0F172A 0%, #2563EB 100%);
+          padding: 32px 40px 28px;
+          text-align: center;
+          border-bottom: 3px solid #C9A227;
+        }
+        .email-header .logo {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          color: #FFFFFF;
+          text-decoration: none;
+          font-size: 24px;
+          font-weight: 800;
+          letter-spacing: -0.5px;
+        }
+        .email-header .logo-icon {
+          width: 44px;
+          height: 44px;
+          background: linear-gradient(135deg, #2563EB, #C9A227);
+          border-radius: 12px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+        }
+        .email-header .logo span {
+          color: #C9A227;
+        }
+        .email-header .subtitle {
+          color: #93C5FD;
+          font-size: 13px;
+          margin-top: 6px;
+          font-weight: 400;
+          letter-spacing: 0.3px;
+        }
+        
+        /* Content */
+        .email-body {
+          padding: 40px 40px 32px;
+        }
+        .email-body .greeting {
+          font-size: 18px;
+          font-weight: 600;
+          color: #0F172A;
+          margin-bottom: 16px;
+        }
+        .email-body .greeting span {
+          color: #2563EB;
+        }
+        .email-body .message {
+          font-size: 15px;
+          line-height: 1.7;
+          color: #334155;
+          margin-bottom: 28px;
+        }
+        .email-body .message strong {
+          color: #0F172A;
+        }
+        
+        /* Button */
+        .btn-wrapper {
+          text-align: center;
+          margin: 32px 0;
+        }
+        .btn-reset {
+          display: inline-block;
+          padding: 14px 44px;
+          background: linear-gradient(135deg, #2563EB, #1D4ED8);
+          color: #FFFFFF !important;
+          font-size: 16px;
+          font-weight: 600;
+          text-decoration: none;
+          border-radius: 12px;
+          box-shadow: 0 8px 24px rgba(37, 99, 235, 0.30);
+          transition: all 0.3s ease;
+          letter-spacing: 0.3px;
+        }
+        .btn-reset:hover {
+          background: linear-gradient(135deg, #3B82F6, #2563EB);
+          box-shadow: 0 12px 32px rgba(37, 99, 235, 0.40);
+          transform: translateY(-2px);
+        }
+        
+        /* Alternative link */
+        .link-alt {
+          text-align: center;
+          margin: 20px 0 28px;
+          padding: 16px;
+          background: #F8FAFC;
+          border-radius: 10px;
+          border: 1px solid #E2E8F0;
+        }
+        .link-alt .label {
+          font-size: 12px;
+          color: #94A3B8;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-bottom: 6px;
+        }
+        .link-alt a {
+          color: #2563EB;
+          font-size: 13px;
+          word-break: break-all;
+          text-decoration: none;
+        }
+        .link-alt a:hover {
+          text-decoration: underline;
+        }
+        
+        /* Divider */
+        .divider {
+          border: none;
+          border-top: 1px solid #E2E8F0;
+          margin: 28px 0 24px;
+        }
+        
+        /* Security notice */
+        .security-notice {
+          background: #F0FDF4;
+          border: 1px solid #BBF7D0;
+          border-radius: 10px;
+          padding: 14px 18px;
+          margin: 20px 0 0;
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+        }
+        .security-notice .icon {
+          color: #22C55E;
+          font-size: 18px;
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+        .security-notice .text {
+          font-size: 13px;
+          color: #166534;
+          line-height: 1.5;
+        }
+        .security-notice .text strong {
+          color: #0F172A;
+        }
+        
+        /* Footer */
+        .email-footer {
+          background: #F8FAFC;
+          padding: 24px 40px;
+          text-align: center;
+          border-top: 1px solid #E2E8F0;
+        }
+        .email-footer .brand {
+          font-size: 15px;
+          font-weight: 700;
+          color: #0F172A;
+        }
+        .email-footer .brand span {
+          color: #C9A227;
+        }
+        .email-footer .tagline {
+          font-size: 12px;
+          color: #94A3B8;
+          margin-top: 2px;
+        }
+        .email-footer .contact {
+          margin-top: 8px;
+          font-size: 12px;
+          color: #94A3B8;
+        }
+        .email-footer .contact a {
+          color: #2563EB;
+          text-decoration: none;
+        }
+        .email-footer .contact a:hover {
+          text-decoration: underline;
+        }
+        .email-footer .copyright {
+          font-size: 11px;
+          color: #94A3B8;
+          margin-top: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+          body { padding: 16px; }
+          .email-header { padding: 24px 20px 20px; }
+          .email-body { padding: 28px 20px 24px; }
+          .email-footer { padding: 20px 20px; }
+          .email-header .logo { font-size: 20px; }
+          .email-header .logo-icon { width: 36px; height: 36px; font-size: 16px; }
+          .btn-reset { padding: 12px 32px; font-size: 15px; }
+          .link-alt a { font-size: 12px; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="email-container">
+        
+        <!-- HEADER -->
+        <div class="email-header">
+          <a href="${domain}" class="logo">
+            Institute<span>Hub</span>
+          </a>
+          <div class="subtitle">🔐 Secure Password Reset</div>
+        </div>
+        
+        <!-- BODY -->
+        <div class="email-body">
+          <div class="greeting">Hello <span>${user.name || user.username || "User"}</span>, 👋</div>
+          
+          <div class="message">
+            We received a request to reset the password for your <strong>InstituteHub</strong> account.
+            If you initiated this request, please click the button below to securely reset your password.
+          </div>
+          
+          <!-- Button -->
+          <div class="btn-wrapper">
+            <a href="${resetLink}" class="btn-reset">🔑 Reset Your Password</a>
+          </div>
+          
+          <!-- Alternative Link -->
+          <div class="link-alt">
+            <div class="label">Or copy and paste this link into your browser</div>
+            <a href="${resetLink}">${resetLink}</a>
+          </div>
+          
+          <!-- Security Notice -->
+          <div class="security-notice">
+            <span class="icon">🛡️</span>
+            <div class="text">
+              <strong>Security tip:</strong> This link is valid for <strong>1 hour</strong> and will expire after that time.
+              For your security, do not share this link with anyone.
             </div>
           </div>
+          
+          <hr class="divider">
+          
+          <div style="font-size:13px; color:#64748B; line-height:1.6;">
+            <p style="margin-bottom:4px;">
+              <strong>Didn't request this?</strong> You can safely ignore this email.
+              No changes have been made to your account.
+            </p>
+            <p style="margin:0; font-size:12px; color:#94A3B8;">
+              Need assistance? Contact us at 
+              <a href="mailto:student001599@gmail.com" style="color:#2563EB; text-decoration:none;">student001599@gmail.com</a>
+            </p>
+          </div>
         </div>
-      </body>
-      </html>
+        
+        <!-- FOOTER -->
+        <div class="email-footer">
+          <div class="brand">Institute<span>Hub</span></div>
+          <div class="tagline">Empowering the next generation of professionals</div>
+          <div class="contact">
+            📧 <a href="mailto:student001599@gmail.com">student001599@gmail.com</a>
+          </div>
+          <div class="copyright">
+            &copy; ${new Date().getFullYear()} InstituteHub. All rights reserved.
+          </div>
+        </div>
+        
+      </div>
+    </body>
+    </html>
     `;
 
-    // Plain text version - Enhanced
+    // Plain text version
     const textContent = `
-      CyberKavach - Password Reset Request
-      =====================================
+    ════════════════════════════════════════════════
+      🔐 InstituteHub — Password Reset Request
+    ════════════════════════════════════════════════
 
-      Hello ${user.name || user.username || "CyberKavach User"},
+    Hello ${user.name || user.username || "User"},
 
-      We received a request to reset your password for your CyberKavach account.
+    We received a request to reset the password for your InstituteHub account.
 
-      To reset your password, please visit the following link:
-      ${resetLink}
+    To reset your password, please visit the following link:
+    ${resetLink}
 
-      This link is valid for 1 hour and will expire after that time.
+    ────────────────────────────────────────────────
+    ⚠️  Security Information
+    ────────────────────────────────────────────────
+    • This link is valid for 1 hour and will expire after that time.
+    • Do not share this link with anyone.
+    • If you didn't request this, please ignore this email.
 
-      If you did not request this password reset, please ignore this email.
-      No changes have been made to your account.
+    ────────────────────────────────────────────────
+    Need help? Contact us at:
+    📧 student001599@gmail.com
 
-      For security reasons, do not share this link with anyone.
-
-      Need assistance? Contact us at:
-      📧 info@cyberkavach.org.in
-
-      ---
-      CyberKavach
-      Cybersecurity Training & Certification Platform
-      ${new Date().getFullYear()} CyberKavach. All rights reserved.
+    ────────────────────────────────────────────────
+    InstituteHub
+    Empowering the next generation of professionals
+    © ${new Date().getFullYear()} InstituteHub. All rights reserved.
     `;
 
     await apiInstance.sendTransacEmail({
-      sender: { email: "info@cyberkavach.org.in", name: "CyberKavach" },
+      sender: { email: "student001599@gmail.com", name: "InstituteHub" },
       to: [{ email: user.email, name: user.name || user.username }],
-      subject: "🔐 Password Reset Request | CyberKavach",
+      subject: "🔐 Reset Your Password | InstituteHub",
       htmlContent: htmlContent,
       textContent: textContent,
     });
@@ -398,7 +459,9 @@ module.exports.postResetPassword = async (req, res) => {
     updatedUser.resetPasswordExpires = undefined;
     await updatedUser.save();
 
-    // Send confirmation email - Enhanced
+    // ================================================================
+    // PASSWORD CONFIRMATION EMAIL — Enhanced with InstituteHub Theme
+    // ================================================================
     try {
       const brevo = require("@getbrevo/brevo");
       const apiInstance = new brevo.TransactionalEmailsApi();
@@ -407,195 +470,258 @@ module.exports.postResetPassword = async (req, res) => {
         process.env.BREVO_API_KEY,
       );
 
-      const htmlContent = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Password Updated | CyberKavach</title>
-          <style>
-            body {
-              margin: 0;
-              padding: 0;
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-              background-color: #f8fafc;
-              color: #1e293b;
-            }
-            .container {
-              max-width: 600px;
-              margin: 0 auto;
-              background-color: #ffffff;
-              border-radius: 12px;
-              overflow: hidden;
-              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            }
-            .header {
-              background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-              padding: 32px 40px;
-              text-align: center;
-            }
-            .header h1 {
-              color: #ffffff;
-              font-size: 28px;
-              font-weight: 700;
-              margin: 0;
-              letter-spacing: -0.5px;
-            }
-            .header .subtitle {
-              color: #93c5fd;
-              font-size: 14px;
-              margin-top: 8px;
-              font-weight: 400;
-            }
-            .content {
-              padding: 40px 40px 32px;
-            }
-            .success-icon {
-              text-align: center;
-              font-size: 48px;
-              margin-bottom: 16px;
-            }
-            .greeting {
-              font-size: 18px;
-              font-weight: 600;
-              color: #1e293b;
-              margin-bottom: 16px;
-            }
-            .message {
-              font-size: 15px;
-              line-height: 1.6;
-              color: #475569;
-              margin-bottom: 16px;
-            }
-            .alert-box {
-              background-color: #ecfdf5;
-              border-left: 4px solid #10b981;
-              padding: 16px 20px;
-              border-radius: 4px;
-              margin: 24px 0;
-            }
-            .alert-box .title {
-              font-size: 13px;
-              font-weight: 600;
-              color: #065f46;
-              margin-bottom: 4px;
-            }
-            .alert-box .text {
-              font-size: 13px;
-              color: #065f46;
-              line-height: 1.5;
-            }
-            .divider {
-              border: none;
-              border-top: 1px solid #e2e8f0;
-              margin: 32px 0 24px;
-            }
-            .footer {
-              padding: 0 40px 32px;
-              text-align: center;
-            }
-            .footer .brand {
-              font-weight: 700;
-              color: #1e293b;
-              font-size: 16px;
-            }
-            .footer .brand span {
-              color: #2563eb;
-            }
-            .footer .tagline {
-              color: #94a3b8;
-              font-size: 13px;
-              margin-top: 4px;
-            }
-            .footer .contact {
-              color: #64748b;
-              font-size: 13px;
-              margin-top: 8px;
-            }
-            .footer .contact a {
-              color: #2563eb;
-              text-decoration: none;
-            }
-            .footer .copyright {
-              color: #94a3b8;
-              font-size: 12px;
-              margin-top: 16px;
-            }
-            @media only screen and (max-width: 600px) {
-              .header {
-                padding: 24px 20px;
-              }
-              .header h1 {
-                font-size: 22px;
-              }
-              .content {
-                padding: 24px 20px;
-              }
-              .footer {
-                padding: 0 20px 24px;
-              }
-            }
-          </style>
-        </head>
-        <body style="margin:0;padding:20px;background-color:#f8fafc;">
-          <div style="max-width:600px;margin:0 auto;">
-            <div class="container">
-              <div class="header">
-                <h1>CyberKavach</h1>
-                <div class="subtitle">Cybersecurity Training &amp; Certification</div>
-              </div>
-              
-              <div class="content">
-                <div class="success-icon">✅</div>
-                
-                <div class="greeting">
-                  Hello ${user.name || user.username || "CyberKavach User"},
-                </div>
-                
-                <div class="message">
-                  Your CyberKavach account password was successfully updated on <strong>${new Date().toLocaleString()}</strong>.
-                </div>
-                
-                <div class="alert-box">
-                  <div class="title">🔐 Security Confirmation</div>
-                  <div class="text">
-                    If you did not initiate this password change, please contact our support team immediately.
-                  </div>
-                </div>
-                
-                <div class="message" style="font-size:14px;color:#94a3b8;margin-bottom:0;">
-                  You can now log in to your account using your new password.
-                </div>
-              </div>
-              
-              <hr class="divider">
-              
-              <div class="footer">
-                <div class="brand">Cyber <span>Kavach</span></div>
-                <div class="tagline">Securing Digital Futures</div>
-                <div class="contact">
-                  📧 <a href="mailto:info@cyberkavach.org.in">info@cyberkavach.org.in</a>
-                </div>
-                <div class="copyright">
-                  &copy; ${new Date().getFullYear()} CyberKavach. All rights reserved.
-                </div>
+      const confirmHtml = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Password Updated | InstituteHub</title>
+        <style>
+          /* ===== EMAIL STYLES ===== */
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #F8FAFC;
+            padding: 40px 0;
+            color: #0F172A;
+          }
+          .email-container {
+            max-width: 560px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+            border: 1px solid #E2E8F0;
+          }
+          
+          /* Header */
+          .email-header {
+            background: linear-gradient(135deg, #0F172A 0%, #2563EB 100%);
+            padding: 32px 40px 28px;
+            text-align: center;
+            border-bottom: 3px solid #22C55E;
+          }
+          .email-header .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+          }
+          .email-header .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #2563EB, #C9A227);
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+          }
+          .email-header .logo span { color: #C9A227; }
+          .email-header .subtitle {
+            color: #93C5FD;
+            font-size: 13px;
+            margin-top: 6px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+          }
+          
+          /* Content */
+          .email-body { padding: 40px 40px 32px; }
+          .email-body .greeting {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0F172A;
+            margin-bottom: 16px;
+          }
+          .email-body .greeting span { color: #2563EB; }
+          .email-body .message {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #334155;
+            margin-bottom: 20px;
+          }
+          .email-body .message strong { color: #0F172A; }
+          
+          /* Success Icon */
+          .success-icon {
+            text-align: center;
+            font-size: 56px;
+            margin-bottom: 16px;
+          }
+          
+          /* Divider */
+          .divider {
+            border: none;
+            border-top: 1px solid #E2E8F0;
+            margin: 24px 0;
+          }
+          
+          /* Info Box */
+          .info-box {
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin: 16px 0 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+          }
+          .info-box .icon {
+            color: #2563EB;
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 1px;
+          }
+          .info-box .text {
+            font-size: 13px;
+            color: #1E40AF;
+            line-height: 1.5;
+          }
+          .info-box .text strong { color: #0F172A; }
+          
+          /* Footer */
+          .email-footer {
+            background: #F8FAFC;
+            padding: 24px 40px;
+            text-align: center;
+            border-top: 1px solid #E2E8F0;
+          }
+          .email-footer .brand {
+            font-size: 15px;
+            font-weight: 700;
+            color: #0F172A;
+          }
+          .email-footer .brand span { color: #C9A227; }
+          .email-footer .tagline {
+            font-size: 12px;
+            color: #94A3B8;
+            margin-top: 2px;
+          }
+          .email-footer .contact {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #94A3B8;
+          }
+          .email-footer .contact a {
+            color: #2563EB;
+            text-decoration: none;
+          }
+          .email-footer .contact a:hover { text-decoration: underline; }
+          .email-footer .copyright {
+            font-size: 11px;
+            color: #94A3B8;
+            margin-top: 10px;
+          }
+          
+          @media (max-width: 600px) {
+            body { padding: 16px; }
+            .email-header { padding: 24px 20px 20px; }
+            .email-body { padding: 28px 20px 24px; }
+            .email-footer { padding: 20px 20px; }
+            .email-header .logo { font-size: 20px; }
+            .email-header .logo-icon { width: 36px; height: 36px; font-size: 16px; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          
+          <!-- HEADER -->
+          <div class="email-header">
+            <a href="${domain}" class="logo">
+              Institute<span>Hub</span>
+            </a>
+            <div class="subtitle">✅ Password Updated Successfully</div>
+          </div>
+          
+          <!-- BODY -->
+          <div class="email-body">
+            <div class="success-icon">✅</div>
+            
+            <div class="greeting">Hello <span>${user.name || user.username || "User"}</span>,</div>
+            
+            <div class="message">
+              Your <strong>InstituteHub</strong> account password was successfully updated on <strong>${new Date().toLocaleString()}</strong>.
+            </div>
+            
+            <div class="info-box">
+              <span class="icon">🛡️</span>
+              <div class="text">
+                <strong>Security reminder:</strong> If you didn't make this change, please 
+                <a href="${domain}/contact" style="color:#2563EB; text-decoration:underline;">contact support immediately</a>.
               </div>
             </div>
+            
+            <hr class="divider">
+            
+            <div style="font-size:13px; color:#64748B; line-height:1.6;">
+              <p style="margin:0;">
+                You can now log in to your account with your new password.
+                <br>
+                <a href="${domain}/login" style="color:#2563EB; text-decoration:none; font-weight:600;">🔑 Log in to InstituteHub</a>
+              </p>
+            </div>
           </div>
-        </body>
-        </html>
+          
+          <!-- FOOTER -->
+          <div class="email-footer">
+            <div class="brand">Institute<span>Hub</span></div>
+            <div class="tagline">Empowering the next generation of professionals</div>
+            <div class="contact">
+              📧 <a href="mailto:student001599@gmail.com">student001599@gmail.com</a>
+            </div>
+            <div class="copyright">
+              &copy; ${new Date().getFullYear()} InstituteHub. All rights reserved.
+            </div>
+          </div>
+          
+        </div>
+      </body>
+      </html>
+      `;
+
+      const confirmText = `
+      ════════════════════════════════════════════════
+        ✅ InstituteHub — Password Updated Successfully
+      ════════════════════════════════════════════════
+
+      Hello ${user.name || user.username || "User"},
+
+      Your InstituteHub account password was successfully updated on ${new Date().toLocaleString()}.
+
+      ────────────────────────────────────────────────
+      ⚠️  Security Reminder
+      ────────────────────────────────────────────────
+      If you didn't make this change, please contact support immediately:
+      📧 student001599@gmail.com
+
+      ────────────────────────────────────────────────
+      You can now log in with your new password:
+      🔑 ${domain}/login
+
+      ────────────────────────────────────────────────
+      InstituteHub
+      Empowering the next generation of professionals
+      © ${new Date().getFullYear()} InstituteHub. All rights reserved.
       `;
 
       await apiInstance.sendTransacEmail({
-        sender: { email: "info@cyberkavach.org.in", name: "CyberKavach" },
+        sender: { email: "student001599@gmail.com", name: "InstituteHub" },
         to: [{ email: user.email, name: user.name || user.username }],
-        subject: "✅ Password Updated Successfully | CyberKavach",
-        htmlContent: htmlContent,
+        subject: "✅ Password Updated Successfully | InstituteHub",
+        htmlContent: confirmHtml,
+        textContent: confirmText,
       });
     } catch (emailErr) {
       console.error("Confirmation email error:", emailErr);
-      // Don't flash error here as password update was successful
       req.flash(
         "info", 
         "Your password was updated successfully, but we couldn't send a confirmation email. You can safely log in now."

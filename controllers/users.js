@@ -33,9 +33,11 @@ const OTP_EXPIRY_MINUTES = 10;
 const OTP_EXPIRY_MS = OTP_EXPIRY_MINUTES * 60 * 1000;
 const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000;
 
-// ==================== PROFESSIONAL EMAIL TEMPLATES ====================
+// ================================================================
+// PROFESSIONAL EMAIL TEMPLATES — InstituteHub Theme
+// ================================================================
 
-// Professional OTP Email Template
+// ===== OTP Verification Email =====
 async function sendVerificationOTP(user) {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -43,194 +45,180 @@ async function sendVerificationOTP(user) {
   user.otpExpires = Date.now() + OTP_EXPIRY_MS;
   await user.save();
 
-  const domain = process.env.DOMAIN || "https://cyberkavach.org.in";
+  const domain = process.env.DOMAIN || "https://institute-hub-7wsi.onrender.com";
 
   const htmlContent = `
   <!DOCTYPE html>
-  <html>
+  <html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification | CyberKavach</title>
+    <title>Verify Your Email | InstituteHub</title>
     <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
       body {
-        margin: 0;
-        padding: 0;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        background-color: #f8fafc;
-        color: #1e293b;
+        background: #F8FAFC;
+        padding: 40px 0;
+        color: #0F172A;
       }
-      .container {
-        max-width: 600px;
+      .email-container {
+        max-width: 560px;
         margin: 0 auto;
-        background-color: #ffffff;
-        border-radius: 12px;
+        background: #FFFFFF;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
         overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #E2E8F0;
       }
-      .header {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        padding: 32px 40px;
+      .email-header {
+        background: linear-gradient(135deg, #0F172A 0%, #2563EB 100%);
+        padding: 32px 40px 28px;
         text-align: center;
+        border-bottom: 3px solid #C9A227;
       }
-      .header h1 {
-        color: #ffffff;
-        font-size: 28px;
-        font-weight: 700;
-        margin: 0;
+      .email-header .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #FFFFFF;
+        text-decoration: none;
+        font-size: 24px;
+        font-weight: 800;
         letter-spacing: -0.5px;
       }
-      .header .subtitle {
-        color: #93c5fd;
-        font-size: 14px;
-        margin-top: 8px;
+      .email-header .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #2563EB, #C9A227);
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+      .email-header .logo span { color: #C9A227; }
+      .email-header .subtitle {
+        color: #93C5FD;
+        font-size: 13px;
+        margin-top: 6px;
         font-weight: 400;
+        letter-spacing: 0.3px;
       }
-      .content {
-        padding: 40px 40px 32px;
-      }
-      .greeting {
+      .email-body { padding: 40px 40px 32px; }
+      .email-body .greeting {
         font-size: 18px;
         font-weight: 600;
-        color: #1e293b;
-        margin-bottom: 8px;
+        color: #0F172A;
+        margin-bottom: 16px;
       }
-      .message {
+      .email-body .greeting span { color: #2563EB; }
+      .email-body .message {
         font-size: 15px;
-        line-height: 1.6;
-        color: #475569;
+        line-height: 1.7;
+        color: #334155;
         margin-bottom: 24px;
       }
       .otp-box {
-        background-color: #f1f5f9;
+        background: #F8FAFC;
+        border: 2px dashed #2563EB;
         border-radius: 12px;
         padding: 24px;
         text-align: center;
-        margin: 24px 0;
-        border: 2px dashed #2563eb;
+        margin: 20px 0;
+      }
+      .otp-box .label {
+        font-size: 12px;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
       }
       .otp-code {
-        font-size: 42px;
-        font-weight: 700;
-        color: #1e3a8a;
+        font-size: 40px;
+        font-weight: 800;
         letter-spacing: 8px;
+        color: #0F172A;
         font-family: 'Courier New', monospace;
-      }
-      .warning-box {
-        background-color: #fefce8;
-        border-left: 4px solid #eab308;
-        padding: 16px 20px;
-        border-radius: 4px;
-        margin: 24px 0;
-      }
-      .warning-box .title {
-        font-size: 13px;
-        font-weight: 600;
-        color: #854d0e;
-        margin-bottom: 4px;
-      }
-      .warning-box .text {
-        font-size: 13px;
-        color: #854d0e;
-        line-height: 1.5;
-      }
-      .divider {
-        border: none;
-        border-top: 1px solid #e2e8f0;
-        margin: 32px 0 24px;
-      }
-      .footer {
-        padding: 0 40px 32px;
-        text-align: center;
-      }
-      .footer .brand {
-        font-weight: 700;
-        color: #1e293b;
-        font-size: 16px;
-      }
-      .footer .brand span {
-        color: #2563eb;
-      }
-      .footer .tagline {
-        color: #94a3b8;
-        font-size: 13px;
         margin-top: 4px;
       }
-      .footer .contact {
-        color: #64748b;
-        font-size: 13px;
-        margin-top: 8px;
+      .otp-code span { color: #2563EB; }
+      .security-box {
+        background: #F0FDF4;
+        border: 1px solid #BBF7D0;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 20px 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
       }
-      .footer .contact a {
-        color: #2563eb;
-        text-decoration: none;
+      .security-box .icon { color: #22C55E; font-size: 18px; flex-shrink: 0; }
+      .security-box .text { font-size: 13px; color: #166534; line-height: 1.5; }
+      .security-box .text strong { color: #0F172A; }
+      .divider { border: none; border-top: 1px solid #E2E8F0; margin: 24px 0; }
+      .email-footer {
+        background: #F8FAFC;
+        padding: 24px 40px;
+        text-align: center;
+        border-top: 1px solid #E2E8F0;
       }
-      .footer .copyright {
-        color: #94a3b8;
-        font-size: 12px;
-        margin-top: 16px;
-      }
-      @media only screen and (max-width: 600px) {
-        .header {
-          padding: 24px 20px;
-        }
-        .content {
-          padding: 24px 20px;
-        }
-        .otp-code {
-          font-size: 32px;
-          letter-spacing: 4px;
-        }
-        .footer {
-          padding: 0 20px 24px;
-        }
+      .email-footer .brand { font-size: 15px; font-weight: 700; color: #0F172A; }
+      .email-footer .brand span { color: #C9A227; }
+      .email-footer .tagline { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+      .email-footer .contact { margin-top: 8px; font-size: 12px; color: #94A3B8; }
+      .email-footer .contact a { color: #2563EB; text-decoration: none; }
+      .email-footer .contact a:hover { text-decoration: underline; }
+      .email-footer .copyright { font-size: 11px; color: #94A3B8; margin-top: 10px; }
+      @media (max-width: 600px) {
+        body { padding: 16px; }
+        .email-header { padding: 24px 20px 20px; }
+        .email-body { padding: 28px 20px 24px; }
+        .email-footer { padding: 20px 20px; }
+        .email-header .logo { font-size: 20px; }
+        .email-header .logo-icon { width: 36px; height: 36px; font-size: 16px; }
+        .otp-code { font-size: 32px; letter-spacing: 6px; }
       }
     </style>
   </head>
-  <body style="margin:0;padding:20px;background-color:#f8fafc;">
-    <div style="max-width:600px;margin:0 auto;">
-      <div class="container">
-        <div class="header">
-          <h1>CyberKavach</h1>
-          <div class="subtitle">Cybersecurity Training &amp; Certification</div>
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <a href="${domain}" class="logo">
+          Institute<span>Hub</span>
+        </a>
+        <div class="subtitle">🔐 Email Verification</div>
+      </div>
+      <div class="email-body">
+        <div class="greeting">Hello <span>${user.name || user.username || "User"}</span>, 👋</div>
+        <div class="message">
+          Welcome to <strong>InstituteHub</strong>! Please verify your email address to complete your registration and start your learning journey.
         </div>
-        
-        <div class="content">
-          <div class="greeting">Hello ${user.name || user.username || "Security Professional"},</div>
-          
-          <div class="message">
-            Welcome to CyberKavach! Please use the One-Time Password (OTP) below to verify your email address and complete your registration.
-          </div>
-          
-          <div class="otp-box">
-            <div style="font-size:13px;color:#64748b;margin-bottom:8px;font-weight:600;">Your Verification Code</div>
-            <div class="otp-code">${otp}</div>
-          </div>
-          
-          <div class="warning-box">
-            <div class="title">⏱️ Security Notice</div>
-            <div class="text">
-              This OTP is valid for <strong>${OTP_EXPIRY_MINUTES} minutes</strong> and will expire at ${new Date(Date.now() + OTP_EXPIRY_MS).toLocaleTimeString()}.
-            </div>
-          </div>
-          
-          <div class="message" style="font-size:14px;color:#94a3b8;margin-bottom:0;">
-            <strong>⚠️ Important:</strong> Never share this OTP with anyone. CyberKavach staff will never ask for your password or OTP.
+        <div class="otp-box">
+          <div class="label">🔑 Your Verification Code</div>
+          <div class="otp-code">${otp}</div>
+        </div>
+        <div class="security-box">
+          <span class="icon">🛡️</span>
+          <div class="text">
+            <strong>Security notice:</strong> This code is valid for <strong>${OTP_EXPIRY_MINUTES} minutes</strong> and will expire at ${new Date(Date.now() + OTP_EXPIRY_MS).toLocaleTimeString()}.
           </div>
         </div>
-        
         <hr class="divider">
-        
-        <div class="footer">
-          <div class="brand">Cyber <span>Kavach</span></div>
-          <div class="tagline">Securing Digital Futures</div>
-          <div class="contact">
-            📧 <a href="mailto:info@cyberkavach.org.in">info@cyberkavach.org.in</a>
-          </div>
-          <div class="copyright">
-            &copy; ${new Date().getFullYear()} CyberKavach. All rights reserved.
-          </div>
+        <div style="font-size:13px; color:#64748B; line-height:1.6;">
+          <p style="margin:0;">
+            Didn't request this? You can safely ignore this email.
+            <br>
+            Need help? Contact us at 
+            <a href="mailto:student001599@gmail.com" style="color:#2563EB; text-decoration:none;">student001599@gmail.com</a>
+          </p>
         </div>
+      </div>
+      <div class="email-footer">
+        <div class="brand">Institute<span>Hub</span></div>
+        <div class="tagline">Empowering the next generation of professionals</div>
+        <div class="contact">📧 <a href="mailto:student001599@gmail.com">student001599@gmail.com</a></div>
+        <div class="copyright">&copy; ${new Date().getFullYear()} InstituteHub. All rights reserved.</div>
       </div>
     </div>
   </body>
@@ -238,36 +226,38 @@ async function sendVerificationOTP(user) {
   `;
 
   const textContent = `
-  CyberKavach - Email Verification
-  ================================
+  ════════════════════════════════════════════════
+    🔐 InstituteHub — Email Verification
+  ════════════════════════════════════════════════
 
-  Hello ${user.name || user.username || "Security Professional"},
+  Hello ${user.name || user.username || "User"},
 
-  Welcome to CyberKavach! Please use the OTP below to verify your email:
+  Welcome to InstituteHub! Please verify your email address to complete your registration.
 
-  Your Verification Code: ${otp}
+  ────────────────────────────────────────────────
+  🔑 Your Verification Code: ${otp}
+  ────────────────────────────────────────────────
 
   ⏱️ Valid for ${OTP_EXPIRY_MINUTES} minutes
-  Expires: ${new Date(Date.now() + OTP_EXPIRY_MS).toLocaleString()}
+  ⏰ Expires: ${new Date(Date.now() + OTP_EXPIRY_MS).toLocaleString()}
 
-  ⚠️ Security Tips:
-  • Never share this OTP with anyone
-  • CyberKavach staff will never ask for your password
-  • If you didn't request this, please ignore this email
+  ────────────────────────────────────────────────
+  Didn't request this? You can safely ignore this email.
 
-  Need assistance? Contact us at info@cyberkavach.org.in
+  Need help? Contact us at:
+  📧 student001599@gmail.com
 
-  ---
-  CyberKavach
-  Cybersecurity Training & Certification Platform
-  ${new Date().getFullYear()} CyberKavach. All rights reserved.
+  ────────────────────────────────────────────────
+  InstituteHub
+  Empowering the next generation of professionals
+  © ${new Date().getFullYear()} InstituteHub. All rights reserved.
   `;
 
   try {
     await emailApi.sendTransacEmail({
-      sender: { email: "info@cyberkavach.org.in", name: "CyberKavach" },
+      sender: { email: "student001599@gmail.com", name: "InstituteHub" },
       to: [{ email: user.email, name: user.name || user.username }],
-      subject: "🔐 Email Verification | CyberKavach",
+      subject: "🔐 Verify Your Email | InstituteHub",
       htmlContent: htmlContent,
       textContent: textContent,
     });
@@ -281,189 +271,188 @@ async function sendVerificationOTP(user) {
   return otp;
 }
 
-// Professional Welcome Email Template
+// ===== Welcome Email =====
 async function sendWelcomeEmail(user) {
-  const domain = process.env.DOMAIN || "https://cyberkavach.org.in";
+  const domain = process.env.DOMAIN || "https://institute-hub-7wsi.onrender.com";
 
   const htmlContent = `
   <!DOCTYPE html>
-  <html>
+  <html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to CyberKavach</title>
+    <title>Welcome to InstituteHub</title>
     <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
       body {
-        margin: 0;
-        padding: 0;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        background-color: #f8fafc;
-        color: #1e293b;
+        background: #F8FAFC;
+        padding: 40px 0;
+        color: #0F172A;
       }
-      .container {
-        max-width: 600px;
+      .email-container {
+        max-width: 560px;
         margin: 0 auto;
-        background-color: #ffffff;
-        border-radius: 12px;
+        background: #FFFFFF;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
         overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #E2E8F0;
       }
-      .header {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        padding: 32px 40px;
+      .email-header {
+        background: linear-gradient(135deg, #0F172A 0%, #2563EB 100%);
+        padding: 32px 40px 28px;
         text-align: center;
+        border-bottom: 3px solid #22C55E;
       }
-      .header h1 {
-        color: #ffffff;
-        font-size: 28px;
-        font-weight: 700;
-        margin: 0;
+      .email-header .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #FFFFFF;
+        text-decoration: none;
+        font-size: 24px;
+        font-weight: 800;
         letter-spacing: -0.5px;
       }
-      .header .subtitle {
-        color: #93c5fd;
-        font-size: 14px;
-        margin-top: 8px;
+      .email-header .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #2563EB, #C9A227);
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+      .email-header .logo span { color: #C9A227; }
+      .email-header .subtitle {
+        color: #93C5FD;
+        font-size: 13px;
+        margin-top: 6px;
         font-weight: 400;
+        letter-spacing: 0.3px;
       }
-      .content {
-        padding: 40px 40px 32px;
-      }
-      .greeting {
+      .email-body { padding: 40px 40px 32px; }
+      .email-body .greeting {
         font-size: 18px;
         font-weight: 600;
-        color: #1e293b;
-        margin-bottom: 8px;
-      }
-      .message {
-        font-size: 15px;
-        line-height: 1.6;
-        color: #475569;
+        color: #0F172A;
         margin-bottom: 16px;
       }
-      .cta-button {
+      .email-body .greeting span { color: #2563EB; }
+      .email-body .message {
+        font-size: 15px;
+        line-height: 1.7;
+        color: #334155;
+        margin-bottom: 20px;
+      }
+      .email-body .message strong { color: #0F172A; }
+      .btn-wrapper { text-align: center; margin: 28px 0; }
+      .btn-primary {
         display: inline-block;
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        color: #ffffff !important;
+        padding: 14px 44px;
+        background: linear-gradient(135deg, #2563EB, #1D4ED8);
+        color: #FFFFFF !important;
         font-size: 16px;
         font-weight: 600;
-        padding: 14px 40px;
-        border-radius: 8px;
         text-decoration: none;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-        margin: 16px 0;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.30);
+        transition: all 0.3s ease;
       }
-      .features {
-        background-color: #f1f5f9;
-        border-radius: 8px;
-        padding: 20px;
-        margin: 24px 0;
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #3B82F6, #2563EB);
+        box-shadow: 0 12px 32px rgba(37, 99, 235, 0.40);
+        transform: translateY(-2px);
       }
-      .features ul {
-        margin: 0;
-        padding-left: 20px;
-        color: #475569;
-        font-size: 14px;
-        line-height: 1.8;
+      .features-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 20px 0;
       }
-      .divider {
-        border: none;
-        border-top: 1px solid #e2e8f0;
-        margin: 32px 0 24px;
+      .feature-item {
+        background: #F8FAFC;
+        border-radius: 10px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: #0F172A;
+        border: 1px solid #E2E8F0;
       }
-      .footer {
-        padding: 0 40px 32px;
+      .feature-item .icon { color: #2563EB; font-size: 16px; }
+      .divider { border: none; border-top: 1px solid #E2E8F0; margin: 24px 0; }
+      .email-footer {
+        background: #F8FAFC;
+        padding: 24px 40px;
         text-align: center;
+        border-top: 1px solid #E2E8F0;
       }
-      .footer .brand {
-        font-weight: 700;
-        color: #1e293b;
-        font-size: 16px;
-      }
-      .footer .brand span {
-        color: #2563eb;
-      }
-      .footer .tagline {
-        color: #94a3b8;
-        font-size: 13px;
-        margin-top: 4px;
-      }
-      .footer .contact {
-        color: #64748b;
-        font-size: 13px;
-        margin-top: 8px;
-      }
-      .footer .contact a {
-        color: #2563eb;
-        text-decoration: none;
-      }
-      .footer .copyright {
-        color: #94a3b8;
-        font-size: 12px;
-        margin-top: 16px;
-      }
-      @media only screen and (max-width: 600px) {
-        .header {
-          padding: 24px 20px;
-        }
-        .content {
-          padding: 24px 20px;
-        }
-        .cta-button {
-          padding: 12px 32px;
-          font-size: 15px;
-        }
-        .footer {
-          padding: 0 20px 24px;
-        }
+      .email-footer .brand { font-size: 15px; font-weight: 700; color: #0F172A; }
+      .email-footer .brand span { color: #C9A227; }
+      .email-footer .tagline { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+      .email-footer .contact { margin-top: 8px; font-size: 12px; color: #94A3B8; }
+      .email-footer .contact a { color: #2563EB; text-decoration: none; }
+      .email-footer .contact a:hover { text-decoration: underline; }
+      .email-footer .copyright { font-size: 11px; color: #94A3B8; margin-top: 10px; }
+      @media (max-width: 600px) {
+        body { padding: 16px; }
+        .email-header { padding: 24px 20px 20px; }
+        .email-body { padding: 28px 20px 24px; }
+        .email-footer { padding: 20px 20px; }
+        .email-header .logo { font-size: 20px; }
+        .email-header .logo-icon { width: 36px; height: 36px; font-size: 16px; }
+        .features-grid { grid-template-columns: 1fr; }
+        .btn-primary { padding: 12px 32px; font-size: 15px; }
       }
     </style>
   </head>
-  <body style="margin:0;padding:20px;background-color:#f8fafc;">
-    <div style="max-width:600px;margin:0 auto;">
-      <div class="container">
-        <div class="header">
-          <h1>CyberKavach</h1>
-          <div class="subtitle">Cybersecurity Training &amp; Certification</div>
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <a href="${domain}" class="logo">
+          Institute<span>Hub</span>
+        </a>
+        <div class="subtitle">✅ Welcome Aboard!</div>
+      </div>
+      <div class="email-body">
+        <div class="greeting">Welcome aboard, <span>${user.name || user.username || "User"}</span>! 🎉</div>
+        <div class="message">
+          Your email has been successfully verified. You're now part of the <strong>InstituteHub</strong> community — India's premier training platform for professionals.
         </div>
-        
-        <div class="content">
-          <div class="greeting">Welcome aboard, ${user.name || user.username || "Security Professional"}! ✅</div>
-          
-          <div class="message">
-            Your email has been successfully verified. You're now part of the CyberKavach community — India's premier cybersecurity training platform.
+        <div class="features-grid">
+          <div class="feature-item">
+            <span class="icon">📚</span> 500+ Courses
           </div>
-          
-          <div style="text-align:center;">
-            <a href="${domain}/dashboard" class="cta-button">Access Your Dashboard</a>
+          <div class="feature-item">
+            <span class="icon">🏅</span> Verified Certificates
           </div>
-          
-          <div class="features">
-            <strong style="color:#1e293b;">🎯 What's Next?</strong>
-            <ul>
-              <li>Explore our industry-leading cybersecurity courses</li>
-              <li>Connect with expert mentors and peers</li>
-              <li>Start your journey towards becoming a certified security professional</li>
-            </ul>
+          <div class="feature-item">
+            <span class="icon">👨‍🏫</span> 340+ Expert Mentors
           </div>
-          
-          <div class="message" style="font-size:14px;color:#94a3b8;">
-            Need help? Contact our support team at <a href="mailto:info@cyberkavach.org.in" style="color:#2563eb;text-decoration:none;">info@cyberkavach.org.in</a>
+          <div class="feature-item">
+            <span class="icon">💼</span> Career Support
           </div>
         </div>
-        
+        <div class="btn-wrapper">
+          <a href="${domain}/" class="btn-primary">🚀 Start Learning Now</a>
+        </div>
         <hr class="divider">
-        
-        <div class="footer">
-          <div class="brand">Cyber <span>Kavach</span></div>
-          <div class="tagline">Securing Digital Futures</div>
-          <div class="contact">
-            📧 <a href="mailto:info@cyberkavach.org.in">info@cyberkavach.org.in</a>
-          </div>
-          <div class="copyright">
-            &copy; ${new Date().getFullYear()} CyberKavach. All rights reserved.
-          </div>
+        <div style="font-size:13px; color:#64748B; line-height:1.6;">
+          <p style="margin:0;">
+            Need help? Contact our support team at 
+            <a href="mailto:student001599@gmail.com" style="color:#2563EB; text-decoration:none;">student001599@gmail.com</a>
+          </p>
         </div>
+      </div>
+      <div class="email-footer">
+        <div class="brand">Institute<span>Hub</span></div>
+        <div class="tagline">Empowering the next generation of professionals</div>
+        <div class="contact">📧 <a href="mailto:student001599@gmail.com">student001599@gmail.com</a></div>
+        <div class="copyright">&copy; ${new Date().getFullYear()} InstituteHub. All rights reserved.</div>
       </div>
     </div>
   </body>
@@ -472,9 +461,9 @@ async function sendWelcomeEmail(user) {
 
   try {
     await apiInstance.sendTransacEmail({
-      sender: { email: "info@cyberkavach.org.in", name: "CyberKavach" },
+      sender: { email: "student001599@gmail.com", name: "InstituteHub" },
       to: [{ email: user.email, name: user.name || user.username }],
-      subject: "🎉 Welcome to CyberKavach! Your Journey Begins",
+      subject: "🎉 Welcome to InstituteHub! Your Journey Begins",
       htmlContent: htmlContent,
     });
 
@@ -484,7 +473,389 @@ async function sendWelcomeEmail(user) {
   }
 }
 
-// ==================== ROUTE HANDLERS ====================
+// ===== OTP Resend Confirmation Email =====
+async function sendOtpResendConfirmation(user, otp) {
+  const domain = process.env.DOMAIN || "https://institute-hub-7wsi.onrender.com";
+
+  const htmlContent = `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Verification Code | InstituteHub</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: #F8FAFC;
+        padding: 40px 0;
+        color: #0F172A;
+      }
+      .email-container {
+        max-width: 560px;
+        margin: 0 auto;
+        background: #FFFFFF;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+        border: 1px solid #E2E8F0;
+      }
+      .email-header {
+        background: linear-gradient(135deg, #0F172A 0%, #2563EB 100%);
+        padding: 32px 40px 28px;
+        text-align: center;
+        border-bottom: 3px solid #C9A227;
+      }
+      .email-header .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #FFFFFF;
+        text-decoration: none;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .email-header .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #2563EB, #C9A227);
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+      .email-header .logo span { color: #C9A227; }
+      .email-header .subtitle {
+        color: #93C5FD;
+        font-size: 13px;
+        margin-top: 6px;
+        font-weight: 400;
+        letter-spacing: 0.3px;
+      }
+      .email-body { padding: 40px 40px 32px; }
+      .email-body .greeting {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0F172A;
+        margin-bottom: 16px;
+      }
+      .email-body .greeting span { color: #2563EB; }
+      .email-body .message {
+        font-size: 15px;
+        line-height: 1.7;
+        color: #334155;
+        margin-bottom: 20px;
+      }
+      .otp-box {
+        background: #F8FAFC;
+        border: 2px dashed #2563EB;
+        border-radius: 12px;
+        padding: 24px;
+        text-align: center;
+        margin: 20px 0;
+      }
+      .otp-box .label {
+        font-size: 12px;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+      }
+      .otp-code {
+        font-size: 40px;
+        font-weight: 800;
+        letter-spacing: 8px;
+        color: #0F172A;
+        font-family: 'Courier New', monospace;
+        margin-top: 4px;
+      }
+      .security-box {
+        background: #F0FDF4;
+        border: 1px solid #BBF7D0;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 20px 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .security-box .icon { color: #22C55E; font-size: 18px; flex-shrink: 0; }
+      .security-box .text { font-size: 13px; color: #166534; line-height: 1.5; }
+      .security-box .text strong { color: #0F172A; }
+      .divider { border: none; border-top: 1px solid #E2E8F0; margin: 24px 0; }
+      .email-footer {
+        background: #F8FAFC;
+        padding: 24px 40px;
+        text-align: center;
+        border-top: 1px solid #E2E8F0;
+      }
+      .email-footer .brand { font-size: 15px; font-weight: 700; color: #0F172A; }
+      .email-footer .brand span { color: #C9A227; }
+      .email-footer .tagline { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+      .email-footer .contact { margin-top: 8px; font-size: 12px; color: #94A3B8; }
+      .email-footer .contact a { color: #2563EB; text-decoration: none; }
+      .email-footer .copyright { font-size: 11px; color: #94A3B8; margin-top: 10px; }
+      @media (max-width: 600px) {
+        body { padding: 16px; }
+        .email-header { padding: 24px 20px 20px; }
+        .email-body { padding: 28px 20px 24px; }
+        .email-footer { padding: 20px 20px; }
+        .email-header .logo { font-size: 20px; }
+        .otp-code { font-size: 32px; letter-spacing: 6px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <a href="${domain}" class="logo">
+          Institute<span>Hub</span>
+        </a>
+        <div class="subtitle">🔄 New Verification Code</div>
+      </div>
+      <div class="email-body">
+        <div class="greeting">Hello <span>${user.name || user.username || "User"}</span>,</div>
+        <div class="message">
+          You requested a new verification code for your <strong>InstituteHub</strong> account. Please use the code below to verify your email.
+        </div>
+        <div class="otp-box">
+          <div class="label">🔑 Your New Verification Code</div>
+          <div class="otp-code">${otp}</div>
+        </div>
+        <div class="security-box">
+          <span class="icon">🛡️</span>
+          <div class="text">
+            <strong>Security notice:</strong> This code is valid for <strong>${OTP_EXPIRY_MINUTES} minutes</strong> and will expire at ${new Date(Date.now() + OTP_EXPIRY_MS).toLocaleTimeString()}.
+          </div>
+        </div>
+        <hr class="divider">
+        <div style="font-size:13px; color:#64748B; line-height:1.6;">
+          <p style="margin:0;">
+            Didn't request this? You can safely ignore this email.
+            <br>
+            Need help? Contact us at 
+            <a href="mailto:student001599@gmail.com" style="color:#2563EB; text-decoration:none;">student001599@gmail.com</a>
+          </p>
+        </div>
+      </div>
+      <div class="email-footer">
+        <div class="brand">Institute<span>Hub</span></div>
+        <div class="tagline">Empowering the next generation of professionals</div>
+        <div class="contact">📧 <a href="mailto:student001599@gmail.com">student001599@gmail.com</a></div>
+        <div class="copyright">&copy; ${new Date().getFullYear()} InstituteHub. All rights reserved.</div>
+      </div>
+    </div>
+  </body>
+  </html>
+  `;
+
+  try {
+    await emailApi.sendTransacEmail({
+      sender: { email: "student001599@gmail.com", name: "InstituteHub" },
+      to: [{ email: user.email, name: user.name || user.username }],
+      subject: "🔄 New Verification Code | InstituteHub",
+      htmlContent: htmlContent,
+    });
+    console.log(`✅ OTP resend confirmation sent to: ${user.email}`);
+  } catch (emailErr) {
+    console.error(`❌ Failed to send OTP resend confirmation:`, emailErr);
+  }
+}
+
+// ===== Password Change Confirmation Email =====
+async function sendPasswordChangeConfirmation(user) {
+  const domain = process.env.DOMAIN || "https://institute-hub-7wsi.onrender.com";
+
+  const htmlContent = `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Changed | InstituteHub</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: #F8FAFC;
+        padding: 40px 0;
+        color: #0F172A;
+      }
+      .email-container {
+        max-width: 560px;
+        margin: 0 auto;
+        background: #FFFFFF;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+        overflow: hidden;
+        border: 1px solid #E2E8F0;
+      }
+      .email-header {
+        background: linear-gradient(135deg, #0F172A 0%, #2563EB 100%);
+        padding: 32px 40px 28px;
+        text-align: center;
+        border-bottom: 3px solid #22C55E;
+      }
+      .email-header .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #FFFFFF;
+        text-decoration: none;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+      .email-header .logo-icon {
+        width: 44px;
+        height: 44px;
+        background: linear-gradient(135deg, #2563EB, #C9A227);
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+      .email-header .logo span { color: #C9A227; }
+      .email-header .subtitle {
+        color: #93C5FD;
+        font-size: 13px;
+        margin-top: 6px;
+        font-weight: 400;
+        letter-spacing: 0.3px;
+      }
+      .email-body { padding: 40px 40px 32px; }
+      .email-body .greeting {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0F172A;
+        margin-bottom: 16px;
+      }
+      .email-body .greeting span { color: #2563EB; }
+      .email-body .message {
+        font-size: 15px;
+        line-height: 1.7;
+        color: #334155;
+        margin-bottom: 20px;
+      }
+      .email-body .message strong { color: #0F172A; }
+      .success-icon { text-align: center; font-size: 56px; margin-bottom: 16px; }
+      .btn-wrapper { text-align: center; margin: 28px 0; }
+      .btn-primary {
+        display: inline-block;
+        padding: 14px 44px;
+        background: linear-gradient(135deg, #2563EB, #1D4ED8);
+        color: #FFFFFF !important;
+        font-size: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.30);
+        transition: all 0.3s ease;
+      }
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #3B82F6, #2563EB);
+        box-shadow: 0 12px 32px rgba(37, 99, 235, 0.40);
+        transform: translateY(-2px);
+      }
+      .security-box {
+        background: #EFF6FF;
+        border: 1px solid #BFDBFE;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 16px 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .security-box .icon { color: #2563EB; font-size: 18px; flex-shrink: 0; }
+      .security-box .text { font-size: 13px; color: #1E40AF; line-height: 1.5; }
+      .security-box .text strong { color: #0F172A; }
+      .divider { border: none; border-top: 1px solid #E2E8F0; margin: 24px 0; }
+      .email-footer {
+        background: #F8FAFC;
+        padding: 24px 40px;
+        text-align: center;
+        border-top: 1px solid #E2E8F0;
+      }
+      .email-footer .brand { font-size: 15px; font-weight: 700; color: #0F172A; }
+      .email-footer .brand span { color: #C9A227; }
+      .email-footer .tagline { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+      .email-footer .contact { margin-top: 8px; font-size: 12px; color: #94A3B8; }
+      .email-footer .contact a { color: #2563EB; text-decoration: none; }
+      .email-footer .copyright { font-size: 11px; color: #94A3B8; margin-top: 10px; }
+      @media (max-width: 600px) {
+        body { padding: 16px; }
+        .email-header { padding: 24px 20px 20px; }
+        .email-body { padding: 28px 20px 24px; }
+        .email-footer { padding: 20px 20px; }
+        .email-header .logo { font-size: 20px; }
+        .btn-primary { padding: 12px 32px; font-size: 15px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <a href="${domain}" class="logo">
+          Institute<span>Hub</span>
+        </a>
+        <div class="subtitle">✅ Password Changed</div>
+      </div>
+      <div class="email-body">
+        <div class="success-icon">✅</div>
+        <div class="greeting">Hello <span>${user.name || user.username || "User"}</span>,</div>
+        <div class="message">
+          Your <strong>InstituteHub</strong> account password was successfully changed on <strong>${new Date().toLocaleString()}</strong>.
+        </div>
+        <div class="security-box">
+          <span class="icon">🛡️</span>
+          <div class="text">
+            <strong>Security reminder:</strong> If you didn't make this change, please 
+            <a href="${domain}/contact" style="color:#2563EB; text-decoration:underline;">contact support immediately</a>.
+          </div>
+        </div>
+        <div class="btn-wrapper">
+          <a href="${domain}/login" class="btn-primary">🔑 Log in to Your Account</a>
+        </div>
+        <hr class="divider">
+        <div style="font-size:13px; color:#64748B; line-height:1.6;">
+          <p style="margin:0;">
+            Need help? Contact us at 
+            <a href="mailto:student001599@gmail.com" style="color:#2563EB; text-decoration:none;">student001599@gmail.com</a>
+          </p>
+        </div>
+      </div>
+      <div class="email-footer">
+        <div class="brand">Institute<span>Hub</span></div>
+        <div class="tagline">Empowering the next generation of professionals</div>
+        <div class="contact">📧 <a href="mailto:student001599@gmail.com">student001599@gmail.com</a></div>
+        <div class="copyright">&copy; ${new Date().getFullYear()} InstituteHub. All rights reserved.</div>
+      </div>
+    </div>
+  </body>
+  </html>
+  `;
+
+  try {
+    await apiInstance.sendTransacEmail({
+      sender: { email: "student001599@gmail.com", name: "InstituteHub" },
+      to: [{ email: user.email, name: user.name || user.username }],
+      subject: "✅ Password Changed Successfully | InstituteHub",
+      htmlContent: htmlContent,
+    });
+    console.log(`✅ Password change confirmation sent to: ${user.email}`);
+  } catch (emailErr) {
+    console.error(`❌ Failed to send password change confirmation:`, emailErr);
+  }
+}
+
+// ================================================================
+// ROUTE HANDLERS
+// ================================================================
 
 module.exports.renderSignupForm = async (req, res) => {
   try {
@@ -528,7 +899,7 @@ module.exports.renderLoginForm = (req, res) => {
 };
 
 module.exports.login = async (req, res) => {
-  req.flash("success", "Welcome back to CyberKavach!");
+  req.flash("success", "Welcome back to InstituteHub!");
   const redirectUrl = res.locals.redirectUrl || "/";
   res.redirect(redirectUrl);
 };
@@ -541,7 +912,9 @@ module.exports.logout = (req, res, next) => {
   });
 };
 
-// ==================== OTP VERIFICATION ====================
+// ================================================================
+// OTP VERIFICATION
+// ================================================================
 
 module.exports.renderVerifyEmailForm = async (req, res) => {
   const { email } = req.query;
@@ -610,7 +983,7 @@ module.exports.verifyEmail = async (req, res) => {
         req.flash("success", "Email verified successfully! Please log in to continue.");
         return res.redirect("/login");
       }
-      req.flash("success", "Email verified! Welcome to CyberKavach.");
+      req.flash("success", "Email verified! Welcome to InstituteHub.");
       res.redirect("/");
     });
   } catch (err) {
@@ -640,7 +1013,8 @@ module.exports.resendOtp = async (req, res) => {
       return res.redirect(`/verify-email?email=${user.email}`);
     }
 
-    await sendVerificationOTP(user);
+    const otp = await sendVerificationOTP(user);
+    await sendOtpResendConfirmation(user, otp);
 
     req.flash("success", "A new verification code has been sent to your email.");
     res.redirect(`/verify-email?email=${user.email}`);
@@ -651,7 +1025,9 @@ module.exports.resendOtp = async (req, res) => {
   }
 };
 
-// ==================== PROFILE & ACCOUNT MANAGEMENT ====================
+// ================================================================
+// PROFILE & ACCOUNT MANAGEMENT
+// ================================================================
 
 module.exports.profile = async (req, res) => {
   try {
@@ -787,7 +1163,10 @@ module.exports.changePassword = async (req, res) => {
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
 
-    req.flash("success", "Password changed successfully.");
+    // Send confirmation email
+    await sendPasswordChangeConfirmation(user);
+
+    req.flash("success", "Password changed successfully. A confirmation email has been sent.");
     res.redirect("/profile#security");
   } catch (err) {
     console.log(err);
@@ -796,7 +1175,9 @@ module.exports.changePassword = async (req, res) => {
   }
 };
 
-// ==================== ENROLLMENT & COURSES ====================
+// ================================================================
+// ENROLLMENT & COURSES
+// ================================================================
 
 module.exports.enrollmentHistory = async (req, res) => {
   try {
@@ -852,7 +1233,6 @@ module.exports.myCourses = async (req, res) => {
     const enrolledIds = enrolledCourses.map(c => c._id.toString());
     
     // Fetch recommended courses (max 4)
-    // Logic: First get popular courses, then fallback to other active courses
     let recommendedCourses = [];
     
     // Try to get popular courses first (excluding enrolled)
@@ -891,7 +1271,7 @@ module.exports.myCourses = async (req, res) => {
     
     res.render("users/myCources.ejs", { 
       enrolledCourses,
-      recommendedCourses, // Pass recommended courses (max 4)
+      recommendedCourses,
       currUser: req.user,
       moment: require("moment")
     });
@@ -901,5 +1281,3 @@ module.exports.myCourses = async (req, res) => {
     res.redirect("/profile");
   }
 };
-
-

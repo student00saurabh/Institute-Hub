@@ -1,4 +1,4 @@
-# robots.txt for thecubicals.online
+# robots.txt for https://institute-hub-7wsi.onrender.com
 
 User-agent: *
 
@@ -10,4 +10,4 @@ Disallow: /api/
 Allow: /
 
 # Sitemap
-Sitemap: https://thecubicals.online/sitemap.xml
+Sitemap: https://institute-hub-7wsi.onrender.com

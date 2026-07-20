@@ -72,10 +72,14 @@ const courcesSchema = new Schema({
     required: true,
   },
   duration: {
-    type: Number,
+    type: Number, // hours
   },
   lounchedDate: {
     type: Date,
+  },
+  slider: {
+    type: Boolean,
+    default: false,
   },
   addInHomePage: {
     type: Boolean,

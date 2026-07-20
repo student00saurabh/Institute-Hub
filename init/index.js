@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/user.js");
 
-const MONGO_URL = "mongodb://127.0.0.1:27017/cyber-kavach";
+const MONGO_URL = "mongodb://127.0.0.1:27017/demoApp1";
 
 main()
   .then(() => {
