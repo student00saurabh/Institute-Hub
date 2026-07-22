@@ -1,5 +1,33 @@
 <% layout("/layouts/boilerplate") %>
 
+<%
+  // ✅ SAFE ACCESS - All variables with fallbacks
+  const course = locals.course || {};
+  const lectures = locals.lectures || [];
+  const sections = locals.sections || {};
+  const totalLectures = locals.totalLectures || 0;
+  const completedLectures = locals.completedLectures || 0;
+  const progress = locals.progress || 0;
+  const hasLectures = locals.hasLectures || lectures.length > 0;
+  
+  // Calculate total duration safely
+  let totalDuration = 0;
+  if (Array.isArray(lectures) && lectures.length > 0) {
+    totalDuration = lectures.reduce((acc, l) => {
+      const duration = l.duration || l.video?.duration || 0;
+      return acc + (typeof duration === 'number' ? duration : parseInt(duration) || 0);
+    }, 0);
+  }
+  const totalMinutes = Math.ceil(totalDuration / 60) || 0;
+  
+  // Get first lecture
+  const firstLecture = (lectures && lectures.length > 0) ? lectures[0] : null;
+  
+  // Safe user access
+  const userEmail = currUser?.email || '';
+  const userName = currUser?.name || 'Student';
+%>
+
 <!-- Course Content Page -->
 <div class="min-h-[90vh] bg-gray-50 dark:bg-gray-900">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -21,7 +49,7 @@
                 <li>
                     <div class="flex items-center">
                         <i class="fas fa-chevron-right text-gray-400 dark:text-gray-600 mx-2 text-xs"></i>
-                        <a href="/courses/<%= course._id %>" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors truncate max-w-[200px]"><%= course.title %></a>
+                        <a href="/courses/<%= course._id || '' %>" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors truncate max-w-[200px]"><%= course.title || 'Course' %></a>
                     </div>
                 </li>
                 <li>
@@ -38,16 +66,19 @@
             <div class="lg:col-span-2">
                 <!-- Course Header -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white"><%= course.title %></h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white"><%= course.title || 'Course Content' %></h1>
                     <div class="flex flex-wrap items-center gap-4 mt-3">
                         <span class="text-sm text-gray-500 dark:text-gray-400">
                             <i class="fas fa-user mr-1"></i> <%= course.teacher ? course.teacher.name : 'Instructor' %>
                         </span>
                         <span class="text-sm text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-play-circle mr-1"></i> <%= lectures.length %> Lectures
+                            <i class="fas fa-play-circle mr-1"></i> <%= totalLectures || lectures.length || 0 %> Lectures
                         </span>
                         <span class="text-sm text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-clock mr-1"></i> Total: ~<%= lectures.reduce((acc, l) => acc + parseInt(l.duration), 0) %> min
+                            <i class="fas fa-clock mr-1"></i> Total: ~<%= totalMinutes || 0 %> min
+                        </span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-check-circle mr-1 text-green-500"></i> <%= completedLectures || 0 %> Completed
                         </span>
                     </div>
                 </div>
@@ -57,7 +88,7 @@
                     <div class="relative aspect-w-16 aspect-h-9">
                         <iframe 
                             id="videoPlayer"
-                            src="<%= lectures.length > 0 ? lectures[0].videoUrl + '?autoplay=1' : 'https://www.youtube.com/embed/dQw4w9WgXcQ' %>" 
+                            src="<%= firstLecture ? (firstLecture.videoUrl || 'https://www.youtube.com/embed/dQw4w9WgXcQ') : 'https://www.youtube.com/embed/dQw4w9WgXcQ' %>" 
                             class="w-full h-[400px] md:h-[500px]"
                             frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -69,10 +100,10 @@
                 <!-- Current Lecture Info -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                     <h3 id="currentLectureTitle" class="text-xl font-semibold text-gray-900 dark:text-white">
-                        <%= lectures.length > 0 ? lectures[0].title : 'No lectures available' %>
+                        <%= firstLecture ? firstLecture.title : 'No lectures available' %>
                     </h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        <i class="far fa-clock mr-1"></i> <span id="currentLectureDuration"><%= lectures.length > 0 ? lectures[0].duration : '0:00' %></span>
+                        <i class="far fa-clock mr-1"></i> <span id="currentLectureDuration"><%= firstLecture ? (firstLecture.duration || '0:00') : '0:00' %></span>
                     </p>
                     <div class="mt-4 flex flex-wrap gap-3">
                         <button onclick="markCurrentComplete()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
@@ -99,8 +130,8 @@
                             <div class="bg-gradient-to-r from-blue-600 to-indigo-600 h-2.5 rounded-full transition-all duration-500" id="progressBar" style="width: <%= progress || 0 %>%"></div>
                         </div>
                         <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                            <span><i class="fas fa-check-circle mr-1 text-green-500"></i> <%= lectures.filter(l => l.isCompleted).length %> Completed</span>
-                            <span><i class="fas fa-circle mr-1 text-gray-300 dark:text-gray-600"></i> <%= lectures.filter(l => !l.isCompleted).length %> Remaining</span>
+                            <span><i class="fas fa-check-circle mr-1 text-green-500"></i> <span id="completedCount"><%= completedLectures || 0 %></span> Completed</span>
+                            <span><i class="fas fa-circle mr-1 text-gray-300 dark:text-gray-600"></i> <span id="remainingCount"><%= (totalLectures || lectures.length || 0) - (completedLectures || 0) %></span> Remaining</span>
                         </div>
                     </div>
 
@@ -108,41 +139,53 @@
                     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
                         <div class="p-4 border-b border-gray-200 dark:border-gray-700">
                             <h3 class="font-semibold text-gray-900 dark:text-white">Course Content</h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400"><%= lectures.length %> lectures</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400"><%= lectures.length || 0 %> lectures</p>
                         </div>
                         <div class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[500px] overflow-y-auto">
-                            <% lectures.forEach((lecture, index) => { %>
-                                <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors cursor-pointer <%= index === 0 ? 'bg-blue-50 dark:bg-blue-900/20' : '' %>" 
-                                     onclick="loadLecture('<%= lecture.id %>', '<%= lecture.videoUrl %>', '<%= lecture.title %>', '<%= lecture.duration %>', '<%= lecture.isCompleted %>')">
-                                    <div class="flex items-start gap-3">
-                                        <div class="mt-1 flex-shrink-0">
-                                            <% if (lecture.isCompleted) { %>
-                                                <i class="fas fa-check-circle text-green-500 text-lg"></i>
-                                            <% } else { %>
-                                                <i class="fas fa-play-circle text-gray-400 dark:text-gray-600 text-lg"></i>
-                                            <% } %>
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-medium text-gray-900 dark:text-white truncate <%= index === 0 ? 'text-blue-600 dark:text-blue-400' : '' %>">
-                                                <%= lecture.title %>
-                                            </p>
-                                            <div class="flex items-center gap-2 mt-0.5">
-                                                <span class="text-xs text-gray-500 dark:text-gray-400">
-                                                    <i class="far fa-clock mr-1"></i> <%= lecture.duration %>
-                                                </span>
-                                                <% if (lecture.isCompleted) { %>
-                                                    <span class="text-xs text-green-500 font-medium">Completed</span>
+                            <% if (lectures && lectures.length > 0) { %>
+                                <% lectures.forEach((lecture, index) => { 
+                                    const isFirst = index === 0;
+                                    const isCompleted = lecture.isCompleted || false;
+                                    const videoUrl = lecture.videoUrl || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
+                                %>
+                                    <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors cursor-pointer <%= isFirst ? 'bg-blue-50 dark:bg-blue-900/20' : '' %>" 
+                                         onclick="loadLecture('<%= lecture._id || lecture.id || '' %>', '<%= videoUrl %>', '<%= lecture.title || 'Lecture' %>', '<%= lecture.duration || '0:00' %>', <%= isCompleted %>)">
+                                        <div class="flex items-start gap-3">
+                                            <div class="mt-1 flex-shrink-0">
+                                                <% if (isCompleted) { %>
+                                                    <i class="fas fa-check-circle text-green-500 text-lg"></i>
                                                 <% } else { %>
-                                                    <span class="text-xs text-gray-400">Pending</span>
+                                                    <i class="fas fa-play-circle text-gray-400 dark:text-gray-600 text-lg"></i>
                                                 <% } %>
                                             </div>
-                                        </div>
-                                        <div class="flex-shrink-0">
-                                            <span class="text-xs text-gray-400 dark:text-gray-500">#<%= index + 1 %></span>
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate <%= isFirst ? 'text-blue-600 dark:text-blue-400' : '' %>">
+                                                    <%= lecture.title || 'Untitled Lecture' %>
+                                                </p>
+                                                <div class="flex items-center gap-2 mt-0.5">
+                                                    <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                        <i class="far fa-clock mr-1"></i> <%= lecture.duration || '0:00' %>
+                                                    </span>
+                                                    <% if (isCompleted) { %>
+                                                        <span class="text-xs text-green-500 font-medium">Completed</span>
+                                                    <% } else { %>
+                                                        <span class="text-xs text-gray-400">Pending</span>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <span class="text-xs text-gray-400 dark:text-gray-500">#<%= index + 1 %></span>
+                                            </div>
                                         </div>
                                     </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="p-8 text-center text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-book-open text-3xl mb-3 block"></i>
+                                    <p>No lectures available yet.</p>
+                                    <p class="text-xs mt-1">Check back soon for course content.</p>
                                 </div>
-                            <% }) %>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -152,180 +195,190 @@
 </div>
 
 <script>
-// Lecture state
-let currentLectureId = '<%= lectures.length > 0 ? lectures[0].id : null %>';
-let completedLectures = new Set(`<%= JSON.stringify(lectures.filter(l => l.isCompleted).map(l => l.id)) %>`);
-
-// Load a lecture
-function loadLecture(lectureId, videoUrl, title, duration, isCompleted) {
-    const player = document.getElementById('videoPlayer');
-    if (player) {
-        player.src = videoUrl + '?autoplay=1';
-    }
-    
-    document.getElementById('currentLectureTitle').textContent = title;
-    document.getElementById('currentLectureDuration').textContent = duration;
-    currentLectureId = lectureId;
-    
-    // Update active state in list
-    document.querySelectorAll('[onclick^="loadLecture"]').forEach(el => {
-        el.classList.remove('bg-blue-50', 'dark:bg-blue-900/20');
-        el.querySelector('p')?.classList.remove('text-blue-600', 'dark:text-blue-400');
-    });
-    
-    const clickedElement = document.querySelector(`[onclick="loadLecture('${lectureId}', '${videoUrl}', '${title}', '${duration}', '${isCompleted}')"]`);
-    if (clickedElement) {
-        clickedElement.classList.add('bg-blue-50', 'dark:bg-blue-900/20');
-        clickedElement.querySelector('p')?.classList.add('text-blue-600', 'dark:text-blue-400');
-    }
-}
-
-// Mark current lecture as complete
-async function markCurrentComplete() {
-    if (!currentLectureId) return;
-    
-    try {
-        const response = await fetch(`/courses/${course._id}/lecture/${currentLectureId}/complete`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ completed: true })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Update UI
-            completedLectures.add(currentLectureId);
-            updateProgress();
-            
-            // Find and update the lecture item
-            const lectureItems = document.querySelectorAll('[onclick^="loadLecture"]');
-            lectureItems.forEach(el => {
-                const onclickAttr = el.getAttribute('onclick');
-                if (onclickAttr && onclickAttr.includes(`'${currentLectureId}'`)) {
-                    // Update icon
-                    const icon = el.querySelector('.fa-play-circle, .fa-check-circle');
-                    if (icon) {
-                        icon.className = 'fas fa-check-circle text-green-500 text-lg';
-                    }
-                    // Update status text
-                    const statusSpan = el.querySelector('.text-xs.text-gray-400, .text-xs.text-green-500');
-                    if (statusSpan) {
-                        statusSpan.className = 'text-xs text-green-500 font-medium';
-                        statusSpan.textContent = 'Completed';
-                    }
-                }
-            });
-            
-            // Update current lecture status
-            const currentIcon = document.querySelector('.bg-blue-50 .fa-play-circle');
-            if (currentIcon) {
-                currentIcon.className = 'fas fa-check-circle text-green-500 text-lg';
-            }
-            
-            // Show success message
-            showToast('Lecture marked as complete! 🎉', 'success');
-        }
-    } catch (error) {
-        console.error('Error marking lecture complete:', error);
-        showToast('Failed to update progress. Please try again.', 'error');
-    }
-}
-
-// Mark current lecture as incomplete
-async function markCurrentIncomplete() {
-    if (!currentLectureId) return;
-    
-    try {
-        const response = await fetch(`/courses/${course._id}/lecture/${currentLectureId}/complete`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ completed: false })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Update UI
-            completedLectures.delete(currentLectureId);
-            updateProgress();
-            
-            // Find and update the lecture item
-            const lectureItems = document.querySelectorAll('[onclick^="loadLecture"]');
-            lectureItems.forEach(el => {
-                const onclickAttr = el.getAttribute('onclick');
-                if (onclickAttr && onclickAttr.includes(`'${currentLectureId}'`)) {
-                    // Update icon
-                    const icon = el.querySelector('.fa-check-circle, .fa-play-circle');
-                    if (icon) {
-                        icon.className = 'fas fa-play-circle text-gray-400 dark:text-gray-600 text-lg';
-                    }
-                    // Update status text
-                    const statusSpan = el.querySelector('.text-xs.text-green-500, .text-xs.text-gray-400');
-                    if (statusSpan) {
-                        statusSpan.className = 'text-xs text-gray-400';
-                        statusSpan.textContent = 'Pending';
-                    }
-                }
-            });
-            
-            showToast('Lecture marked as incomplete', 'info');
-        }
-    } catch (error) {
-        console.error('Error marking lecture incomplete:', error);
-        showToast('Failed to update progress. Please try again.', 'error');
-    }
-}
-
-// Update progress bar
-function updateProgress() {
-    const total = `<%= lectures.length %>`;
-    const completed = completedLectures.size;
-    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-    
-    document.getElementById('progressBar').style.width = percentage + '%';
-    document.getElementById('progressPercentage').textContent = percentage + '%';
-    
-    // Update stats
-    const stats = document.querySelectorAll('.flex.items-center.justify-between.text-sm');
-    if (stats.length > 0) {
-        const completedSpan = stats[0].querySelectorAll('span')[1];
-        if (completedSpan) {
-            completedSpan.textContent = completed + ' Completed';
-        }
-        const remainingSpan = stats[1].querySelectorAll('span')[1];
-        if (remainingSpan) {
-            remainingSpan.textContent = (total - completed) + ' Remaining';
-        }
-    }
-}
-
-// Toast notification
-function showToast(message, type = 'success') {
-    const colors = {
-        success: 'bg-green-500',
-        error: 'bg-red-500',
-        info: 'bg-blue-500',
-        warning: 'bg-yellow-500'
-    };
-    
-    const toast = document.createElement('div');
-    toast.className = `fixed bottom-4 right-4 ${colors[type] || 'bg-blue-500'} text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-y-0 opacity-100`;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-4');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-// Initialize progress
+// ✅ SAFE - Only run if course exists
 document.addEventListener('DOMContentLoaded', function() {
+    const courseId = '<%= course._id || "" %>';
+    if (!courseId) {
+        console.warn('No course ID found');
+        return;
+    }
+    
+    // Initialize lecture state
+    let currentLectureId = '<%= firstLecture ? (firstLecture._id || firstLecture.id || "") : "" %>';
+    let completedLectures = new Set(<%= JSON.stringify((lectures || []).filter(l => l.isCompleted).map(l => l._id || l.id)) %>);
+    let totalLectures = <%= lectures.length || 0 %>;
+
+    // Load a lecture
+    window.loadLecture = function(lectureId, videoUrl, title, duration, isCompleted) {
+        const player = document.getElementById('videoPlayer');
+        if (player && videoUrl) {
+            player.src = videoUrl + '?autoplay=1';
+        }
+        
+        const titleEl = document.getElementById('currentLectureTitle');
+        if (titleEl) titleEl.textContent = title || 'Lecture';
+        
+        const durationEl = document.getElementById('currentLectureDuration');
+        if (durationEl) durationEl.textContent = duration || '0:00';
+        
+        currentLectureId = lectureId;
+        
+        // Update active state in list
+        document.querySelectorAll('[onclick^="loadLecture"]').forEach(el => {
+            el.classList.remove('bg-blue-50', 'dark:bg-blue-900/20');
+            el.querySelector('p')?.classList.remove('text-blue-600', 'dark:text-blue-400');
+        });
+        
+        const clickedElement = document.querySelector(`[onclick="loadLecture('${lectureId}', '${videoUrl}', '${title}', '${duration}', ${isCompleted})"]`);
+        if (clickedElement) {
+            clickedElement.classList.add('bg-blue-50', 'dark:bg-blue-900/20');
+            clickedElement.querySelector('p')?.classList.add('text-blue-600', 'dark:text-blue-400');
+        }
+    };
+
+    // Mark current lecture as complete
+    window.markCurrentComplete = async function() {
+        if (!currentLectureId || !courseId) {
+            showToast('No lecture selected', 'warning');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/courses/${courseId}/lecture/${currentLectureId}/progress`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    ended: true,
+                    currentTime: 100,
+                    duration: 100
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                completedLectures.add(currentLectureId);
+                updateProgress();
+                
+                // Find and update the lecture item
+                const lectureItems = document.querySelectorAll('[onclick^="loadLecture"]');
+                lectureItems.forEach(el => {
+                    const onclickAttr = el.getAttribute('onclick');
+                    if (onclickAttr && onclickAttr.includes(`'${currentLectureId}'`)) {
+                        const icon = el.querySelector('.fa-play-circle, .fa-check-circle');
+                        if (icon) {
+                            icon.className = 'fas fa-check-circle text-green-500 text-lg';
+                        }
+                        const statusSpan = el.querySelector('.text-xs.text-gray-400, .text-xs.text-green-500');
+                        if (statusSpan) {
+                            statusSpan.className = 'text-xs text-green-500 font-medium';
+                            statusSpan.textContent = 'Completed';
+                        }
+                        // Update data attribute
+                        el.setAttribute('onclick', onclickAttr.replace(/, false\)/, ', true)').replace(/, true\)/, ', true)'));
+                    }
+                });
+                
+                showToast('Lecture marked as complete! 🎉', 'success');
+            }
+        } catch (error) {
+            console.error('Error marking lecture complete:', error);
+            showToast('Failed to update progress. Please try again.', 'error');
+        }
+    };
+
+    // Mark current lecture as incomplete
+    window.markCurrentIncomplete = async function() {
+        if (!currentLectureId || !courseId) {
+            showToast('No lecture selected', 'warning');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/courses/${courseId}/lecture/${currentLectureId}/progress`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    ended: false,
+                    currentTime: 0,
+                    duration: 100
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                completedLectures.delete(currentLectureId);
+                updateProgress();
+                
+                // Find and update the lecture item
+                const lectureItems = document.querySelectorAll('[onclick^="loadLecture"]');
+                lectureItems.forEach(el => {
+                    const onclickAttr = el.getAttribute('onclick');
+                    if (onclickAttr && onclickAttr.includes(`'${currentLectureId}'`)) {
+                        const icon = el.querySelector('.fa-check-circle, .fa-play-circle');
+                        if (icon) {
+                            icon.className = 'fas fa-play-circle text-gray-400 dark:text-gray-600 text-lg';
+                        }
+                        const statusSpan = el.querySelector('.text-xs.text-green-500, .text-xs.text-gray-400');
+                        if (statusSpan) {
+                            statusSpan.className = 'text-xs text-gray-400';
+                            statusSpan.textContent = 'Pending';
+                        }
+                        el.setAttribute('onclick', onclickAttr.replace(/, true\)/, ', false)').replace(/, false\)/, ', false)'));
+                    }
+                });
+                
+                showToast('Lecture marked as incomplete', 'info');
+            }
+        } catch (error) {
+            console.error('Error marking lecture incomplete:', error);
+            showToast('Failed to update progress. Please try again.', 'error');
+        }
+    };
+
+    // Update progress bar
+    function updateProgress() {
+        const total = totalLectures || document.querySelectorAll('[onclick^="loadLecture"]').length || 1;
+        const completed = completedLectures.size;
+        const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+        
+        const progressBar = document.getElementById('progressBar');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const completedCount = document.getElementById('completedCount');
+        const remainingCount = document.getElementById('remainingCount');
+        
+        if (progressBar) progressBar.style.width = percentage + '%';
+        if (progressPercentage) progressPercentage.textContent = percentage + '%';
+        if (completedCount) completedCount.textContent = completed;
+        if (remainingCount) remainingCount.textContent = Math.max(total - completed, 0);
+    }
+
+    // Toast notification
+    function showToast(message, type = 'success') {
+        const colors = {
+            success: 'bg-green-500',
+            error: 'bg-red-500',
+            info: 'bg-blue-500',
+            warning: 'bg-yellow-500'
+        };
+        
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-4 right-4 ${colors[type] || 'bg-blue-500'} text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-y-0 opacity-100 max-w-sm`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('opacity-0', 'translate-y-4');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Initialize progress
     updateProgress();
 });
 </script>
@@ -343,7 +396,6 @@ document.addEventListener('DOMContentLoaded', function() {
         height: 100%;
     }
     
-    /* Custom scrollbar for lecture list */
     .overflow-y-auto::-webkit-scrollbar {
         width: 4px;
     }
