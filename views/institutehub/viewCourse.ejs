@@ -2,8 +2,8 @@
 
 <div class="min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120]" id="courseContentRoot"
      data-course-id="<%= course._id %>"
-     data-user-email="<%= currentUser.email %>"
-     data-user-name="<%= currentUser.name %>">
+     data-user-email="<%= currUser.email %>"
+     data-user-name="<%= currUser.name %>">
 
     <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
@@ -66,7 +66,7 @@
 
                     <!-- Moving watermark: ties any leaked recording back to this account -->
                     <div id="videoWatermark" class="pointer-events-none absolute text-white/25 text-xs font-semibold tracking-wide select-none transition-all duration-1000 ease-linear hidden">
-                        <%= currentUser.email %>
+                        <%= currUser.email %>
                     </div>
 
                     <!-- Devtools / tab-blur guard overlay -->
