@@ -1,0 +1,624 @@
+<% layout("/layouts/boilerplate") %>
+
+<%
+  // ============================================================
+  // ✅ HELPER FUNCTIONS
+  // ============================================================
+  function buildPaginationUrl(page, search, category, level, sortBy, filter) {
+      const params = new URLSearchParams();
+      
+      if (page && page > 1) params.set('page', page);
+      if (search) params.set('search', search);
+      if (category && category !== 'All Categories') params.set('category', category);
+      if (level && level !== 'All Levels') params.set('level', level);
+      if (sortBy && sortBy !== 'popular') params.set('sortBy', sortBy);
+      if (filter && filter !== 'all') params.set('filter', filter);
+      
+      return params.toString();
+  }
+
+  function buildRemoveFilterUrl(removeKey, search, category, level, sortBy, filter) {
+      const params = new URLSearchParams();
+      
+      if (search && removeKey !== 'search') params.set('search', search);
+      if (category && category !== 'All Categories' && removeKey !== 'category') params.set('category', category);
+      if (level && level !== 'All Levels' && removeKey !== 'level') params.set('level', level);
+      if (sortBy && sortBy !== 'popular') params.set('sortBy', sortBy);
+      if (filter && filter !== 'all' && removeKey !== 'filter') params.set('filter', filter);
+      
+      return params.toString();
+  }
+
+%>
+
+<!-- ============================================================ -->
+<!-- PAGE HEADER                                                   -->
+<!-- ============================================================ -->
+<section class="relative overflow-hidden bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-[#2563EB] py-16 lg:py-24 -mt-6">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-[#C9A227] rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-[#2563EB] rounded-full blur-3xl"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4">
+            Explore Our <span class="text-[#C9A227]">Courses</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto">
+            Discover <%= stats.total %>+ courses designed to help you master in-demand skills and advance your career.
+        </p>
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-2 text-sm text-white/60">
+            <span><i class="fas fa-check-circle text-[#22C55E]"></i> <%= stats.total %> Courses</span>
+            <span class="w-px h-4 bg-white/20"></span>
+            <span><i class="fas fa-check-circle text-[#22C55E]"></i> <%= stats.popular %> Popular</span>
+            <span class="w-px h-4 bg-white/20"></span>
+            <span><i class="fas fa-check-circle text-[#22C55E]"></i> <%= stats.free %> Free</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- UPCOMING COURSES — Auto-Sliding Banner                      -->
+<!-- ============================================================ -->
+<% if (upcomingCourses && upcomingCourses.length > 0) { %>
+<section class="py-12 lg:py-16 bg-[#F8FAFC] dark:bg-[#0B1120] border-b border-[#E2E8F0] dark:border-[#1E293B]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-6 reveal-up">
+            <div>
+                <span class="inline-flex items-center gap-1.5 text-xs font-bold tracking-widest text-[#2563EB] uppercase">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#2563EB] pulse-dot"></span> Coming Soon
+                </span>
+                <h2 class="mt-2 text-2xl sm:text-3xl font-extrabold text-[#0F172A] dark:text-white">
+                    Upcoming <span class="text-[#C9A227]">Courses</span>
+                </h2>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="scrollUpcoming(-1)" class="w-10 h-10 rounded-full border border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-center text-[#0F172A] dark:text-white hover:bg-[#2563EB] hover:text-white transition-all duration-300">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </button>
+                <button onclick="scrollUpcoming(1)" class="w-10 h-10 rounded-full border border-[#E2E8F0] dark:border-[#1E293B] flex items-center justify-center text-[#0F172A] dark:text-white hover:bg-[#2563EB] hover:text-white transition-all duration-300">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="relative overflow-hidden rounded-2xl">
+            <div id="upcomingTrack" class="flex transition-transform duration-700 ease-in-out">
+                <% upcomingCourses.forEach((course, index) => { %>
+                    <div class="min-w-full relative">
+                        <div class="relative rounded-2xl overflow-hidden">
+                            <img src="<%= course.img %>" alt="<%= course.title %>" class="w-full h-[280px] sm:h-[320px] object-cover" loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#0F172A]/90 via-[#0F172A]/40 to-transparent"></div>
+                            
+                            <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-[#2563EB] text-white text-xs font-bold rounded-full shadow-lg">
+                                    <i class="fas fa-clock mr-1"></i> <%= course.launchDate || 'Coming Soon' %>
+                                </span>
+                                <span class="px-3 py-1 bg-[#C9A227] text-white text-xs font-bold rounded-full shadow-lg">
+                                    <%= course.tag || 'New' %>
+                                </span>
+                            </div>
+                            
+                            <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                                <div class="max-w-2xl">
+                                    <div class="flex flex-wrap items-center gap-2 text-sm text-white/70 mb-2">
+                                        <span><i class="fas fa-user-tie mr-1"></i> <%= course.instructor || 'Expert' %></span>
+                                        <span class="w-px h-3 bg-white/30"></span>
+                                        <span><i class="fas fa-graduation-cap mr-1"></i> <%= course.level || 'All Levels' %></span>
+                                        <span class="w-px h-3 bg-white/30"></span>
+                                        <span><i class="fas fa-clock mr-1"></i> <%= course.duration || '0h' %></span>
+                                    </div>
+                                    <h3 class="text-2xl sm:text-3xl font-bold text-white"><%= course.title %></h3>
+                                    <div class="flex items-center gap-3 mt-3">
+                                        <div class="flex items-center gap-1 text-[#C9A227]">
+                                            <i class="fas fa-star text-sm"></i>
+                                            <span class="text-white font-semibold"><%= course.rating || 0 %></span>
+                                        </div>
+                                        <span class="text-white/60 text-sm"><i class="fas fa-users mr-1"></i> <%= (course.students || 0).toLocaleString() %> interested</span>
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-3 mt-4">
+                                        <span class="text-2xl font-extrabold text-[#C9A227]">₹<%= (course.price || 0).toLocaleString() %></span>
+                                        <% if (course.oldPrice && course.oldPrice > course.price) { %>
+                                            <span class="text-sm text-white/60 line-through">₹<%= (course.oldPrice || 0).toLocaleString() %></span>
+                                            <span class="px-2 py-0.5 bg-[#22C55E]/20 text-[#22C55E] text-xs font-bold rounded-full">
+                                                <%= Math.round((1 - course.price / course.oldPrice) * 100) %>% OFF
+                                            </span>
+                                        <% } %>
+                                    </div>
+                                    <button onclick="notifyMe('<%= course._id %>')" class="mt-4 px-6 py-2.5 bg-[#C9A227] text-[#0F172A] font-semibold rounded-xl hover:bg-[#E6C35A] transition-all duration-300 shadow-lg shadow-[#C9A227]/30 hover:shadow-[#C9A227]/50">
+                                        <i class="fas fa-bell mr-2"></i> Get Notified
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+            
+            <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                <% upcomingCourses.forEach((_, index) => { %>
+                    <button onclick="goToUpcoming(<%= index %>)" 
+                            class="upcoming-dot w-2 h-2 rounded-full transition-all duration-300 <%= index === 0 ? 'w-8 bg-[#C9A227]' : 'bg-white/50 hover:bg-white/80' %>">
+                    </button>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+</section>
+<% } %>
+
+<!-- ============================================================ -->
+<!-- FILTER SECTION                                                -->
+<!-- ============================================================ -->
+<section class="py-8 lg:py-10 bg-white dark:bg-[#0F172A]/40 border-b border-[#E2E8F0] dark:border-[#1E293B] sticky top-16 z-30 backdrop-blur-lg bg-white/90 dark:bg-[#0F172A]/90">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <form action="/courses" method="GET" id="filterForm">
+            <div class="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6">
+                
+                <!-- Search -->
+                <div class="relative flex-1 min-w-[200px]">
+                    <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                    <input type="text" 
+                           name="search" 
+                           value="<%= search %>"
+                           placeholder="Search courses..." 
+                           class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white placeholder-[#94A3B8] text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300">
+                </div>
+
+                <!-- Category Filter -->
+                <div class="relative min-w-[160px]">
+                    <i class="fas fa-tag absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                    <select name="category" class="filter-select w-full pl-10 pr-8 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 cursor-pointer">
+                        <% filterCategories.forEach(cat => { %>
+                            <option value="<%= cat %>" <%= cat === category ? 'selected' : '' %>><%= cat %></option>
+                        <% }) %>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-xs pointer-events-none"></i>
+                </div>
+
+                <!-- Level Filter -->
+                <div class="relative min-w-[140px]">
+                    <i class="fas fa-signal absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                    <select name="level" class="filter-select w-full pl-10 pr-8 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 cursor-pointer">
+                        <% filterLevels.forEach(lvl => { %>
+                            <option value="<%= lvl %>" <%= lvl === level ? 'selected' : '' %>><%= lvl %></option>
+                        <% }) %>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-xs pointer-events-none"></i>
+                </div>
+
+                <!-- Sort -->
+                <div class="relative min-w-[140px]">
+                    <i class="fas fa-arrow-up-wide-short absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
+                    <select name="sortBy" class="filter-select w-full pl-10 pr-8 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 cursor-pointer">
+                        <option value="popular" <%= sortBy === 'popular' ? 'selected' : '' %>>Most Popular</option>
+                        <option value="newest" <%= sortBy === 'newest' ? 'selected' : '' %>>Newest First</option>
+                        <option value="price-low" <%= sortBy === 'price-low' ? 'selected' : '' %>>Price: Low to High</option>
+                        <option value="price-high" <%= sortBy === 'price-high' ? 'selected' : '' %>>Price: High to Low</option>
+                        <option value="rating" <%= sortBy === 'rating' ? 'selected' : '' %>>Highest Rated</option>
+                        <option value="students" <%= sortBy === 'students' ? 'selected' : '' %>>Most Students</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-xs pointer-events-none"></i>
+                </div>
+
+                <!-- Reset Filters -->
+                <a href="/courses" class="px-4 py-2.5 text-sm font-medium text-[#2563EB] border border-[#2563EB]/30 rounded-xl hover:bg-[#2563EB]/10 transition-all duration-300 whitespace-nowrap">
+                    <i class="fas fa-rotate-right mr-1.5"></i> Reset
+                </a>
+
+                <!-- Results Count -->
+                <span class="text-sm text-[#64748B] dark:text-[#94A3B8] whitespace-nowrap font-medium">
+                    <span id="courseCount"><%= totalCourses %></span> courses
+                </span>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- COURSES GRID                                                  -->
+<!-- ============================================================ -->
+<section class="py-12 lg:py-16 bg-[#F8FAFC] dark:bg-[#0B1120]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Active Filters Display -->
+        <div id="activeFilters" class="flex flex-wrap items-center gap-2 mb-6 reveal-up">
+            <span class="text-sm text-[#64748B] dark:text-[#94A3B8]">Active filters:</span>
+            <%
+                const activeFilters = [];
+                if (category && category !== 'All Categories') activeFilters.push({ key: 'category', value: category });
+                if (level && level !== 'All Levels') activeFilters.push({ key: 'level', value: level });
+                if (search) activeFilters.push({ key: 'search', value: `"${search}"` });
+                if (filter === 'popular') activeFilters.push({ key: 'filter', value: 'Popular' });
+                if (filter === 'free') activeFilters.push({ key: 'filter', value: 'Free' });
+                if (filter === 'paid') activeFilters.push({ key: 'filter', value: 'Paid' });
+            %>
+            
+            <% if (activeFilters.length === 0) { %>
+                <span class="text-sm text-[#64748B] dark:text-[#94A3B8]">None</span>
+            <% } else { %>
+                <% activeFilters.forEach(f => { %>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-[#2563EB]/10 text-[#2563EB] text-xs font-medium rounded-full">
+                        <%= f.value %>
+                        <a href="?<%= buildRemoveFilterUrl(f.key, search, category, level, sortBy, filter) %>" 
+                           class="hover:text-[#EF4444] transition-colors">
+                            <i class="fas fa-times text-[10px]"></i>
+                        </a>
+                    </span>
+                <% }) %>
+            <% } %>
+        </div>
+
+        <!-- Course Grid -->
+        <div id="courseGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <% if (courses && courses.length > 0) { %>
+                <% courses.forEach((c, i) => { %>
+                    <div class="group reveal-up rounded-2xl overflow-hidden bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl hover:shadow-[#2563EB]/10 hover:-translate-y-2 transition-all duration-400 course-card"
+                         data-id="<%= c._id %>"
+                         data-category="<%= c.category %>"
+                         data-level="<%= c.level %>"
+                         data-title="<%= c.title.toLowerCase() %>"
+                         data-price="<%= c.price %>"
+                         data-rating="<%= c.rating %>"
+                         style="transition-delay: <%= (i % 4) * 60 %>ms">
+                        
+                        <div class="relative overflow-hidden h-44">
+                            <img src="<%= c.img %>" alt="<%= c.title %>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy">
+                            <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white/90 dark:bg-[#0B1120]/90 text-[#0F172A] dark:text-white backdrop-blur">
+                                <%= c.level || 'Beginner' %>
+                            </span>
+                            <% if (c.tags && c.tags.includes('best-seller')) { %>
+                                <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#C9A227] text-white shadow">
+                                    <i class="fas fa-crown mr-0.5"></i> Best Seller
+                                </span>
+                            <% } else if (c.tags && c.tags.includes('popular')) { %>
+                                <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#2563EB] text-white shadow">
+                                    <i class="fas fa-fire mr-0.5"></i> Popular
+                                </span>
+                            <% } else if (c.tags && c.tags.includes('trending')) { %>
+                                <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#7C3AED] text-white shadow">
+                                    <i class="fas fa-chart-line mr-0.5"></i> Trending
+                                </span>
+                            <% } else if (c.tags && c.tags.includes('new')) { %>
+                                <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#22C55E] text-white shadow">
+                                    <i class="fas fa-sparkles mr-0.5"></i> New
+                                </span>
+                            <% } else if (c.tags && c.tags.includes('hot')) { %>
+                                <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#EF4444] text-white shadow animate-pulse">
+                                    <i class="fas fa-fire mr-0.5"></i> Hot
+                                </span>
+                            <% } %>
+                            <button type="button" onclick="toggleSave(this, event)" data-course-id="<%= c._id %>" class="save-btn absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/90 dark:bg-[#0B1120]/90 backdrop-blur flex items-center justify-center text-[#64748B] hover:text-[#EF4444] shadow transition-all duration-300">
+                                <i class="far fa-heart text-xs"></i>
+                            </button>
+                            <div class="absolute bottom-3 left-3 flex flex-wrap items-center gap-2 text-white text-[10px] bg-black/40 backdrop-blur px-2.5 py-1 rounded-lg">
+                                <span><i class="fas fa-play-circle mr-1"></i><%= c.lessons || 0 %> lessons</span>
+                                <span class="w-px h-3 bg-white/30"></span>
+                                <span><i class="fas fa-clock mr-1"></i><%= c.duration || '0h' %></span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-5">
+                            <span class="text-[10px] font-bold tracking-wider text-[#2563EB] uppercase"><%= c.category || 'Course' %></span>
+                            <h3 class="mt-1.5 text-sm font-bold text-[#0F172A] dark:text-white leading-snug line-clamp-2 min-h-[2.5rem]"><%= c.title %></h3>
+                            <p class="mt-1.5 text-xs text-[#64748B] dark:text-[#94A3B8]">by <%= c.instructor || 'Expert' %></p>
+
+                            <div class="mt-3 flex items-center gap-1.5 text-xs">
+                                <span class="font-bold text-[#C9A227]"><%= c.rating || 0 %></span>
+                                <div class="flex text-[#C9A227] text-[10px]">
+                                    <% for (let s = 0; s < 5; s++) { %>
+                                        <i class="fa-star <%= s < Math.round(c.rating || 0) ? 'fas' : 'far' %>"></i>
+                                    <% } %>
+                                </div>
+                                <span class="text-[#94A3B8]">(<%= (c.reviews || 0).toLocaleString() %>)</span>
+                            </div>
+
+                            <div class="mt-3 flex items-baseline gap-2 flex-wrap">
+                                <span class="text-base font-extrabold text-[#0F172A] dark:text-white">₹<%= (c.price || 0).toLocaleString() %></span>
+                                <% if (c.oldPrice && c.oldPrice > c.price) { %>
+                                    <span class="text-xs text-[#94A3B8] line-through">₹<%= (c.oldPrice || 0).toLocaleString() %></span>
+                                    <span class="ml-auto text-xs font-bold text-[#22C55E]">
+                                        <%= Math.round((1 - c.price / c.oldPrice) * 100) %>% OFF
+                                    </span>
+                                <% } %>
+                            </div>
+
+                            <div class="mt-4 pt-4 border-t border-[#E2E8F0] dark:border-[#1E293B] flex items-center gap-2">
+                                <a href="/courses/<%= c._id %>" class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-semibold border border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:border-[#2563EB]/50 hover:text-[#2563EB] transition-all duration-300">
+                                    View Details
+                                </a>
+                                <button type="button" onclick="handleEnroll(this, '<%= c._id %>')" class="enroll-btn flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-md shadow-[#2563EB]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+                                    Enroll Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <!-- No Results -->
+                <div class="col-span-full text-center py-16">
+                    <div class="w-24 h-24 mx-auto rounded-full bg-[#2563EB]/10 flex items-center justify-center text-[#2563EB] text-4xl mb-4">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#0F172A] dark:text-white">No courses found</h3>
+                    <p class="text-sm text-[#64748B] dark:text-[#94A3B8] mt-2">Try adjusting your filters or search query</p>
+                    <a href="/courses" class="mt-4 inline-block px-6 py-2.5 bg-[#2563EB] text-white rounded-xl hover:bg-[#1D4ED8] transition-all duration-300">
+                        Clear all filters
+                    </a>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- PAGINATION                                                    -->
+        <!-- ============================================================ -->
+        <% if (totalPages > 1) { %>
+        <div class="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 reveal-up">
+            <p class="text-sm text-[#64748B] dark:text-[#94A3B8]">
+                Showing <span class="font-medium text-[#0F172A] dark:text-white"><%= ((currentPage - 1) * limit) + 1 %></span> 
+                to <span class="font-medium text-[#0F172A] dark:text-white"><%= Math.min(currentPage * limit, totalCourses) %></span> 
+                of <span class="font-medium text-[#0F172A] dark:text-white"><%= totalCourses %></span> courses
+            </p>
+            
+            <div class="flex items-center gap-1.5">
+                <!-- Previous Page -->
+                <% if (hasPrevPage) { %>
+                    <a href="?<%= buildPaginationUrl(currentPage - 1, search, category, level, sortBy, filter) %>" 
+                       class="px-4 py-2 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all duration-300">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </a>
+                <% } else { %>
+                    <span class="px-4 py-2 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] text-[#94A3B8] cursor-not-allowed opacity-50">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </span>
+                <% } %>
+
+                <!-- Page Numbers -->
+                <% 
+                    let startPage = Math.max(1, currentPage - 2);
+                    let endPage = Math.min(totalPages, currentPage + 2);
+                    
+                    if (endPage - startPage < 4) {
+                        if (startPage === 1) endPage = Math.min(5, totalPages);
+                        else if (endPage === totalPages) startPage = Math.max(1, totalPages - 4);
+                    }
+                %>
+                
+                <% if (startPage > 1) { %>
+                    <a href="?<%= buildPaginationUrl(1, search, category, level, sortBy, filter) %>" 
+                       class="px-3.5 py-2 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all duration-300 text-sm font-medium">
+                        1
+                    </a>
+                    <% if (startPage > 2) { %>
+                        <span class="px-2 text-[#94A3B8]">…</span>
+                    <% } %>
+                <% } %>
+
+                <% for (let p = startPage; p <= endPage; p++) { %>
+                    <a href="?<%= buildPaginationUrl(p, search, category, level, sortBy, filter) %>" 
+                       class="px-3.5 py-2 rounded-xl border transition-all duration-300 text-sm font-medium
+                              <%= p === currentPage ? 
+                                  'bg-[#2563EB] text-white border-[#2563EB] shadow-lg shadow-[#2563EB]/25' : 
+                                  'border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB]' %>">
+                        <%= p %>
+                    </a>
+                <% } %>
+
+                <% if (endPage < totalPages) { %>
+                    <% if (endPage < totalPages - 1) { %>
+                        <span class="px-2 text-[#94A3B8]">…</span>
+                    <% } %>
+                    <a href="?<%= buildPaginationUrl(totalPages, search, category, level, sortBy, filter) %>" 
+                       class="px-3.5 py-2 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all duration-300 text-sm font-medium">
+                        <%= totalPages %>
+                    </a>
+                <% } %>
+
+                <!-- Next Page -->
+                <% if (hasNextPage) { %>
+                    <a href="?<%= buildPaginationUrl(currentPage + 1, search, category, level, sortBy, filter) %>" 
+                       class="px-4 py-2 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all duration-300">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </a>
+                <% } else { %>
+                    <span class="px-4 py-2 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] text-[#94A3B8] cursor-not-allowed opacity-50">
+                        <i class="fas fa-chevron-right text-xs"></i>
+                    </span>
+                <% } %>
+            </div>
+        </div>
+        <% } %>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- STYLES                                                        -->
+<!-- ============================================================ -->
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .reveal-up { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+    .reveal-up.in-view { opacity: 1; transform: translateY(0); }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    @keyframes pulseDot {
+        0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.5); }
+        70% { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+        100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); }
+    }
+    .pulse-dot { animation: pulseDot 1.8s infinite; }
+
+    @keyframes savePop {
+        0% { transform: scale(1); }
+        40% { transform: scale(1.25); }
+        100% { transform: scale(1); }
+    }
+    .save-pop i { animation: savePop 0.35s ease; }
+
+    .sticky {
+        transition: box-shadow 0.3s ease;
+    }
+    .sticky.scrolled {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .reveal-up { opacity: 1 !important; transform: none !important; transition: none !important; }
+        .pulse-dot { animation: none !important; }
+        .save-pop i { animation: none !important; }
+    }
+
+    @media (max-width: 640px) {
+        .sticky {
+            position: relative !important;
+            top: 0 !important;
+        }
+    }
+</style>
+
+<!-- ============================================================ -->
+<!-- SCRIPTS                                                       -->
+<!-- ============================================================ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        'use strict';
+
+        // ========== UPCOMING COURSES SLIDER ==========
+        let currentUpcoming = 0;
+        const totalUpcoming = <%= upcomingCourses.length %>;
+        const upcomingTrack = document.getElementById('upcomingTrack');
+        let autoUpcomingInterval;
+
+        function updateUpcomingSlider() {
+            if (!upcomingTrack || totalUpcoming <= 0) return;
+            upcomingTrack.style.transform = `translateX(-${currentUpcoming * 100}%)`;
+            
+            document.querySelectorAll('.upcoming-dot').forEach((dot, index) => {
+                if (index === currentUpcoming) {
+                    dot.classList.add('w-8', 'bg-[#C9A227]');
+                    dot.classList.remove('w-2', 'bg-white/50');
+                } else {
+                    dot.classList.remove('w-8', 'bg-[#C9A227]');
+                    dot.classList.add('w-2', 'bg-white/50');
+                }
+            });
+        }
+
+        window.scrollUpcoming = function(direction) {
+            if (totalUpcoming <= 0) return;
+            currentUpcoming = (currentUpcoming + direction + totalUpcoming) % totalUpcoming;
+            updateUpcomingSlider();
+            resetUpcomingAutoSlide();
+        };
+
+        window.goToUpcoming = function(index) {
+            if (totalUpcoming <= 0) return;
+            currentUpcoming = index;
+            updateUpcomingSlider();
+            resetUpcomingAutoSlide();
+        };
+
+        function startUpcomingAutoSlide() {
+            if (totalUpcoming <= 0) return;
+            autoUpcomingInterval = setInterval(() => {
+                currentUpcoming = (currentUpcoming + 1) % totalUpcoming;
+                updateUpcomingSlider();
+            }, 5000);
+        }
+
+        function resetUpcomingAutoSlide() {
+            clearInterval(autoUpcomingInterval);
+            startUpcomingAutoSlide();
+        }
+
+        // ========== SAVE/BUTTON FUNCTIONS ==========
+        window.toggleSave = function(btn, evt) {
+            if (evt) { evt.preventDefault(); evt.stopPropagation(); }
+            const icon = btn.querySelector('i');
+            const isSaved = icon.classList.contains('fas');
+
+            icon.classList.toggle('fas', !isSaved);
+            icon.classList.toggle('far', isSaved);
+            btn.style.color = isSaved ? '' : '#EF4444';
+            
+            btn.classList.remove('save-pop');
+            void btn.offsetWidth;
+            btn.classList.add('save-pop');
+
+            // AJAX call to save/unsave
+            const courseId = btn.dataset.courseId;
+            if (courseId) {
+                fetch(`/api/courses/${courseId}/save`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ saved: !isSaved })
+                }).catch(err => console.error('Save error:', err));
+            }
+        };
+
+        window.handleEnroll = function(btn, courseId) {
+            if (btn.dataset.enrolled === 'true') return;
+            btn.dataset.enrolled = 'true';
+            btn.innerHTML = '<i class="fas fa-check mr-1"></i> Enrolled';
+            btn.classList.remove('bg-[#2563EB]', 'hover:bg-[#1D4ED8]', 'shadow-[#2563EB]/25');
+            btn.classList.add('bg-[#22C55E]', 'shadow-[#22C55E]/25', 'cursor-default');
+            
+            // Redirect to course page
+            if (courseId) {
+                setTimeout(() => {
+                    window.location.href = `/courses/${courseId}`;
+                }, 500);
+            }
+        };
+
+        window.notifyMe = function(courseId) {
+            // Show notification
+            alert('You will be notified when this course launches!');
+            // In production, send to backend
+            fetch(`/api/courses/${courseId}/notify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).catch(err => console.error('Notification error:', err));
+        };
+
+        // ========== REVEAL ON SCROLL ==========
+        const revealEls = document.querySelectorAll('.reveal-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        revealEls.forEach(el => observer.observe(el));
+
+        // ========== STICKY FILTER BAR ==========
+        const filterBar = document.querySelector('.sticky');
+        if (filterBar) {
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 80) {
+                    filterBar.classList.add('scrolled');
+                } else {
+                    filterBar.classList.remove('scrolled');
+                }
+            });
+        }
+
+        // ========== AUTO-FORM SUBMIT ON FILTER CHANGE ==========
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function() {
+                document.getElementById('filterForm').submit();
+            });
+        });
+
+        // ========== INIT ==========
+        startUpcomingAutoSlide();
+    });
+</script>

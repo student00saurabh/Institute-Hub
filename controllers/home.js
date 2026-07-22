@@ -15,261 +15,721 @@ const razorpay = new Razorpay({
 });
 
 module.exports.homePage = async (req, res, next) => {
-  try {
+    try {
+        // ============================================================
+        // 1. STATISTICS - Dynamic from Database
+        // ============================================================
+        const totalUsers = await User.countDocuments();
+        const totalInstructors = await User.countDocuments({ 
+            role: { $in: ["admin", "teacher"] } 
+        });
+        const totalCourses = await Course.countDocuments({ isActive: true });
+        
+        // Calculate satisfaction score from reviews
+        const reviewStats = await Review.aggregate([
+            { $match: { isApproved: true } },
+            { $group: { 
+                _id: null, 
+                avgRating: { $avg: "$rating" },
+                total: { $sum: 1 }
+            }}
+        ]);
+        const satisfaction = reviewStats.length > 0 
+            ? Math.round((reviewStats[0].avgRating / 5) * 100) 
+            : 98;
 
-    // Fetch approved reviews for testimonials
-const approvedReviews = await Review.find({
-  isApproved: true,
-  isVerified: true
-})
-  .sort({ createdAt: -1 })
-  .limit(10)
-  .lean();
+        // ✅ STATS with fallback
+        const stats = [
+            { value: totalCourses || 120, suffix: "+", label: "Courses" },
+            { value: totalUsers || 15000, suffix: "+", label: "Students" },
+            { value: totalInstructors || 45, suffix: "+", label: "Mentors" },
+            { value: satisfaction || 98, suffix: "%", label: "Satisfaction" },
+        ];
 
-// If no approved reviews, use fallback data
-let testimonials = [];
-if (approvedReviews && approvedReviews.length > 2) {
-  testimonials = approvedReviews.map(review => ({
-    name: review.name || 'Anonymous',
-    rating: review.rating || 5,
-    message: review.message || '',
-    date: review.createdAt,
-    isVerified: true
-  }));
-} else {
-  // Fallback testimonials (static data)
- testimonials = [
-{
-name: 'Ananya Sharma',
-rating: 5,
-message: 'CyberKavach provided me with practical, industry-focused training. The hands-on labs and expert guidance helped me build confidence and secure my first cybersecurity role.',
-date: new Date(),
-isVerified: true
-},
-{
-name: 'Rahul Verma',
-rating: 5,
-message: 'The OSCP preparation program was outstanding. The lab environment closely mirrored real-world scenarios, making the learning experience both challenging and rewarding.',
-date: new Date(),
-isVerified: true
-},
-{
-name: 'Priya Mehta',
-rating: 5,
-message: 'As someone new to cybersecurity, I found the CEH course extremely well-structured. The instructors explained complex concepts in a simple and engaging manner.',
-date: new Date(),
-isVerified: true
-},
-{
-name: 'Arjun Singh',
-rating: 5,
-message: 'What impressed me most was the mentorship support. The instructors were always available to clarify doubts and guide us throughout the course journey.',
-date: new Date(),
-isVerified: true
-},
-{
-name: 'Sneha Patel',
-rating: 4,
-message: 'CyberKavach offers high-quality content with excellent practical exercises. The curriculum is up-to-date and aligned with current industry standards.',
-date: new Date(),
-isVerified: true
-},
-{
-name: 'Vikram Joshi',
-rating: 5,
-message: 'The platform helped me transition from IT support to cybersecurity. The hands-on approach and career guidance made a significant difference in my learning path.',
-date: new Date(),
-isVerified: true
-}
-];
+        // ============================================================
+        // 2. CATEGORIES - Dynamic with fallback
+        // ============================================================
+        let categories = await CourseCategory.find({ isActive: true })
+            .sort({ displayOrder: 1, name: 1 })
+            .lean();
 
-}
+        // ✅ FALLBACK CATEGORIES - if DB empty
+        const FALLBACK_CATEGORIES = [
+            { name: "Web Development", icon: "fa-code", color: "blue" },
+            { name: "Data Science", icon: "fa-chart-line", color: "purple" },
+            { name: "UI / UX Design", icon: "fa-pen-ruler", color: "pink" },
+            { name: "Cybersecurity", icon: "fa-shield-halved", color: "red" },
+            { name: "Cloud & DevOps", icon: "fa-cloud", color: "cyan" },
+            { name: "Mobile Apps", icon: "fa-mobile-screen", color: "green" },
+            { name: "AI & ML", icon: "fa-brain", color: "indigo" },
+            { name: "Marketing", icon: "fa-bullhorn", color: "orange" },
+        ];
 
+        let categoriesWithCount = [];
+        if (categories && categories.length > 0) {
+            // Use real categories
+            categoriesWithCount = await Promise.all(
+                categories.map(async (cat) => {
+                    const count = await Course.countDocuments({
+                        category: cat._id,
+                        isActive: true
+                    });
+                    return {
+                        _id: cat._id,
+                        name: cat.name,
+                        slug: cat.slug,
+                        icon: cat.icon || "fa-shield-alt",
+                        color: cat.color || "blue",
+                        count: count || 0
+                    };
+                })
+            );
+        } else {
+            // ✅ Use FALLBACK categories with random counts
+            categoriesWithCount = FALLBACK_CATEGORIES.map((cat, index) => ({
+                _id: `fallback-${index}`,
+                name: cat.name,
+                slug: cat.name.toLowerCase().replace(/ /g, '-'),
+                icon: cat.icon,
+                color: cat.color,
+                count: Math.floor(Math.random() * 80) + 20 // Random count 20-100
+            }));
+        }
 
-
-    // ── STATS ──────────────────────────────────────────────────────────────
-    const totalUsers = await User.countDocuments();
-    const totalInstructors = await User.countDocuments({ role: { $in: ["admin", "teacher"] } });
-    const totalCources = await Course.countDocuments({ isActive: true });
-
-    // ── 1. HERO SLIDER COURSES ────────────────────────────────────────────
-    const heroCourses = await Course.find({
-      isPopular: true,
-      isActive: true,
-    })
-      .populate("teacher", "name")
-      .sort({ createdAt: -1 })
-      .limit(5);
-
-    // ── 2. POPULAR COURSE ─────────────────────────────────────────────────
-    const popularCourse = await Course.findOne({
-      isPopular: true,
-      isActive: true,
-    })
-      .populate("teacher", "name email")
-      .lean();
-    
-    
-
-    // ── 3. FEATURED COURSES (6 courses, 3 per row) ──────────────────────
-    const featuredCourses = await Course.find({
-      isActive: true,
-      showInHomepage: true,
-      homepageSection: { $ne: "hero" }, // Exclude hero courses
-    })
-      .sort({ isPopular: -1, createdAt: -1 })
-      .limit(6)
-      .populate("teacher", "name")
-      .lean();
-
-    // If not enough featured, get more active courses
-    let allFeaturedCourses = [...featuredCourses];
-    if (allFeaturedCourses.length < 6) {
-      const additional = await Course.find({
-        isActive: true,
-        _id: { $nin: allFeaturedCourses.map(c => c._id) }
-      })
-        .sort({ createdAt: -1 })
-        .limit(6 - allFeaturedCourses.length)
-        .populate("teacher", "name")
-        .lean();
-      allFeaturedCourses = [...allFeaturedCourses, ...additional];
-    }
-
-    // ── 4. COURSES BY CATEGORY ────────────────────────────────────────────
-    const activeCategories = await CourseCategory.find({ isActive: true })
-      .sort({ displayOrder: 1, name: 1 })
-      .lean();
-
-    const coursesByCategory = await Promise.all(
-      activeCategories.map(async (cat) => {
-        const courses = await Course.find({
-          isActive: true,
-          category: cat._id,
+        // ============================================================
+        // 3. OFFER SLIDER - Upcoming/Popular Courses
+        // ============================================================
+        let offerCourses = await Course.find({
+            isActive: true,
+            isPopular: true
         })
-          .sort({ isPopular: -1, createdAt: -1 })
-          .limit(4)
-          .select(
-            "title shortDescription image price actualPrice duration courseLevel rating isPopular tableOfContent navbarButtonText navbarButtonLink navbarButtonIcon showInNavbar _id"
-          )
-          .lean();
+            .sort({ createdAt: -1 })
+            .limit(6)
+            .populate("teacher", "name")
+            .lean();
 
-        const courseCount = await Course.countDocuments({
-          isActive: true,
-          category: cat._id,
+        // ✅ FALLBACK OFFERS - if DB empty
+        const FALLBACK_OFFERS = [
+            { title: "Complete Web Development Bootcamp", discount: "40% OFF", price: "₹2,499", original: "₹4,999", tag: "Best Seller", color: "from-[#2563EB] to-[#1D4ED8]", img: "https://picsum.photos/seed/offer1/800/500", enrolled: 2400 },
+            { title: "Data Science & Machine Learning A-Z", discount: "35% OFF", price: "₹3,199", original: "₹4,999", tag: "Trending", color: "from-[#7C3AED] to-[#6D28D9]", img: "https://picsum.photos/seed/offer2/800/500", enrolled: 1800 },
+            { title: "UI/UX Design Masterclass", discount: "45% OFF", price: "₹1,999", original: "₹3,499", tag: "Popular", color: "from-[#C9A227] to-[#B8901E]", img: "https://picsum.photos/seed/offer3/800/500", enrolled: 1200 },
+            { title: "Cybersecurity Bundle", discount: "50% OFF", price: "₹2,799", original: "₹5,599", tag: "Limited", color: "from-[#EF4444] to-[#DC2626]", img: "https://picsum.photos/seed/offer4/800/500", enrolled: 900 },
+            { title: "Cloud Architect Path", discount: "30% OFF", price: "₹2,999", original: "₹4,299", tag: "New", color: "from-[#06B6D4] to-[#0891B2]", img: "https://picsum.photos/seed/offer5/800/500", enrolled: 700 },
+            { title: "Deep Learning with PyTorch", discount: "35% OFF", price: "₹3,499", original: "₹6,499", tag: "Featured", color: "from-[#22C55E] to-[#16A34A]", img: "https://picsum.photos/seed/offer6/800/500", enrolled: 500 },
+        ];
+
+        let offers = [];
+        if (offerCourses && offerCourses.length > 0) {
+            // Format real courses as offers
+            offers = offerCourses.map((course, index) => {
+                const discount = course.actualPrice > course.price 
+                    ? Math.round(((course.actualPrice - course.price) / course.actualPrice) * 100)
+                    : 20 + (index * 5);
+            
+                const tags = ["Best Seller", "Trending", "Popular", "Limited", "New", "Featured"];
+                const colors = [
+                    "from-[#2563EB] to-[#1D4ED8]",
+                    "from-[#7C3AED] to-[#6D28D9]",
+                    "from-[#C9A227] to-[#B8901E]",
+                    "from-[#EF4444] to-[#DC2626]",
+                    "from-[#06B6D4] to-[#0891B2]",
+                    "from-[#22C55E] to-[#16A34A]"
+                ];
+                
+                return {
+                    title: course.title || "Featured Course",
+                    discount: `${discount}% OFF`,
+                    price: `₹${(course.price || 0).toLocaleString()}`,
+                    original: `₹${(course.actualPrice || 0).toLocaleString()}`,
+                    tag: tags[index % tags.length],
+                    color: colors[index % colors.length],
+                    img: course.image?.url || FALLBACK_OFFERS[index % FALLBACK_OFFERS.length].img,
+                    courseId: course._id,
+                    enrolled: course.preStudents || Math.floor(Math.random() * 2000) + 500
+                };
+            });
+        } else {
+            // ✅ Use FALLBACK offers
+            offers = FALLBACK_OFFERS;
+        }
+
+        // ============================================================
+        // 4. POPULAR COURSES
+        // ============================================================
+        let popularCourses = await Course.find({
+            isActive: true,
+            isPopular: true
+        })
+            .sort({ rating: -1, createdAt: -1 })
+            .limit(8)
+            .populate("teacher", "name")
+            .lean();
+
+        // ✅ FALLBACK POPULAR COURSES
+        const FALLBACK_POPULAR_COURSES = [
+            { title: "Complete Web Development Bootcamp", instructor: "Aarav Mehta", category: "Web Development", price: 2499, oldPrice: 4999, rating: 4.8, reviews: 2140, students: 18500, lessons: 86, duration: "42h", level: "Beginner", img: "https://picsum.photos/seed/course1/640/420" },
+            { title: "Data Science & Machine Learning A-Z", instructor: "Priya Nair", category: "Data Science", price: 3199, oldPrice: 5999, rating: 4.9, reviews: 1870, students: 15200, lessons: 104, duration: "58h", level: "Intermediate", img: "https://picsum.photos/seed/course2/640/420" },
+            { title: "UI/UX Design Masterclass", instructor: "Kabir Sethi", category: "UI / UX Design", price: 1999, oldPrice: 3499, rating: 4.7, reviews: 980, students: 9800, lessons: 62, duration: "30h", level: "Beginner", img: "https://picsum.photos/seed/course3/640/420" },
+            { title: "Ethical Hacking & Cybersecurity", instructor: "Rohan Kapoor", category: "Cybersecurity", price: 2799, oldPrice: 4499, rating: 4.8, reviews: 1420, students: 11200, lessons: 74, duration: "36h", level: "Advanced", img: "https://picsum.photos/seed/course4/640/420" },
+            { title: "AWS Certified Solutions Architect", instructor: "Simran Kaur", category: "Cloud & DevOps", price: 2999, oldPrice: 5499, rating: 4.9, reviews: 1650, students: 13400, lessons: 91, duration: "48h", level: "Intermediate", img: "https://picsum.photos/seed/course5/640/420" },
+            { title: "React Native: Build Mobile Apps", instructor: "Dev Malhotra", category: "Mobile Apps", price: 2299, oldPrice: 3999, rating: 4.6, reviews: 760, students: 7300, lessons: 58, duration: "27h", level: "Intermediate", img: "https://picsum.photos/seed/course6/640/420" },
+            { title: "Deep Learning with PyTorch", instructor: "Ananya Rao", category: "AI & ML", price: 3499, oldPrice: 6499, rating: 4.9, reviews: 1120, students: 8900, lessons: 96, duration: "52h", level: "Advanced", img: "https://picsum.photos/seed/course7/640/420" },
+            { title: "Digital Marketing Complete Guide", instructor: "Ishaan Verma", category: "Marketing", price: 1799, oldPrice: 2999, rating: 4.5, reviews: 640, students: 6100, lessons: 45, duration: "22h", level: "Beginner", img: "https://picsum.photos/seed/course8/640/420" },
+        ];
+
+        let formattedPopularCourses = [];
+        if (popularCourses && popularCourses.length > 0) {
+            formattedPopularCourses = popularCourses.map((course) => ({
+                _id: course._id,
+                title: course.title,
+                instructor: course.teacher?.name || "Expert Instructor",
+                category: course.courceType || "Course",
+                price: course.price || 0,
+                oldPrice: course.actualPrice || course.price || 0,
+                rating: course.rating || 0,
+                reviews: course.reviewCount || 0,
+                students: course.preStudents || course.students?.length || 0,
+                lessons: course.tableOfContent?.length || Math.floor(Math.random() * 50) + 20,
+                duration: course.duration ? `${course.duration}h` : `${Math.floor(Math.random() * 30) + 15}h`,
+                level: course.courseLevel || "Beginner",
+                img: course.image?.url || `https://picsum.photos/seed/course${Math.floor(Math.random() * 100)}/640/420`,
+                isPopular: true,
+                categoryId: course.category
+            }));
+        } else {
+            // ✅ Use FALLBACK popular courses
+            formattedPopularCourses = FALLBACK_POPULAR_COURSES.map((course, index) => ({
+                _id: `fallback-popular-${index}`,
+                ...course,
+                tags: index < 2 ? ["best-seller"] : index < 4 ? ["popular"] : []
+            }));
+        }
+
+        // ============================================================
+        // 5. NEWLY LAUNCHED COURSES
+        // ============================================================
+        let newCourses = await Course.find({ isActive: true })
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .populate("teacher", "name")
+            .lean();
+
+        // ✅ FALLBACK NEW COURSES
+        const FALLBACK_NEW_COURSES = [
+            { title: "Next.js 15 Full Stack Development", instructor: "Aarav Mehta", price: 2699, rating: 4.9, students: 420, duration: "34h", img: "https://picsum.photos/seed/new1/640/420", launched: "3 days ago", category: "Web Development" },
+            { title: "Prompt Engineering for Developers", instructor: "Meera Iyer", price: 1499, rating: 4.8, students: 310, duration: "16h", img: "https://picsum.photos/seed/new2/640/420", launched: "5 days ago", category: "AI & ML" },
+            { title: "Advanced Figma for Product Teams", instructor: "Kabir Sethi", price: 1899, rating: 4.7, students: 265, duration: "19h", img: "https://picsum.photos/seed/new3/640/420", launched: "1 week ago", category: "UI / UX Design" },
+            { title: "Kubernetes for Production", instructor: "Simran Kaur", price: 2899, rating: 4.9, students: 198, duration: "29h", img: "https://picsum.photos/seed/new4/640/420", launched: "1 week ago", category: "Cloud & DevOps" },
+            { title: "Generative AI with LangChain", instructor: "Ananya Rao", price: 3099, rating: 4.8, students: 372, duration: "31h", img: "https://picsum.photos/seed/new5/640/420", launched: "2 weeks ago", category: "AI & ML" },
+            { title: "iOS 18 App Development with Swift", instructor: "Dev Malhotra", price: 2599, rating: 4.6, students: 154, duration: "26h", img: "https://picsum.photos/seed/new6/640/420", launched: "2 weeks ago", category: "Mobile Apps" },
+        ];
+
+        let formattedNewCourses = [];
+        if (newCourses && newCourses.length > 0) {
+            formattedNewCourses = newCourses.map((course) => ({
+                _id: course._id,
+                title: course.title,
+                instructor: course.teacher?.name || "Expert Instructor",
+                price: course.price || 0,
+                rating: course.rating || 0,
+                students: course.preStudents || course.students?.length || 0,
+                duration: course.duration ? `${course.duration}h` : `${Math.floor(Math.random() * 30) + 15}h`,
+                img: course.image?.url || `https://picsum.photos/seed/new${Math.floor(Math.random() * 100)}/640/420`,
+                launched: course.createdAt ? getTimeAgo(course.createdAt) : "Recently",
+                category: course.courceType || "Course"
+            }));
+        } else {
+            // ✅ Use FALLBACK new courses
+            formattedNewCourses = FALLBACK_NEW_COURSES.map((course, index) => ({
+                _id: `fallback-new-${index}`,
+                ...course
+            }));
+        }
+
+        // ============================================================
+        // 6. FEATURES (Static)
+        // ============================================================
+        const features = [
+            { icon: "fa-video", title: "HD Video Lessons", desc: "Crisp, structured video lectures you can learn from at your own pace, anytime." },
+            { icon: "fa-certificate", title: "Verified Certificates", desc: "Earn shareable certificates recognized by employers on completion." },
+            { icon: "fa-infinity", title: "Lifetime Access", desc: "Pay once, learn forever — including all future course updates." },
+            { icon: "fa-user-tie", title: "Industry Mentors", desc: "Learn directly from working professionals and subject-matter experts." },
+            { icon: "fa-comments", title: "1:1 Doubt Support", desc: "Get your questions answered by mentors within 24 hours, guaranteed." },
+            { icon: "fa-mobile-screen-button", title: "Learn On Any Device", desc: "Seamless experience across desktop, tablet and mobile — even offline." },
+        ];
+
+        // ============================================================
+        // 7. BLOGS with Likes
+        // ============================================================
+        let blogs = await Blog.find({ isvalid: true, blocked: false })
+            .sort({ createdAt: -1 })
+            .limit(6)
+            .populate("author", "name")
+            .lean();
+
+        // ✅ FALLBACK BLOGS
+        const FALLBACK_BLOGS = [
+            { title: "10 Habits of Highly Effective Self-Taught Developers", category: "Career", author: "Aarav Mehta", authorInitial: "A", date: "Jul 12, 2026", readTime: "6 min read", img: "https://picsum.photos/seed/blog1/640/420", comments: 34, views: 2840, likes: 120 },
+            { title: "How to Choose Your First Programming Language in 2026", category: "Web Development", author: "Priya Nair", authorInitial: "P", date: "Jul 8, 2026", readTime: "8 min read", img: "https://picsum.photos/seed/blog2/640/420", comments: 21, views: 1970, likes: 85 },
+            { title: "Portfolio Projects That Actually Get You Hired", category: "Career", author: "Kabir Sethi", authorInitial: "K", date: "Jul 3, 2026", readTime: "5 min read", img: "https://picsum.photos/seed/blog3/640/420", comments: 47, views: 3620, likes: 210 },
+            { title: "A Beginner's Guide to Cloud Certifications", category: "Cloud & DevOps", author: "Simran Kaur", authorInitial: "S", date: "Jun 27, 2026", readTime: "7 min read", img: "https://picsum.photos/seed/blog4/640/420", comments: 18, views: 1540, likes: 64 },
+            { title: "Why Every Designer Should Learn Basic Front-End Code", category: "UI / UX Design", author: "Neha Joshi", authorInitial: "N", date: "Jun 20, 2026", readTime: "4 min read", img: "https://picsum.photos/seed/blog5/640/420", comments: 29, views: 2210, likes: 95 },
+            { title: "Cybersecurity Basics Every Developer Should Know", category: "Cybersecurity", author: "Rohan Kapoor", authorInitial: "R", date: "Jun 14, 2026", readTime: "9 min read", img: "https://picsum.photos/seed/blog6/640/420", comments: 52, views: 4130, likes: 310 },
+        ];
+
+        let formattedBlogs = [];
+        if (blogs && blogs.length > 0) {
+            formattedBlogs = blogs.map((blog) => ({
+                _id: blog._id,
+                id: blog.id || blog._id,
+                title: blog.title,
+                category: blog.category || "General",
+                author: blog.author?.name || "Anonymous",
+                authorInitial: blog.author?.name?.charAt(0) || "A",
+                date: blog.createdAt ? formatDate(blog.createdAt) : "Recent",
+                readTime: `${Math.ceil((blog.content?.length || 1000) / 1000)} min read`,
+                img: blog.image?.url || `https://picsum.photos/seed/blog${Math.floor(Math.random() * 100)}/640/420`,
+                comments: blog.comments?.length || 0,
+                views: blog.usersSeen?.length || Math.floor(Math.random() * 3000) + 500,
+                likes: blog.likes?.length || 0,
+                likedByUser: blog.likes?.some(id => id.toString() === req.user?._id?.toString()) || false,
+                authorId: blog.author?._id
+            }));
+        } else {
+            // ✅ Use FALLBACK blogs
+            formattedBlogs = FALLBACK_BLOGS.map((blog, index) => ({
+                _id: `fallback-blog-${index}`,
+                ...blog,
+                likedByUser: false
+            }));
+        }
+
+        // ============================================================
+        // 8. REVIEWS / TESTIMONIALS
+        // ============================================================
+        let approvedReviews = await Review.find({
+            isApproved: true,
+            isVerified: true
+        })
+            .sort({ createdAt: -1 })
+            .limit(10)
+            .lean();
+
+        // ✅ FALLBACK TESTIMONIALS
+        const FALLBACK_TESTIMONIALS = [
+            { name: 'Ananya Sharma', rating: 5, text: 'The courses are incredibly well-structured. The hands-on labs and expert guidance helped me build confidence and secure my first role.', role: 'Security Analyst', isVerified: true },
+            { name: 'Rahul Verma', rating: 5, text: 'Outstanding platform! The learning environment closely mirrored real-world scenarios, making the experience both challenging and rewarding.', role: 'DevOps Engineer', isVerified: true },
+            { name: 'Priya Mehta', rating: 5, text: 'As someone new to this field, I found the courses extremely well-structured. The instructors explained complex concepts in a simple manner.', role: 'Data Scientist', isVerified: true },
+            { name: 'Arjun Singh', rating: 5, text: 'What impressed me most was the mentorship support. The instructors were always available to clarify doubts and guide us throughout.', role: 'Full Stack Developer', isVerified: true },
+            { name: 'Sneha Patel', rating: 4, text: 'The platform offers great value for money. The practical exercises and real-world projects made learning engaging and effective.', role: 'Product Manager', isVerified: true },
+            { name: 'Vikram Joshi', rating: 5, text: 'I transitioned from IT support to cybersecurity thanks to this platform. The career guidance and hands-on approach made all the difference.', role: 'Security Engineer', isVerified: true },
+        ];
+
+        let testimonials = [];
+        if (approvedReviews && approvedReviews.length > 0) {
+            testimonials = approvedReviews.map(review => ({
+                name: review.name || 'Anonymous',
+                rating: review.rating || 5,
+                text: review.message || 'Great experience!',
+                role: review.user?.role || 'Learner',
+                date: review.createdAt,
+                isVerified: true
+            }));
+        } else {
+            // ✅ Use FALLBACK testimonials
+            testimonials = FALLBACK_TESTIMONIALS;
+        }
+
+        // ============================================================
+        // 9. RENDER with ALL DATA
+        // ============================================================
+        res.render("institutehub/home.ejs", {
+            stats,
+            categories: categoriesWithCount,
+            offers,
+            popularCourses: formattedPopularCourses,
+            newCourses: formattedNewCourses,
+            features,
+            blogs: formattedBlogs,
+            testimonials,
+            totalCourses: await Course.countDocuments({ isActive: true }) || 120,
+            totalBlogs: await Blog.countDocuments({ isvalid: true, blocked: false }) || 45,
+            moment: require("moment"),
+            currentUser: req.user || null,
+            isFallback: {
+                categories: categories.length === 0,
+                offers: offerCourses.length === 0,
+                popular: popularCourses.length === 0,
+                new: newCourses.length === 0,
+                blogs: blogs.length === 0,
+                reviews: approvedReviews.length === 0
+            }
         });
 
-        const navbarCourses = await Course.find({
-          isActive: true,
-          category: cat._id,
-          showInNavbar: true,
-        })
-          .sort({ createdAt: -1 })
-          .select("title navbarButtonText navbarButtonLink navbarButtonIcon _id")
-          .lean();
-
-        return {
-          ...cat,
-          courses,
-          courseCount,
-          navbarCourses,
-        };
-      })
-    );
-
-    // ── 5. "OTHERS" CATEGORY ──────────────────────────────────────────────
-    const assignedCategoryIds = activeCategories.map((c) => c._id);
-
-    const otherCourses = await Course.find({
-      isActive: true,
-      $or: [
-        { category: { $exists: false } },
-        { category: null },
-        { category: { $nin: assignedCategoryIds } },
-      ],
-    })
-      .sort({ createdAt: -1 })
-      .limit(4)
-      .select(
-        "title shortDescription image price actualPrice duration courseLevel rating isPopular tableOfContent navbarButtonText navbarButtonLink navbarButtonIcon showInNavbar _id"
-      )
-      .lean();
-
-    const otherCourseCount = await Course.countDocuments({
-      isActive: true,
-      $or: [
-        { category: { $exists: false } },
-        { category: null },
-        { category: { $nin: assignedCategoryIds } },
-      ],
-    });
-
-    const otherNavbarCourses = await Course.find({
-      isActive: true,
-      showInNavbar: true,
-      $or: [
-        { category: { $exists: false } },
-        { category: null },
-        { category: { $nin: assignedCategoryIds } },
-      ],
-    })
-      .select("title navbarButtonText navbarButtonLink navbarButtonIcon _id")
-      .lean();
-
-    if (otherCourseCount > 0) {
-      coursesByCategory.push({
-        _id: "others",
-        name: "Others",
-        icon: "fa-folder-open",
-        color: "gray",
-        courseCount: otherCourseCount,
-        courses: otherCourses,
-        navbarCourses: otherNavbarCourses,
-      });
+    } catch (error) {
+        console.error("Homepage error:", error);
+        req.flash("error", "Unable to load the homepage. Please refresh the page or try again later.");
+        res.redirect("/login");
     }
-
-    // ── 6. LATEST BLOGS (max 8, 4 per row) ──────────────────────────────
-    // ✅ FIXED: Using correct fields: isvalid=true, blocked=false
-    const latestBlogs = await Blog.find({
-      isvalid: true,
-      blocked: false,
-    })
-      .sort({ createdAt: -1 })
-      .limit(8) // Max 8 blogs
-      .populate("author", "name")
-      .lean();
-
-    // ── 7. TOTAL BLOG COUNT (for "View All" button) ──────────────────────
-    const totalBlogs = await Blog.countDocuments({
-      isvalid: true,
-      blocked: false,
-    });
-
-    // ── 8. TOTAL COURSES COUNT (for "View All" button) ────────────────────
-    const totalActiveCourses = await Course.countDocuments({ isActive: true });
-
-    // ── RENDER ──────────────────────────────────────────────────────────────
-    res.render("cyberkavach/home.ejs", {
-      totalUsers,
-      totalInstructors,
-      totalCources,
-      heroCourses,
-      featuredCourses: allFeaturedCourses, // 6 courses for the grid
-      coursesByCategory,
-      popularCourse,
-      latestBlogs, // Max 8 blogs
-      totalBlogs, // For "View All" badge
-      totalActiveCourses, // For "View All" badge
-      moment: require("moment"),
-      testimonials: testimonials,
-    });
-
-  } catch (error) {
-    console.error("Homepage error:", error);
-    req.flash("error", "Unable to load the homepage. Please refresh the page or try again later.");
-    res.redirect("/login");
-  }
 };
+function getTimeAgo(date) {
+    const now = new Date();
+    const diff = now - new Date(date);
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor(diff / (1000 * 60));
+    
+    if (days > 7) return `${Math.floor(days / 7)} weeks ago`;
+    if (days > 0) return `${days} days ago`;
+    if (hours > 0) return `${hours} hours ago`;
+    if (minutes > 0) return `${minutes} minutes ago`;
+    return 'Just now';
+}
+
+function formatDate(date) {
+    const d = new Date(date);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
+
+module.exports.allCourses = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 12;
+        const skip = (page - 1) * limit;
+        
+        // Get filter parameters
+        const search = req.query.search || "";
+        const category = req.query.category || "";
+        const level = req.query.level || "";
+        const sortBy = req.query.sortBy || "popular";
+        const filter = req.query.filter || "all";
+
+        // ✅ FALLBACK COURSES DATA
+        const FALLBACK_COURSES = [
+            { id: 1, title: "Complete Web Development Bootcamp", instructor: "Aarav Mehta", category: "Web Development", price: 2499, oldPrice: 4999, rating: 4.8, reviews: 2140, students: 18500, lessons: 86, duration: "42h", level: "Beginner", img: "https://picsum.photos/seed/course1/640/420", tags: ["popular", "best-seller"] },
+            { id: 2, title: "Data Science & Machine Learning A-Z", instructor: "Priya Nair", category: "Data Science", price: 3199, oldPrice: 5999, rating: 4.9, reviews: 1870, students: 15200, lessons: 104, duration: "58h", level: "Intermediate", img: "https://picsum.photos/seed/course2/640/420", tags: ["trending"] },
+            { id: 3, title: "UI/UX Design Masterclass", instructor: "Kabir Sethi", category: "UI / UX Design", price: 1999, oldPrice: 3499, rating: 4.7, reviews: 980, students: 9800, lessons: 62, duration: "30h", level: "Beginner", img: "https://picsum.photos/seed/course3/640/420", tags: ["popular"] },
+            { id: 4, title: "Ethical Hacking & Cybersecurity", instructor: "Rohan Kapoor", category: "Cybersecurity", price: 2799, oldPrice: 4499, rating: 4.8, reviews: 1420, students: 11200, lessons: 74, duration: "36h", level: "Advanced", img: "https://picsum.photos/seed/course4/640/420", tags: ["trending"] },
+            { id: 5, title: "AWS Certified Solutions Architect", instructor: "Simran Kaur", category: "Cloud & DevOps", price: 2999, oldPrice: 5499, rating: 4.9, reviews: 1650, students: 13400, lessons: 91, duration: "48h", level: "Intermediate", img: "https://picsum.photos/seed/course5/640/420", tags: ["best-seller"] },
+            { id: 6, title: "React Native: Build Mobile Apps", instructor: "Dev Malhotra", category: "Mobile Apps", price: 2299, oldPrice: 3999, rating: 4.6, reviews: 760, students: 7300, lessons: 58, duration: "27h", level: "Intermediate", img: "https://picsum.photos/seed/course6/640/420", tags: [] },
+            { id: 7, title: "Deep Learning with PyTorch", instructor: "Ananya Rao", category: "AI & ML", price: 3499, oldPrice: 6499, rating: 4.9, reviews: 1120, students: 8900, lessons: 96, duration: "52h", level: "Advanced", img: "https://picsum.photos/seed/course7/640/420", tags: ["trending"] },
+            { id: 8, title: "Digital Marketing Complete Guide", instructor: "Ishaan Verma", category: "Marketing", price: 1799, oldPrice: 2999, rating: 4.5, reviews: 640, students: 6100, lessons: 45, duration: "22h", level: "Beginner", img: "https://picsum.photos/seed/course8/640/420", tags: [] },
+            { id: 9, title: "JavaScript: The Advanced Concepts", instructor: "Aarav Mehta", category: "Web Development", price: 1999, oldPrice: 3499, rating: 4.7, reviews: 890, students: 8200, lessons: 52, duration: "28h", level: "Intermediate", img: "https://picsum.photos/seed/course9/640/420", tags: ["popular"] },
+            { id: 10, title: "Python for Data Science", instructor: "Priya Nair", category: "Data Science", price: 2199, oldPrice: 3999, rating: 4.8, reviews: 1340, students: 11200, lessons: 68, duration: "34h", level: "Beginner", img: "https://picsum.photos/seed/course10/640/420", tags: [] },
+            { id: 11, title: "Figma Masterclass for UI/UX", instructor: "Kabir Sethi", category: "UI / UX Design", price: 1499, oldPrice: 2499, rating: 4.6, reviews: 720, students: 6800, lessons: 38, duration: "18h", level: "Beginner", img: "https://picsum.photos/seed/course11/640/420", tags: ["new"] },
+            { id: 12, title: "Cloud Computing with AWS & Azure", instructor: "Simran Kaur", category: "Cloud & DevOps", price: 3299, oldPrice: 5999, rating: 4.8, reviews: 980, students: 8900, lessons: 82, duration: "44h", level: "Intermediate", img: "https://picsum.photos/seed/course12/640/420", tags: ["trending"] },
+            { id: 13, title: "React JS: From Zero to Hero", instructor: "Aarav Mehta", category: "Web Development", price: 2299, oldPrice: 3999, rating: 4.7, reviews: 1560, students: 14200, lessons: 68, duration: "36h", level: "Beginner", img: "https://picsum.photos/seed/course13/640/420", tags: ["popular"] },
+            { id: 14, title: "Machine Learning Engineering", instructor: "Ananya Rao", category: "AI & ML", price: 3799, oldPrice: 6999, rating: 4.8, reviews: 890, students: 6700, lessons: 78, duration: "42h", level: "Advanced", img: "https://picsum.photos/seed/course14/640/420", tags: ["trending"] },
+            { id: 15, title: "DevOps with Docker & Kubernetes", instructor: "Simran Kaur", category: "Cloud & DevOps", price: 2799, oldPrice: 4999, rating: 4.7, reviews: 1120, students: 9800, lessons: 56, duration: "30h", level: "Intermediate", img: "https://picsum.photos/seed/course15/640/420", tags: ["best-seller"] },
+            { id: 16, title: "Flutter Mobile App Development", instructor: "Dev Malhotra", category: "Mobile Apps", price: 1999, oldPrice: 3499, rating: 4.6, reviews: 580, students: 5200, lessons: 48, duration: "24h", level: "Beginner", img: "https://picsum.photos/seed/course16/640/420", tags: ["new"] },
+        ];
+
+        // Build query
+        let query = { isActive: true };
+        
+        // Search filter
+        if (search) {
+            query.$or = [
+                { title: { $regex: search, $options: "i" } },
+                { shortDescription: { $regex: search, $options: "i" } },
+                { courceType: { $regex: search, $options: "i" } }
+            ];
+        }
+
+        // Category filter
+        if (category && category !== "All Categories") {
+            if (category.match(/^[0-9a-fA-F]{24}$/)) {
+                query.category = category;
+            } else {
+                query.courceType = { $regex: category, $options: "i" };
+            }
+        }
+
+        // Level filter
+        if (level && level !== "All Levels") {
+            query.courseLevel = level.toLowerCase();
+        }
+
+        // Filter by status
+        if (filter === "popular") query.isPopular = true;
+        else if (filter === "free") query.price = 0;
+        else if (filter === "paid") query.price = { $gt: 0 };
+
+        // Build sort options
+        let sortOptions = {};
+        switch(sortBy) {
+            case "popular":
+                sortOptions = { rating: -1, reviewCount: -1 };
+                break;
+            case "newest":
+                sortOptions = { createdAt: -1 };
+                break;
+            case "oldest":
+                sortOptions = { createdAt: 1 };
+                break;
+            case "price-low":
+                sortOptions = { price: 1 };
+                break;
+            case "price-high":
+                sortOptions = { price: -1 };
+                break;
+            case "rating":
+                sortOptions = { rating: -1 };
+                break;
+            case "students":
+                sortOptions = { preStudents: -1 };
+                break;
+            default:
+                sortOptions = { rating: -1, reviewCount: -1 };
+        }
+
+        // Get total count for pagination
+        let totalCourses = await Course.countDocuments(query);
+        
+        // Fetch courses
+        let courses = await Course.find(query)
+            .populate("teacher", "name email")
+            .populate("category", "name slug")
+            .sort(sortOptions)
+            .skip(skip)
+            .limit(limit)
+            .lean();
+
+        // ✅ IF NO COURSES IN DB, USE FALLBACK DATA
+        let useFallback = false;
+        let formattedCourses = [];
+        let fallbackFiltered = [];
+
+        if (courses && courses.length > 0) {
+            // Use real courses
+            formattedCourses = courses.map((course) => ({
+                _id: course._id,
+                title: course.title,
+                instructor: course.teacher?.name || "Expert Instructor",
+                category: course.courceType || course.category?.name || "Course",
+                price: course.price || 0,
+                oldPrice: course.actualPrice || course.price || 0,
+                rating: course.rating || 0,
+                reviews: course.reviewCount || 0,
+                students: course.preStudents || course.students?.length || 0,
+                lessons: course.tableOfContent?.length || Math.floor(Math.random() * 50) + 20,
+                duration: course.duration ? `${course.duration}h` : `${Math.floor(Math.random() * 30) + 15}h`,
+                level: course.courseLevel || "Beginner",
+                img: course.image?.url || `https://picsum.photos/seed/course${Math.floor(Math.random() * 100)}/640/420`,
+                tags: getCourseTags(course),
+                categoryId: course.category?._id
+            }));
+            
+            // Get total from DB
+            totalCourses = await Course.countDocuments(query);
+        } else {
+            // ✅ USE FALLBACK DATA
+            useFallback = true;
+            
+            // Filter fallback data
+            fallbackFiltered = FALLBACK_COURSES.filter(c => {
+                let show = true;
+                
+                if (search && !c.title.toLowerCase().includes(search.toLowerCase())) {
+                    show = false;
+                }
+                if (category && category !== "All Categories" && c.category !== category) {
+                    show = false;
+                }
+                if (level && level !== "All Levels" && c.level !== level) {
+                    show = false;
+                }
+                if (filter === "popular" && !c.tags.includes("popular") && !c.tags.includes("best-seller")) {
+                    show = false;
+                }
+                
+                return show;
+            });
+
+            // Sort fallback data
+            switch(sortBy) {
+                case "popular":
+                    fallbackFiltered.sort((a, b) => b.rating - a.rating);
+                    break;
+                case "price-low":
+                    fallbackFiltered.sort((a, b) => a.price - b.price);
+                    break;
+                case "price-high":
+                    fallbackFiltered.sort((a, b) => b.price - a.price);
+                    break;
+                case "rating":
+                    fallbackFiltered.sort((a, b) => b.rating - a.rating);
+                    break;
+                default:
+                    break;
+            }
+
+            totalCourses = fallbackFiltered.length;
+
+            // Paginate fallback data
+            const paginatedFallback = fallbackFiltered.slice(skip, skip + limit);
+            
+            formattedCourses = paginatedFallback.map(c => ({
+                _id: `fallback-${c.id}`,
+                title: c.title,
+                instructor: c.instructor,
+                category: c.category,
+                price: c.price,
+                oldPrice: c.oldPrice,
+                rating: c.rating,
+                reviews: c.reviews,
+                students: c.students,
+                lessons: c.lessons,
+                duration: c.duration,
+                level: c.level,
+                img: c.img,
+                tags: c.tags || []
+            }));
+        }
+
+        // Calculate pagination
+        const totalPages = Math.max(1, Math.ceil(totalCourses / limit));
+        const hasNextPage = page < totalPages;
+        const hasPrevPage = page > 1;
+
+        // Get all categories for filter dropdown
+        let allCategories = await CourseCategory.find({ isActive: true })
+            .sort({ displayOrder: 1, name: 1 })
+            .lean();
+
+        // ✅ FALLBACK CATEGORIES for filter
+        const FALLBACK_FILTER_CATEGORIES = [
+            "Web Development", "Data Science", "UI / UX Design", 
+            "Cybersecurity", "Cloud & DevOps", "Mobile Apps", 
+            "AI & ML", "Marketing"
+        ];
+
+        let filterCategories = ["All Categories"];
+        if (allCategories && allCategories.length > 0) {
+            filterCategories = ["All Categories", ...allCategories.map(c => c.name)];
+        } else {
+            filterCategories = ["All Categories", ...FALLBACK_FILTER_CATEGORIES];
+        }
+
+        // Get upcoming courses for slider
+        let upcomingCourses = await Course.find({
+            isActive: true,
+            isPopular: true,
+            lounchedDate: { $gt: new Date() }
+        })
+            .sort({ lounchedDate: 1 })
+            .limit(6)
+            .populate("teacher", "name")
+            .lean();
+
+        // ✅ FALLBACK UPCOMING COURSES
+        const FALLBACK_UPCOMING = [
+            { title: "Full Stack AI Development", instructor: "Aarav Mehta", price: 3999, oldPrice: 6999, rating: 4.9, students: 540, duration: "56h", level: "Intermediate", img: "https://picsum.photos/seed/upcoming1/800/500", launchDate: "Coming Aug 2026", tag: "Highly Anticipated" },
+            { title: "Blockchain & Web3 Fundamentals", instructor: "Priya Nair", price: 3499, oldPrice: 5999, rating: 4.8, students: 320, duration: "42h", level: "Intermediate", img: "https://picsum.photos/seed/upcoming2/800/500", launchDate: "Coming Sep 2026", tag: "New Topic" },
+            { title: "DevOps Mastery with Kubernetes", instructor: "Simran Kaur", price: 3799, oldPrice: 6499, rating: 4.9, students: 280, duration: "48h", level: "Advanced", img: "https://picsum.photos/seed/upcoming3/800/500", launchDate: "Coming Oct 2026", tag: "Industry Focus" },
+            { title: "Mobile App Development with Flutter", instructor: "Dev Malhotra", price: 2699, oldPrice: 4499, rating: 4.7, students: 410, duration: "32h", level: "Beginner", img: "https://picsum.photos/seed/upcoming4/800/500", launchDate: "Coming Nov 2026", tag: "Trending" },
+            { title: "Advanced Cybersecurity & Ethical Hacking", instructor: "Rohan Kapoor", price: 4299, oldPrice: 7499, rating: 4.9, students: 190, duration: "64h", level: "Advanced", img: "https://picsum.photos/seed/upcoming5/800/500", launchDate: "Coming Dec 2026", tag: "Most Wanted" },
+        ];
+
+        let formattedUpcoming = [];
+        if (upcomingCourses && upcomingCourses.length > 0) {
+            formattedUpcoming = upcomingCourses.map((course, index) => {
+                const tags = ["Highly Anticipated", "New Topic", "Industry Focus", "Trending", "Most Wanted", "Coming Soon"];
+                const launchDate = course.lounchedDate 
+                    ? `Coming ${formatMonthYear(course.lounchedDate)}`
+                    : "Coming Soon";
+                
+                return {
+                    _id: course._id,
+                    title: course.title,
+                    instructor: course.teacher?.name || "Expert Instructor",
+                    price: course.price || 0,
+                    oldPrice: course.actualPrice || course.price || 0,
+                    rating: course.rating || 0,
+                    students: course.preStudents || Math.floor(Math.random() * 500) + 100,
+                    duration: course.duration ? `${course.duration}h` : `${Math.floor(Math.random() * 30) + 20}h`,
+                    level: course.courseLevel || "Intermediate",
+                    img: course.image?.url || `https://picsum.photos/seed/upcoming${index+1}/800/500`,
+                    launchDate: launchDate,
+                    tag: tags[index % tags.length]
+                };
+            });
+        } else {
+            formattedUpcoming = FALLBACK_UPCOMING;
+        }
+
+        // Get stats
+        let stats = {
+            total: totalCourses || FALLBACK_COURSES.length,
+            popular: await Course.countDocuments({ isActive: true, isPopular: true }) || 8,
+            free: await Course.countDocuments({ isActive: true, price: 0 }) || 2,
+            paid: await Course.countDocuments({ isActive: true, price: { $gt: 0 } }) || 10
+        };
+
+        // If fallback, adjust stats
+        if (useFallback) {
+            stats = {
+                total: FALLBACK_COURSES.length,
+                popular: FALLBACK_COURSES.filter(c => c.tags.includes('popular') || c.tags.includes('best-seller')).length,
+                free: FALLBACK_COURSES.filter(c => c.price === 0).length,
+                paid: FALLBACK_COURSES.filter(c => c.price > 0).length
+            };
+        }
+
+        // Levels for filter
+        const filterLevels = ["All Levels", "Beginner", "Intermediate", "Advanced", "Expert"];
+
+        // Render the page
+        res.render("institutehub/courses.ejs", {
+            courses: formattedCourses,
+            totalCourses,
+            currentPage: page,
+            totalPages,
+            limit,
+            hasNextPage,
+            hasPrevPage,
+            search: search || "",
+            category: category || "",
+            level: level || "",
+            sortBy: sortBy || "popular",
+            filter: filter || "all",
+            filterCategories,
+            filterLevels,
+            allCategories,
+            upcomingCourses: formattedUpcoming,
+            stats,
+            moment: require("moment"),
+            currentUser: req.user || null,
+            isFallback: useFallback
+        });
+
+    } catch (error) {
+        console.error("All courses error:", error);
+        req.flash("error", "Unable to load courses. Please refresh the page.");
+        res.redirect("/");
+    }
+};
+
+function getCourseTags(course) {
+    const tags = [];
+    if (course.isPopular) tags.push("popular");
+    if (course.rating >= 4.8) tags.push("best-seller");
+    if (course.rating >= 4.5 && course.rating < 4.8) tags.push("trending");
+    if (course.createdAt && (Date.now() - new Date(course.createdAt).getTime()) < 30 * 24 * 60 * 60 * 1000) {
+        tags.push("new");
+    }
+    if (course.preStudents > 1000) tags.push("hot");
+    return tags;
+}
+
+function formatMonthYear(date) {
+    const d = new Date(date);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+
 
 module.exports.profile = async (req, res) => {
   try {
@@ -308,76 +768,7 @@ module.exports.contact = (req, res) => {
 };
 
 // Courses
-module.exports.allCourses = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = 20;
-    const skip = (page - 1) * limit;
-    const search = req.query.search || "";
-    const level = req.query.level || "";
-    const filter = req.query.filter || "all";
-    const sortBy = req.query.sortBy || "latest";
 
-    let query = {};
-    
-    if (search) {
-      query.title = { $regex: search, $options: "i" };
-    }
-
-    if (level && level !== "all") {
-      query.courseLevel = level;
-    }
-
-    if (filter === "active") query.isActive = true;
-    else if (filter === "inactive") query.isActive = false;
-    else if (filter === "popular") query.isPopular = true;
-    else if (filter === "navbar") query.showInNavbar = true;
-    else if (filter === "homepage") query.showInHomepage = true;
-
-    let sortOptions = {};
-    
-    switch(sortBy) {
-      case "latest":
-        sortOptions = { createdAt: -1 };
-        break;
-      case "oldest":
-        sortOptions = { createdAt: 1 };
-        break;
-      case "price_asc":
-        sortOptions = { actualPrice: 1 };
-        break;
-      case "price_desc":
-        sortOptions = { actualPrice: -1 };
-        break;
-      default:
-        sortOptions = { createdAt: -1 };
-    }
-
-    const totalCourses = await Course.countDocuments(query);
-    
-    const courses = await Course.find(query)
-      .populate("teacher", "name email")
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    res.render("cyberkavach/courses.ejs", {
-      cources: courses,
-      currentPage: page,
-      totalPages: Math.ceil(totalCourses / limit),
-      totalCourses,
-      search,
-      level,
-      filter,
-      sortBy,
-    });
-  } catch (error) {
-    console.error(error);
-    req.flash("error", "Unable to load courses. Please refresh the page.");
-    res.redirect("/login");
-  }
-};
 
 module.exports.renderNewCourseForm = async (req, res) => {
   try {
@@ -389,7 +780,7 @@ module.exports.renderNewCourseForm = async (req, res) => {
       .sort({ displayOrder: 1, name: 1 })
       .lean();
     
-    res.render("cyberkavach/newcourse.ejs", { 
+    res.render("institutehub/newcourse.ejs", { 
       course: {}, 
       teachers: teachers || [] ,
       categories: categories || []
@@ -515,7 +906,7 @@ module.exports.renderEditCourseForm = async (req, res) => {
       .sort({ displayOrder: 1, name: 1 })
       .lean();
 
-    res.render("cyberkavach/editcourse.ejs", { 
+    res.render("institutehub/editcourse.ejs", { 
       course,
       teachers: teachers || [],
       categories: categories || []
@@ -706,7 +1097,7 @@ module.exports.toggleHomepageVisibility = async (req, res) => {
 module.exports.enrollCourseForm = async (req, res) => {
   try {
     const courses = await Course.find();
-    res.render("cyberkavach/enroll.ejs", { courses });
+    res.render("institutehub/enroll.ejs", { courses });
   } catch (error) {
     console.log(error);
     req.flash("error", "Unable to load the enrollment form. Please try again.");
@@ -894,7 +1285,7 @@ module.exports.viewCourse = async (req, res) => {
       ) || 0;
 
     const dynamicMeta = {
-      title: course.title + " | cyberkavach Courses",
+      title: course.title + " | institutehub Courses",
       description: course.shortDescription,
       keywords:
         course.courceType +
@@ -910,7 +1301,7 @@ module.exports.viewCourse = async (req, res) => {
       image: course.image.url,
     };
 
-    res.render("cyberkavach/viewCourse.ejs", {
+    res.render("institutehub/viewCourse.ejs", {
       meta: dynamicMeta,
       course,
       relatedCourses,
@@ -1165,7 +1556,7 @@ module.exports.getCourseContent = async (req, res) => {
       }
     ];
     
-    res.render('cyberkavach/course-content.ejs', {
+    res.render('institutehub/course-content.ejs', {
       course,
       lectures,
       enrollment,

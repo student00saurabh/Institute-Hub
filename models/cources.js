@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const courcesSchema = new Schema({
-  teacher: {
+  teacher: {// teacher of this course
     type: Schema.Types.ObjectId,
     ref: "User",
   },
 
-  students: [
+  students: [//student when enrolle in this courses
     {
       user: {
         type: Schema.Types.ObjectId,
@@ -23,7 +23,7 @@ const courcesSchema = new Schema({
         type: Number,
         required: true,
       },
-      description: {
+      description: {//what user has asked any specific question ....
         type: String,
       },
       isSeen: {
@@ -32,6 +32,39 @@ const courcesSchema = new Schema({
       },
     },
   ],
+
+  // COURSE STRUCTURE - For organizing lectures
+  sections: [{
+    title: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    description: {
+      type: String,
+      trim: true,
+      default: ""
+    },
+    order: {
+      type: Number,
+      default: 0
+    },
+    lectureIds: [{
+      type: Schema.Types.ObjectId,
+      ref: "Lecture"
+    }]
+  }],
+  
+  // COURSE STATISTICS
+  totalLectures: {
+    type: Number,
+    default: 0
+  },
+  totalDuration: {
+    type: Number, // Total seconds
+    default: 0
+  },
+
   image: {
     url: String,
     filename: String,

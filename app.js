@@ -290,7 +290,7 @@ app.use(async (req, res, next) => {
 });
 
 app.use("/search", (req, res, next) => {
-  // Allow only AJAX/API requests to pass through
+  // Allow only AJAX/API requests to pass through 
   if (req.xhr || req.headers.accept?.includes('application/json')) {
     return next();
   }

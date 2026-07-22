@@ -12,7 +12,7 @@ router.get("/profile", isLoggedIn, homeController.profile);
 router.get("/about", homeController.about);
 router.get("/privacy", homeController.privacy);
 router.get("/terms", homeController.terms);
-router.get("/contact", homeController.contact);
+// router.get("/contact", homeController.contact);
 
 // Courses
 router

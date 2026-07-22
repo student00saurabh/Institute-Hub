@@ -28,7 +28,7 @@ async function sendReviewEmail(user, reviewLink) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Share Your Experience | CyberKavach</title>
+        <title>Share Your Experience | InstituteHub</title>
         <style>
           body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f8fafc; color: #1e293b; }
           .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
@@ -63,13 +63,13 @@ async function sendReviewEmail(user, reviewLink) {
         <div style="max-width:600px;margin:0 auto;">
           <div class="container">
             <div class="header">
-              <h1>CyberKavach</h1>
+              <h1>InstituteHub</h1>
               <div class="subtitle">We Value Your Feedback!</div>
             </div>
             <div class="content">
               <div class="greeting">Hello ${user.name || 'there'},</div>
               <div class="message">
-                Thank you for being a part of the CyberKavach community! We'd love to hear about your experience with our platform.
+                Thank you for being a part of the InstituteHub community! We'd love to hear about your experience with our platform.
                 <br><br>
                 Your feedback helps us improve and helps others make informed decisions.
               </div>
@@ -83,15 +83,15 @@ async function sendReviewEmail(user, reviewLink) {
                 </div>
               </div>
               <div class="message" style="font-size:14px;color:#94a3b8;margin-bottom:0;">
-                If you have any questions, feel free to contact us at info@cyberkavach.org.in
+                If you have any questions, feel free to contact us at stundent001599@gmail.com
               </div>
             </div>
             <hr class="divider">
             <div class="footer">
-              <div class="brand">Cyber <span>Kavach</span></div>
+              <div class="brand">Institute <span>Hub</span></div>
               <div class="tagline">Securing Digital Futures</div>
-              <div class="contact">📧 <a href="mailto:info@cyberkavach.org.in">info@cyberkavach.org.in</a></div>
-              <div class="copyright">&copy; ${new Date().getFullYear()} CyberKavach. All rights reserved.</div>
+              <div class="contact">📧 <a href="mailto:student001599@gmail.com">student001599@gmail.com</a></div>
+              <div class="copyright">&copy; ${new Date().getFullYear()} InstituteHub. All rights reserved.</div>
             </div>
           </div>
         </div>
@@ -100,9 +100,9 @@ async function sendReviewEmail(user, reviewLink) {
     `;
 
     await apiInstance.sendTransacEmail({
-      sender: { email: "info@cyberkavach.org.in", name: "CyberKavach" },
+      sender: { email: "info@institutehub.com", name: "InstituteHub" },
       to: [{ email: user.email, name: user.name || user.username }],
-      subject: "⭐ Share Your Experience | CyberKavach Review",
+      subject: "⭐ Share Your Experience | InstituteHub Review",
       htmlContent: htmlContent,
     });
 
