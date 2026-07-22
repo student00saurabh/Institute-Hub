@@ -1,9 +1,16 @@
 <% layout("/layouts/boilerplate") %>
 
+<%
+  // ✅ Safe access - currUser from app.js
+  const userEmail = currUser?.email || '';
+  const userName = currUser?.name || 'Student';
+  const userInitial = userName.charAt(0).toUpperCase() || 'S';
+%>
+
 <div class="min-h-screen bg-[#F8FAFC] dark:bg-[#0B1120]" id="courseContentRoot"
      data-course-id="<%= course._id %>"
-     data-user-email="<%= currUser.email %>"
-     data-user-name="<%= currUser.name %>">
+     data-user-email="<%= userEmail %>"
+     data-user-name="<%= userName %>">
 
     <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
@@ -35,8 +42,8 @@
                     <h1 class="text-xl sm:text-2xl font-extrabold text-[#0F172A] dark:text-white"><%= course.title %></h1>
                     <div class="flex flex-wrap items-center gap-4 mt-2.5 text-sm text-[#64748B] dark:text-[#94A3B8]">
                         <span><i class="fas fa-user mr-1 text-[#2563EB]"></i> <%= course.teacher ? course.teacher.name : 'Instructor' %></span>
-                        <span><i class="fas fa-play-circle mr-1 text-[#2563EB]"></i> <%= totalLectures %> Lectures</span>
-                        <span><i class="fas fa-check-circle mr-1 text-[#22C55E]"></i> <%= completedLectures %> Completed</span>
+                        <span><i class="fas fa-play-circle mr-1 text-[#2563EB]"></i> <%= totalLectures || 0 %> Lectures</span>
+                        <span><i class="fas fa-check-circle mr-1 text-[#22C55E]"></i> <%= completedLectures || 0 %> Completed</span>
                     </div>
                 </div>
 
@@ -49,7 +56,7 @@
                         <span class="text-sm">Loading secure video…</span>
                     </div>
 
-                    <!-- Native video element (hidden until a signed URL is loaded) -->
+                    <!-- Native video element -->
                     <video id="lectureVideo"
                            class="w-full aspect-video hidden"
                            controlsList="nodownload noremoteplayback"
@@ -57,19 +64,19 @@
                            playsinline
                            controls></video>
 
-                    <!-- Embed fallback (YouTube/Vimeo — unprotected, flagged to the user) -->
+                    <!-- Embed fallback -->
                     <iframe id="lectureEmbed"
                             class="w-full aspect-video hidden"
                             frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowfullscreen></iframe>
 
-                    <!-- Moving watermark: ties any leaked recording back to this account -->
+                    <!-- Moving watermark -->
                     <div id="videoWatermark" class="pointer-events-none absolute text-white/25 text-xs font-semibold tracking-wide select-none transition-all duration-1000 ease-linear hidden">
-                        <%= currUser.email %>
+                        <%= userEmail || 'Student' %>
                     </div>
 
-                    <!-- Devtools / tab-blur guard overlay -->
+                    <!-- Security overlay -->
                     <div id="securityOverlay" class="hidden absolute inset-0 bg-[#0F172A]/95 backdrop-blur-sm flex-col items-center justify-center gap-3 text-white text-center px-6 z-20">
                         <i class="fas fa-shield-halved text-3xl text-[#C9A227]"></i>
                         <p class="font-semibold">Playback paused</p>
@@ -124,54 +131,61 @@
                             <div class="bg-gradient-to-r from-[#2563EB] to-[#C9A227] h-2.5 rounded-full transition-all duration-500" id="overallProgressBar" style="width: <%= progress || 0 %>%"></div>
                         </div>
                         <div class="flex items-center justify-between text-sm text-[#64748B] dark:text-[#94A3B8]">
-                            <span><i class="fas fa-check-circle mr-1 text-[#22C55E]"></i> <span id="completedCount"><%= completedLectures %></span> Completed</span>
-                            <span><i class="fas fa-circle mr-1 text-[#CBD5E1] dark:text-[#334155]"></i> <span id="remainingCount"><%= totalLectures - completedLectures %></span> Remaining</span>
+                            <span><i class="fas fa-check-circle mr-1 text-[#22C55E]"></i> <span id="completedCount"><%= completedLectures || 0 %></span> Completed</span>
+                            <span><i class="fas fa-circle mr-1 text-[#CBD5E1] dark:text-[#334155]"></i> <span id="remainingCount"><%= (totalLectures || 0) - (completedLectures || 0) %></span> Remaining</span>
                         </div>
                     </div>
 
-                    <!-- Lecture list, grouped by section -->
+                    <!-- Lecture list -->
                     <div class="bg-white dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-[#1E293B] overflow-hidden">
                         <div class="p-4 border-b border-[#E2E8F0] dark:border-[#1E293B]">
                             <h3 class="font-semibold text-[#0F172A] dark:text-white">Course Content</h3>
-                            <p class="text-xs text-[#64748B] dark:text-[#94A3B8]"><%= totalLectures %> lectures</p>
+                            <p class="text-xs text-[#64748B] dark:text-[#94A3B8]"><%= totalLectures || 0 %> lectures</p>
                         </div>
                         <div class="max-h-[560px] overflow-y-auto lecture-scroll">
-                            <% let globalIndex = 0; %>
-                            <% Object.keys(sections).forEach((sectionName) => { %>
-                                <div class="px-4 py-2.5 bg-[#F8FAFC] dark:bg-[#0B1120] text-xs font-bold uppercase tracking-wide text-[#64748B] dark:text-[#94A3B8] border-b border-[#E2E8F0] dark:border-[#1E293B]">
-                                    <%= sectionName %>
-                                </div>
-                                <div class="divide-y divide-[#E2E8F0] dark:divide-[#1E293B]">
-                                    <% sections[sectionName].forEach((lecture) => { globalIndex++; %>
-                                        <button type="button"
-                                                class="lecture-item w-full text-left p-4 hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/40 transition-colors flex items-start gap-3"
-                                                data-lecture-id="<%= lecture._id %>"
-                                                data-title="<%= lecture.title %>"
-                                                data-duration="<%= lecture.video && lecture.video.duration ? lecture.video.duration : 0 %>"
-                                                data-completed="<%= lecture.isCompleted %>">
-                                            <span class="mt-0.5 shrink-0 lecture-status-icon">
-                                                <% if (lecture.isCompleted) { %>
-                                                    <i class="fas fa-check-circle text-[#22C55E] text-lg"></i>
-                                                <% } else { %>
-                                                    <i class="fas fa-play-circle text-[#94A3B8] text-lg"></i>
-                                                <% } %>
-                                            </span>
-                                            <span class="flex-1 min-w-0">
-                                                <span class="block text-sm font-medium text-[#0F172A] dark:text-white truncate lecture-title-text"><%= lecture.title %></span>
-                                                <span class="flex items-center gap-2 mt-0.5">
-                                                    <span class="text-xs text-[#64748B] dark:text-[#94A3B8]">
-                                                        <i class="far fa-clock mr-1"></i><%= lecture.video && lecture.video.duration ? Math.ceil(lecture.video.duration / 60) + ' min' : '—' %>
-                                                    </span>
-                                                    <span class="text-xs lecture-status-text <%= lecture.isCompleted ? 'text-[#22C55E] font-medium' : 'text-[#94A3B8]' %>">
-                                                        <%= lecture.isCompleted ? 'Completed' : 'Pending' %>
+                            <% if (sections && Object.keys(sections).length > 0) { %>
+                                <% let globalIndex = 0; %>
+                                <% Object.keys(sections).forEach((sectionName) => { %>
+                                    <div class="px-4 py-2.5 bg-[#F8FAFC] dark:bg-[#0B1120] text-xs font-bold uppercase tracking-wide text-[#64748B] dark:text-[#94A3B8] border-b border-[#E2E8F0] dark:border-[#1E293B]">
+                                        <%= sectionName %>
+                                    </div>
+                                    <div class="divide-y divide-[#E2E8F0] dark:divide-[#1E293B]">
+                                        <% sections[sectionName].forEach((lecture) => { globalIndex++; %>
+                                            <button type="button"
+                                                    class="lecture-item w-full text-left p-4 hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]/40 transition-colors flex items-start gap-3"
+                                                    data-lecture-id="<%= lecture._id %>"
+                                                    data-title="<%= lecture.title %>"
+                                                    data-duration="<%= lecture.video && lecture.video.duration ? lecture.video.duration : 0 %>"
+                                                    data-completed="<%= lecture.isCompleted || false %>">
+                                                <span class="mt-0.5 shrink-0 lecture-status-icon">
+                                                    <% if (lecture.isCompleted) { %>
+                                                        <i class="fas fa-check-circle text-[#22C55E] text-lg"></i>
+                                                    <% } else { %>
+                                                        <i class="fas fa-play-circle text-[#94A3B8] text-lg"></i>
+                                                    <% } %>
+                                                </span>
+                                                <span class="flex-1 min-w-0">
+                                                    <span class="block text-sm font-medium text-[#0F172A] dark:text-white truncate lecture-title-text"><%= lecture.title %></span>
+                                                    <span class="flex items-center gap-2 mt-0.5">
+                                                        <span class="text-xs text-[#64748B] dark:text-[#94A3B8]">
+                                                            <i class="far fa-clock mr-1"></i><%= lecture.video && lecture.video.duration ? Math.ceil(lecture.video.duration / 60) + ' min' : '—' %>
+                                                        </span>
+                                                        <span class="text-xs lecture-status-text <%= lecture.isCompleted ? 'text-[#22C55E] font-medium' : 'text-[#94A3B8]' %>">
+                                                            <%= lecture.isCompleted ? 'Completed' : 'Pending' %>
+                                                        </span>
                                                     </span>
                                                 </span>
-                                            </span>
-                                            <span class="text-xs text-[#94A3B8] shrink-0">#<%= globalIndex %></span>
-                                        </button>
-                                    <% }) %>
+                                                <span class="text-xs text-[#94A3B8] shrink-0">#<%= globalIndex %></span>
+                                            </button>
+                                        <% }) %>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="p-6 text-center text-[#64748B] dark:text-[#94A3B8]">
+                                    <i class="fas fa-book-open text-2xl mb-2 block"></i>
+                                    <p>No lectures available yet.</p>
                                 </div>
-                            <% }) %>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -180,10 +194,22 @@
     </div>
 </div>
 
+<!-- ============================================================ -->
+<!-- SCRIPTS                                                       -->
+<!-- ============================================================ -->
 <script>
-(function () {
+document.addEventListener('DOMContentLoaded', function() {
+    'use strict';
+
     const root = document.getElementById('courseContentRoot');
+    if (!root) {
+        console.error('Course content root not found');
+        return;
+    }
+
     const COURSE_ID = root.dataset.courseId;
+    const USER_EMAIL = root.dataset.userEmail || '';
+    const USER_NAME = root.dataset.userName || 'Student';
 
     const videoEl = document.getElementById('lectureVideo');
     const embedEl = document.getElementById('lectureEmbed');
@@ -201,42 +227,44 @@
     let watermarkTimer = null;
     let hasSentEnded = false;
 
-    // ========== WATERMARK — repositions every few seconds ==========
+    // ========== WATERMARK ==========
     function startWatermarkDrift() {
         stopWatermarkDrift();
+        watermarkEl.textContent = USER_EMAIL || USER_NAME;
         watermarkEl.classList.remove('hidden');
         const place = () => {
-            const top = 10 + Math.random() * 70;   // %
-            const left = 10 + Math.random() * 70;  // %
+            const top = 10 + Math.random() * 70;
+            const left = 10 + Math.random() * 70;
             watermarkEl.style.top = top + '%';
             watermarkEl.style.left = left + '%';
         };
         place();
         watermarkTimer = setInterval(place, 6000);
     }
+
     function stopWatermarkDrift() {
         if (watermarkTimer) clearInterval(watermarkTimer);
         watermarkEl.classList.add('hidden');
     }
 
-    // ========== DETERRENTS: right-click, common inspect shortcuts ==========
+    // ========== DETERRENTS ==========
     const playerWrapper = document.getElementById('playerWrapper');
-    playerWrapper.addEventListener('contextmenu', (e) => e.preventDefault());
+    if (playerWrapper) {
+        playerWrapper.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
 
     document.addEventListener('keydown', (e) => {
         const key = e.key?.toLowerCase();
-        const blocked =
-            key === 'f12' ||
+        const blocked = key === 'f12' ||
             (e.ctrlKey && e.shiftKey && ['i', 'j', 'c'].includes(key)) ||
             (e.ctrlKey && key === 'u') ||
-            (e.metaKey && e.altKey && key === 'i'); // Safari devtools
+            (e.metaKey && e.altKey && key === 'i');
         if (blocked) e.preventDefault();
     });
 
-    // Best-effort devtools heuristic (window size delta). Not bulletproof —
-    // nothing client-side can be — but pauses playback as a deterrent.
     let devtoolsWarned = false;
     setInterval(() => {
+        if (!videoEl) return;
         const widthDelta = window.outerWidth - window.innerWidth > 160;
         const heightDelta = window.outerHeight - window.innerHeight > 160;
         if ((widthDelta || heightDelta) && !videoEl.paused) {
@@ -251,7 +279,6 @@
         }
     }, 1500);
 
-    // Pause when the tab is hidden (reduces casual re-recording via screen share)
     document.addEventListener('visibilitychange', () => {
         if (document.hidden && videoEl && !videoEl.paused) {
             videoEl.pause();
@@ -269,7 +296,7 @@
         videoEl.pause();
         stopWatermarkDrift();
 
-        // Highlight active item in the list
+        // Highlight active item
         document.querySelectorAll('.lecture-item').forEach((el) => {
             el.classList.remove('bg-[#2563EB]/5');
             el.querySelector('.lecture-title-text')?.classList.remove('text-[#2563EB]');
@@ -278,7 +305,7 @@
         if (activeEl) {
             activeEl.classList.add('bg-[#2563EB]/5');
             activeEl.querySelector('.lecture-title-text')?.classList.add('text-[#2563EB]');
-            titleEl.textContent = activeEl.dataset.title;
+            titleEl.textContent = activeEl.dataset.title || 'Lecture';
         }
 
         try {
@@ -292,8 +319,8 @@
                 return;
             }
 
-            durationEl.textContent = formatDuration(data.duration);
-            updateWatchUI(data.isCompleted, data.duration ? Math.round((data.resumeAt / data.duration) * 100) : 0);
+            durationEl.textContent = formatDuration(data.duration || 0);
+            updateWatchUI(data.isCompleted || false, data.duration ? Math.round((data.resumeAt / data.duration) * 100) : 0);
 
             if (data.playerType === 'embed-unprotected') {
                 embedEl.src = data.playbackUrl;
@@ -304,9 +331,8 @@
 
             videoEl.src = data.playbackUrl;
             videoEl.classList.remove('hidden');
-            videoEl.dataset.minWatchPercentage = data.minWatchPercentage || 95;
 
-            if (data.resumeAt > 2) {
+            if (data.resumeAt && data.resumeAt > 2) {
                 videoEl.addEventListener('loadedmetadata', function resume() {
                     videoEl.currentTime = data.resumeAt;
                     videoEl.removeEventListener('loadedmetadata', resume);
@@ -314,7 +340,7 @@
             }
 
             startWatermarkDrift();
-            videoEl.play().catch(() => {}); // autoplay may be blocked — that's fine
+            videoEl.play().catch(() => {});
         } catch (err) {
             console.error('Load lecture error:', err);
             loadingEl.classList.add('hidden');
@@ -322,23 +348,25 @@
         }
     }
 
-    // ========== PROGRESS TRACKING (server-enforced) ==========
-    videoEl.addEventListener('timeupdate', () => {
-        if (progressPingTimer) return;
-        progressPingTimer = setTimeout(() => {
-            progressPingTimer = null;
-            sendProgress(false);
-        }, 8000); // throttle to one ping every 8s of playback
-    });
+    // ========== PROGRESS TRACKING ==========
+    if (videoEl) {
+        videoEl.addEventListener('timeupdate', () => {
+            if (progressPingTimer) return;
+            progressPingTimer = setTimeout(() => {
+                progressPingTimer = null;
+                sendProgress(false);
+            }, 8000);
+        });
 
-    videoEl.addEventListener('ended', () => {
-        if (hasSentEnded) return;
-        hasSentEnded = true;
-        sendProgress(true);
-    });
+        videoEl.addEventListener('ended', () => {
+            if (hasSentEnded) return;
+            hasSentEnded = true;
+            sendProgress(true);
+        });
+    }
 
     async function sendProgress(ended) {
-        if (!currentLectureId || !videoEl.duration) return;
+        if (!currentLectureId || !videoEl || !videoEl.duration) return;
         try {
             const res = await fetch(`/courses/${COURSE_ID}/lecture/${currentLectureId}/progress`, {
                 method: 'POST',
@@ -346,13 +374,13 @@
                 body: JSON.stringify({
                     currentTime: videoEl.currentTime,
                     duration: videoEl.duration,
-                    ended
+                    ended: ended || false
                 })
             });
             const data = await res.json();
             if (data.success) {
-                updateWatchUI(data.isCompleted, data.watchPercentage);
-                if (data.justCompleted) {
+                updateWatchUI(data.isCompleted || false, data.watchPercentage || 0);
+                if (data.isCompleted && !data.wasCompleted) {
                     showToast('Lecture completed! 🎉', 'success');
                     reflectCompletionInList(currentLectureId);
                 }
@@ -371,7 +399,7 @@
     function reflectCompletionInList(lectureId) {
         const el = document.querySelector(`.lecture-item[data-lecture-id="${lectureId}"]`);
         if (!el) return;
-        if (el.dataset.completed === 'true') return; // already reflected
+        if (el.dataset.completed === 'true') return;
 
         el.dataset.completed = 'true';
         const icon = el.querySelector('.lecture-status-icon i');
@@ -382,25 +410,27 @@
             statusText.className = 'text-xs lecture-status-text text-[#22C55E] font-medium';
         }
 
-        // bump the sidebar counters
+        // Update counters
         const completedCountEl = document.getElementById('completedCount');
         const remainingCountEl = document.getElementById('remainingCount');
         const overallBar = document.getElementById('overallProgressBar');
         const overallLabel = document.getElementById('overallProgressPercentage');
 
-        const completed = parseInt(completedCountEl.textContent, 10) + 1;
-        const remaining = Math.max(parseInt(remainingCountEl.textContent, 10) - 1, 0);
-        const total = completed + remaining;
-        const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+        if (completedCountEl && remainingCountEl) {
+            const completed = parseInt(completedCountEl.textContent, 10) + 1;
+            const remaining = Math.max(parseInt(remainingCountEl.textContent, 10) - 1, 0);
+            const total = completed + remaining;
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-        completedCountEl.textContent = completed;
-        remainingCountEl.textContent = remaining;
-        overallBar.style.width = pct + '%';
-        overallLabel.textContent = pct + '%';
+            completedCountEl.textContent = completed;
+            remainingCountEl.textContent = remaining;
+            if (overallBar) overallBar.style.width = pct + '%';
+            if (overallLabel) overallLabel.textContent = pct + '%';
+        }
     }
 
     function formatDuration(seconds) {
-        if (!seconds) return '--:--';
+        if (!seconds || seconds <= 0) return '--:--';
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins}:${secs.toString().padStart(2, '0')}`;
@@ -408,23 +438,40 @@
 
     // ========== TOASTS ==========
     function showToast(message, type = 'success') {
-        const colors = { success: 'bg-[#22C55E]', error: 'bg-[#EF4444]', info: 'bg-[#2563EB]', warning: 'bg-[#F59E0B]' };
+        const colors = {
+            success: 'bg-[#22C55E]',
+            error: 'bg-[#EF4444]',
+            info: 'bg-[#2563EB]',
+            warning: 'bg-[#F59E0B]'
+        };
         const toast = document.createElement('div');
-        toast.className = `fixed bottom-4 right-4 ${colors[type] || 'bg-[#2563EB]'} text-white px-5 py-3 rounded-xl shadow-lg z-50 transition-all duration-300 text-sm font-medium`;
+        toast.className = `fixed bottom-4 right-4 ${colors[type] || 'bg-[#2563EB]'} text-white px-5 py-3 rounded-xl shadow-lg z-50 transition-all duration-300 text-sm font-medium max-w-sm`;
         toast.textContent = message;
         document.body.appendChild(toast);
-        setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateY(8px)'; setTimeout(() => toast.remove(), 300); }, 3000);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(8px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
     }
 
     // ========== WIRE UP LECTURE LIST ==========
     document.querySelectorAll('.lecture-item').forEach((el) => {
-        el.addEventListener('click', () => loadLecture(el.dataset.lectureId));
+        el.addEventListener('click', function() {
+            loadLecture(this.dataset.lectureId);
+        });
     });
 
-    // Auto-load the first lecture
+    // ========== AUTO-LOAD FIRST LECTURE ==========
     const firstLecture = document.querySelector('.lecture-item');
-    if (firstLecture) loadLecture(firstLecture.dataset.lectureId);
-})();
+    if (firstLecture) {
+        loadLecture(firstLecture.dataset.lectureId);
+    } else {
+        // No lectures - show message
+        loadingEl.classList.add('hidden');
+        titleEl.textContent = 'No lectures available';
+    }
+});
 </script>
 
 <style>
@@ -436,7 +483,14 @@
     .dark .lecture-scroll::-webkit-scrollbar-thumb { background: #475569; }
 
     #videoWatermark { user-select: none; -webkit-user-select: none; }
-
-    /* Discourage trivial drag-save of the video frame */
     #lectureVideo, #playerWrapper img { -webkit-user-drag: none; }
+
+    /* Loading spinner animation */
+    .fa-spin {
+        animation: fa-spin 2s infinite linear;
+    }
+    @keyframes fa-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 </style>

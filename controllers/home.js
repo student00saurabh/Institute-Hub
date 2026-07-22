@@ -1487,116 +1487,350 @@ module.exports.verifyPayment = async (req, res) => {
 
 // Get course content for enrolled users
 module.exports.getCourseContent = async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    if (!req.user) {
-      req.flash('warning', 'Please login to access course content');
-      return res.redirect('/login');
+    try {
+        const { id: courseId } = req.params;
+
+        // ✅ Check if user is logged in
+        if (!req.user) {
+            req.flash("warning", "Please login to access course content");
+            return res.redirect(`/login?redirect=/courses/${courseId}/access`);
+        }
+
+        // ✅ Get course with teacher details
+        const course = await Course.findById(courseId)
+            .populate("teacher", "name email")
+            .lean();
+
+        if (!course) {
+            req.flash("error", "Course not found");
+            return res.redirect("/courses");
+        }
+
+        // ✅ Check enrollment
+        const isEnrolled = (course.students || []).some(
+            (s) => s.user.toString() === req.user._id.toString()
+        );
+
+        if (!isEnrolled) {
+            req.flash("warning", "Please enroll in this course to access content");
+            return res.redirect(`/courses/${courseId}`);
+        }
+
+        // ✅ Get lectures for this course
+        const sections = await Lecture.getCourseLectures(courseId);
+        
+        // Flatten to get all lecture IDs
+        const allLectureIds = [];
+        Object.values(sections).forEach(lectures => {
+            lectures.forEach(l => allLectureIds.push(l._id));
+        });
+
+        // ✅ Get progress for this user
+        const progressDocs = await LectureProgress.find({
+            user: req.user._id,
+            course: courseId,
+            lecture: { $in: allLectureIds }
+        }).lean();
+
+        const progressMap = new Map();
+        progressDocs.forEach(p => {
+            progressMap.set(p.lecture.toString(), p);
+        });
+
+        let totalLectures = 0;
+        let completedLectures = 0;
+
+        // ✅ Add progress info to lectures
+        Object.keys(sections).forEach((sectionName) => {
+            sections[sectionName] = sections[sectionName].map((lecture) => {
+                const progress = progressMap.get(lecture._id.toString());
+                totalLectures += 1;
+                if (progress?.isCompleted) completedLectures += 1;
+
+                return {
+                    ...lecture,
+                    isCompleted: !!progress?.isCompleted,
+                    watchPercentage: progress?.watchPercentage || 0,
+                    lastPosition: progress?.lastPosition || 0
+                };
+            });
+        });
+
+        const progressPercentage = totalLectures > 0 
+            ? Math.round((completedLectures / totalLectures) * 100) 
+            : 0;
+
+        // ✅ Render with safe data
+        res.render("institutehub/course-content.ejs", {
+            course,
+            sections,
+            progress: progressPercentage,
+            totalLectures,
+            completedLectures,
+            // currUser automatically available via app.js
+        });
+
+    } catch (error) {
+        console.error("Course content error:", error);
+        req.flash("error", "Unable to load course content. Please try again.");
+        res.redirect("/courses");
     }
-    
-    const course = await Course.findById(id)
-      .populate('teacher', 'name email')
-      .lean();
-    
-    if (!course) {
-      req.flash('error', 'Course not found');
-      return res.redirect('/courses');
-    }
-    
-    // Check if user is enrolled
-    const isEnrolled = course.students.some(
-      student => student.user.toString() === req.user._id.toString()
-    );
-    
-    if (!isEnrolled) {
-      req.flash('warning', 'Please enroll in this course to access content');
-      return res.redirect(`/courses/${id}`);
-    }
-    
-    // Fetch user enrollment details
-    const enrollment = course.students.find(
-      student => student.user.toString() === req.user._id.toString()
-    );
-    
-    // Dummy lectures data (you can replace with actual lectures from database)
-    const lectures = [
-      {
-        id: 1,
-        title: 'Introduction to Cybersecurity',
-        duration: '10:25',
-        isCompleted: false,
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
-      },
-      {
-        id: 2,
-        title: 'Understanding Network Security',
-        duration: '15:30',
-        isCompleted: false,
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
-      },
-      {
-        id: 3,
-        title: 'Threat Detection and Analysis',
-        duration: '20:15',
-        isCompleted: false,
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
-      },
-      {
-        id: 4,
-        title: 'Security Protocols and Standards',
-        duration: '18:45',
-        isCompleted: false,
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
-      },
-      {
-        id: 5,
-        title: 'Practical Lab: Security Implementation',
-        duration: '25:00',
-        isCompleted: false,
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
-      }
-    ];
-    
-    res.render('institutehub/course-content.ejs', {
-      course,
-      lectures,
-      enrollment,
-      progress: Math.floor((lectures.filter(l => l.isCompleted).length / lectures.length) * 100),
-      currentUser: req.user
-    });
-    
-  } catch (error) {
-    console.error('Course content error:', error);
-    req.flash('error', 'Unable to load course content');
-    res.redirect('/courses');
-  }
 };
 
 // Mark lecture as complete
 module.exports.markLectureComplete = async (req, res) => {
-  try {
-    const { courseId, lectureId } = req.params;
-    const { completed } = req.body;
-    
-    if (!req.user) {
-      return res.status(401).json({ success: false, message: 'Please login' });
+    try {
+        const { courseId, lectureId } = req.params;
+        const { currentTime, duration, ended } = req.body;
+
+        if (!req.user) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Please login to update progress" 
+            });
+        }
+
+        // ✅ Verify lecture exists and is in course
+        const lecture = await Lecture.findById(lectureId);
+        if (!lecture) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Lecture not found" 
+            });
+        }
+
+        if (!lecture.isInCourse(courseId)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Lecture does not belong to this course" 
+            });
+        }
+
+        // ✅ Check access
+        const hasAccess = await lecture.canAccess(req.user._id, courseId);
+        if (!hasAccess) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "You don't have access to this lecture" 
+            });
+        }
+
+        // ✅ Get or create progress
+        let progress = await LectureProgress.findOne({
+            user: req.user._id,
+            course: courseId,
+            lecture: lectureId
+        });
+
+        if (!progress) {
+            progress = new LectureProgress({
+                user: req.user._id,
+                course: courseId,
+                lecture: lectureId,
+                lastAccessed: new Date()
+            });
+        }
+
+        // ✅ Update progress
+        const videoDuration = duration || lecture.video?.duration || 0;
+        if (currentTime && videoDuration > 0) {
+            progress.lastPosition = Math.max(progress.lastPosition || 0, currentTime);
+            progress.watchTime = Math.max(progress.watchTime || 0, currentTime);
+            progress.watchPercentage = Math.min(
+                Math.round((currentTime / videoDuration) * 100), 
+                100
+            );
+        }
+
+        // ✅ Auto-complete when ended or reached threshold
+        const minWatchPercentage = lecture.minWatchPercentage || 95;
+        if (ended || progress.watchPercentage >= minWatchPercentage) {
+            progress.isCompleted = true;
+            progress.completedAt = new Date();
+        }
+
+        progress.lastAccessed = new Date();
+        await progress.save();
+
+        // ✅ Check if course is fully completed
+        let allLectures = await Lecture.find({ 
+            "courses.courseId": courseId 
+        }).select('_id').lean();
+        
+        if (allLectures.length === 0) {
+            allLectures = await Lecture.find({ course: courseId }).select('_id').lean();
+        }
+
+        const allLectureIds = allLectures.map(l => l._id);
+        const completedCount = await LectureProgress.countDocuments({
+            user: req.user._id,
+            course: courseId,
+            isCompleted: true,
+            lecture: { $in: allLectureIds }
+        });
+
+        const isCourseCompleted = allLectureIds.length > 0 && 
+            completedCount >= allLectureIds.length;
+
+        res.json({
+            success: true,
+            isCompleted: progress.isCompleted,
+            watchPercentage: progress.watchPercentage,
+            lastPosition: progress.lastPosition,
+            isCourseCompleted: isCourseCompleted,
+            completedCount: completedCount,
+            totalLectures: allLectureIds.length
+        });
+
+    } catch (error) {
+        console.error("Mark lecture complete error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to update progress. Please try again." 
+        });
     }
-    
-    // Update lecture completion in database
-    // You would typically have a progress tracking model
-    // For now, we'll just return success
-    
-    res.json({
-      success: true,
-      message: 'Progress updated successfully'
-    });
-    
-  } catch (error) {
-    console.error('Error marking lecture complete:', error);
-    res.status(500).json({ success: false, message: 'Failed to update progress' });
-  }
 };
+
+
+module.exports.getSecureVideoUrl = async (req, res) => {
+    try {
+        const { courseId, lectureId } = req.params;
+
+        if (!req.user) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Please login to watch this lecture" 
+            });
+        }
+
+        // ✅ Verify lecture
+        const lecture = await Lecture.findById(lectureId);
+        if (!lecture) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Lecture not found" 
+            });
+        }
+
+        // ✅ Check if lecture is in course
+        if (!lecture.isInCourse(courseId)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Lecture does not belong to this course" 
+            });
+        }
+
+        // ✅ Check access
+        const hasAccess = await lecture.canAccess(req.user._id, courseId);
+        if (!hasAccess) {
+            return res.status(403).json({ 
+                success: false, 
+                message: "You don't have access to this lecture" 
+            });
+        }
+
+        // ✅ Get secure URL
+        const { provider, publicId, url, embedId } = lecture.video || {};
+        let playbackUrl = null;
+        let playerType = "direct";
+
+        if (provider === "cloudinary" && publicId) {
+            playbackUrl = cloudinary.url(publicId, {
+                resource_type: "video",
+                type: "authenticated",
+                sign_url: true,
+                secure: true
+            });
+        } else if (provider === "youtube" && embedId) {
+            playbackUrl = `https://www.youtube.com/embed/${embedId}`;
+            playerType = "embed-unprotected";
+        } else if (provider === "vimeo" && embedId) {
+            playbackUrl = `https://player.vimeo.com/video/${embedId}`;
+            playerType = "embed-unprotected";
+        } else if (url) {
+            playbackUrl = url;
+        }
+
+        if (!playbackUrl) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "No video is attached to this lecture yet" 
+            });
+        }
+
+        // ✅ Get progress
+        let progress = await LectureProgress.findOne({
+            user: req.user._id,
+            course: courseId,
+            lecture: lectureId
+        });
+
+        if (!progress) {
+            progress = new LectureProgress({
+                user: req.user._id,
+                course: courseId,
+                lecture: lectureId,
+                lastAccessed: new Date()
+            });
+            await progress.save();
+        }
+
+        res.json({
+            success: true,
+            playbackUrl,
+            playerType,
+            duration: lecture.video?.duration || 0,
+            resumeAt: progress.lastPosition || 0,
+            isCompleted: progress.isCompleted || false,
+            minWatchPercentage: lecture.minWatchPercentage || 95
+        });
+
+    } catch (error) {
+        console.error("Get secure video URL error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to load video. Please try again." 
+        });
+    }
+};
+
+module.exports.getProgress = async (req, res) => {
+    try {
+        const { courseId } = req.params;
+
+        if (!req.user) {
+            return res.status(401).json({ 
+                success: false, 
+                message: "Please login" 
+            });
+        }
+
+        const progress = await LectureProgress.find({
+            user: req.user._id,
+            course: courseId
+        }).lean();
+
+        const total = progress.length;
+        const completed = progress.filter(p => p.isCompleted).length;
+
+        res.json({
+            success: true,
+            total,
+            completed,
+            percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
+            progress
+        });
+
+    } catch (error) {
+        console.error("Get progress error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to get progress" 
+        });
+    }
+};
+
 
 module.exports.getCourseContent = lectureController.renderCourseContent;
 module.exports.markLectureComplete = lectureController.updateProgress;
+module.exports.getSecureVideoUrl = lectureController.getSecureVideoUrl;
