@@ -1237,128 +1237,103 @@ module.exports.enrollCourse = async (req, res) => {
   }
 };
 
-// controllers/home.js - Update viewCourse function
-
 module.exports.viewCourse = async (req, res) => {
-    try {
-        const course = await Course.findById(req.params.id)
-            .populate("teacher", "name email mobile profileImage")
-            .populate("students.user", "name email")
-            .lean();
+  try {
+    const course = await Course.findById(req.params.id)
+      .populate("teacher", "name email mobile profileImage")
+      .populate("students.user", "name email")
+      .lean();
 
-        if (!course) {
-            req.flash("error", "The course you're looking for was not found.");
-            return res.redirect("/courses");
-        }
-
-        // ✅ Get lecture count for this course
-        let totalLectures = 0;
-        let completedLectures = 0;
-
-        try {
-            // Get all lectures in this course
-            const lectures = await Lecture.find({
-                $or: [
-                    { "courses.courseId": course._id },
-                    { course: course._id }
-                ],
-                isPublished: true
-            }).lean();
-
-            totalLectures = lectures.length || 0;
-
-            // If user is logged in, get completed lectures count
-            if (req.user) {
-                const completed = await LectureProgress.countDocuments({
-                    user: req.user._id,
-                    course: course._id,
-                    isCompleted: true
-                });
-                completedLectures = completed || 0;
-            }
-        } catch (err) {
-            console.error("Error fetching lecture count:", err);
-            // Continue with default values
-        }
-
-        // ✅ Get related courses
-        const newerCourses = await Course.find({
-            courceType: course.courceType,
-            _id: { $ne: course._id },
-            isActive: true,
-            lounchedDate: { $gt: course.lounchedDate }
-        })
-            .sort({ lounchedDate: 1 })
-            .limit(4)
-            .select("title image price shortDescription courceType")
-            .populate("teacher", "name")
-            .lean();
-
-        let relatedCourses = [...newerCourses];
-
-        if (relatedCourses.length < 4) {
-            const remaining = 4 - relatedCourses.length;
-            const olderCourses = await Course.find({
-                courceType: course.courceType,
-                _id: { $ne: course._id },
-                isActive: true,
-                lounchedDate: { $lt: course.lounchedDate }
-            })
-                .sort({ lounchedDate: -1 })
-                .limit(remaining)
-                .select("title image price shortDescription courceType")
-                .populate("teacher", "name")
-                .lean();
-            relatedCourses = [...relatedCourses, ...olderCourses];
-        }
-
-        // ✅ Check enrollment
-        let isEnrolled = false;
-        let userEnrollment = null;
-
-        if (req.user) {
-            const enrollment = course.students?.find(
-                (student) => student.user?._id?.toString() === req.user._id.toString()
-            );
-            if (enrollment) {
-                isEnrolled = true;
-                userEnrollment = enrollment;
-            }
-        }
-
-        const totalStudents = course.students?.length || 0;
-        const totalRevenue = course.students?.reduce(
-            (sum, student) => sum + (student.paidPrice || 0),
-            0
-        ) || 0;
-
-        const dynamicMeta = {
-            title: course.title + " | InstituteHub Courses",
-            description: course.shortDescription,
-            keywords: course.courceType + ", " + course.title + ", " + course.shortDescription + ", " + course.teacher?.name + " course online",
-            image: course.image?.url || '/images/default-course.jpg',
-        };
-
-        // ✅ Render with ALL required variables
-        res.render("institutehub/viewCourse.ejs", {
-            meta: dynamicMeta,
-            course,
-            relatedCourses,
-            isEnrolled,
-            userEnrollment,
-            totalStudents,
-            totalRevenue,
-            totalLectures: totalLectures || 0,      // ✅ Added
-            completedLectures: completedLectures || 0, // ✅ Added
-            currentUser: req.user,
-            pageTitle: course.title,
-        });
-
-    } catch (err) {
-        console.error("Error viewing course:", err);
-        req.flash("error", "Unable to load course details. Please try again.");
-        res.redirect("/courses");
+    if (!course) {
+      req.flash("error", "The course you're looking for was not found.");
+      return res.redirect("/courses");
     }
+
+    const newerCourses = await Course.find({
+      courceType: course.courceType,
+      _id: { $ne: course._id },
+      isActive: true,
+      lounchedDate: { $gt: course.lounchedDate }
+    })
+      .sort({ lounchedDate: 1 })
+      .limit(4)
+      .select("title image price shortDescription courceType")
+      .populate("teacher", "name")
+      .lean();
+
+    let relatedCourses = [...newerCourses];
+
+    if (relatedCourses.length < 4) {
+      const remaining = 4 - relatedCourses.length;
+
+      const olderCourses = await Course.find({
+        courceType: course.courceType,
+        _id: { $ne: course._id },
+        isActive: true,
+        lounchedDate: { $lt: course.lounchedDate }
+      })
+        .sort({ lounchedDate: -1 })
+        .limit(remaining)
+        .select("title image price shortDescription courceType")
+        .populate("teacher", "name")
+        .lean();
+
+      relatedCourses = [...relatedCourses, ...olderCourses];
+    }
+
+    let isEnrolled = false;
+    let userEnrollment = null;
+
+    if (req.user) {
+      const enrollment = course.students?.find(
+        (student) => student.user?._id?.toString() === req.user._id.toString(),
+      );
+      if (enrollment) {
+        isEnrolled = true;
+        userEnrollment = enrollment;
+      }
+    }
+
+    const totalStudents = course.students?.length || 0;
+    const totalRevenue =
+      course.students?.reduce(
+        (sum, student) => sum + (student.paidPrice || 0),
+        0,
+      ) || 0;
+
+    const dynamicMeta = {
+      title: course.title + " | institutehub Courses",
+      description: course.shortDescription,
+      keywords:
+        course.courceType +
+        ", " +
+        course.title +
+        ", " +
+        course.shortDescription +
+        ", " +
+        course.teacher.name +
+        " best cybersecurity course, Best academy for cybersecurity, " +
+        course.courceType +
+        " course online",
+      image: course.image.url,
+    };
+
+    res.render("institutehub/viewCourse.ejs", {
+      meta: dynamicMeta,
+      course,
+      relatedCourses,
+      isEnrolled,
+      userEnrollment,
+      totalStudents,
+      totalRevenue,
+      currentUser: req.user,
+      pageTitle: course.title,
+    });
+  } catch (err) {
+    console.error("Error viewing course:", err);
+    req.flash("error", "Unable to load course details. Please try again.");
+    res.redirect("/courses");
+  }
 };
 
 

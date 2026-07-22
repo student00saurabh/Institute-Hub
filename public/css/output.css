@@ -5367,6 +5367,11 @@ video {
   background-color: rgb(254 252 232 / var(--tw-bg-opacity, 1));
 }
 
+.hover\:bg-\[\#16A34A\]:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(22 163 74 / var(--tw-bg-opacity, 1));
+}
+
 .hover\:from-\[\#047857\]:hover {
   --tw-gradient-from: #047857 var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(4 120 87 / 0) var(--tw-gradient-to-position);
