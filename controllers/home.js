@@ -3,6 +3,7 @@ const User = require("../models/user");
 const Course = require("../models/cources");
 const Blog = require("../models/blog");
 const Review = require("../models/review");
+const lectureController = require("./lectureController");
 const cloudinary = require("../Cloudconfig.js"); 
 const CourseCategory = require("../models/courseCategory");
 const { all } = require("axios");
@@ -1108,57 +1109,61 @@ module.exports.enrollCourseForm = async (req, res) => {
 module.exports.enrollInNewCource = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const { description, paidPrice } = req.body;
-
+    const { description } = req.body;
+ 
     if (!req.user) {
       req.flash("warning", "Please log in to your account to enroll in a course.");
       return res.redirect("/login");
     }
-
+ 
     const user = await User.findById(req.user._id);
     if (!user) {
       req.flash("error", "Your account was not found. Please log in again.");
       return res.redirect("/login");
     }
-
+ 
     if (user.isBlocked) {
-      req.flash(
-        "error",
-        "Your account has been blocked. Please contact our support team for assistance.",
-      );
+      req.flash("error", "Your account has been blocked. Please contact our support team for assistance.");
       return res.redirect("/contact");
     }
-
+ 
     const course = await Course.findById(courseId);
     if (!course) {
       req.flash("error", "The course you're trying to enroll in was not found.");
       return res.redirect("/enroll");
     }
-
+ 
     if (!course.isActive) {
       req.flash("info", "This course is currently unavailable and cannot be enrolled in.");
       return res.redirect("/enroll");
     }
-
+ 
     const alreadyEnrolled = course.students.some(
-      (student) => student.user.toString() === user._id.toString(),
+      (student) => student.user.toString() === user._id.toString()
     );
-
     if (alreadyEnrolled) {
       req.flash("info", "You are already enrolled in this course.");
       return res.redirect("/enroll");
     }
-
+ 
+    // ✅ THE FIX — a priced course can NEVER be enrolled through this route.
+    const coursePrice = course.actualPrice ?? course.price ?? 0;
+    if (coursePrice > 0) {
+      req.flash("warning", "This is a paid course. Please complete payment on the course page to enroll.");
+      return res.redirect(`/courses/${courseId}`);
+    }
+ 
+    // Only reachable for genuinely free courses now.
     course.students.push({
       user: user._id,
-      paidPrice: paidPrice ? Number(paidPrice) : 0,
+      paidPrice: 0,
       description: description || "",
       enrolledAt: new Date(),
       isSeen: false,
     });
-
+ 
     await course.save();
-
+ 
     req.flash("success", `You have successfully enrolled in "${course.title}". Welcome aboard!`);
     return res.redirect("/courses");
   } catch (error) {
@@ -1167,50 +1172,62 @@ module.exports.enrollInNewCource = async (req, res) => {
     return res.redirect("/enroll");
   }
 };
+ 
 
 module.exports.enrollCourse = async (req, res) => {
   const redirectUrl = res.locals.redirectUrl || "/";
   try {
-    const { courseId, paidPrice, name, email, mobile, description } = req.body;
-
+    const { courseId, name, email, mobile, description } = req.body;
+ 
     if (!courseId || !name || !email || !mobile) {
       req.flash("warning", "Please fill in all required fields to complete enrollment.");
       return res.redirect(redirectUrl);
     }
-
+ 
     const user = req.user;
-
+    if (!user) {
+      req.flash("warning", "Please log in to enroll.");
+      return res.redirect("/login");
+    }
+ 
     if (!user.mobile) {
       user.mobile = mobile;
       await user.save();
     }
-
+ 
     const course = await Course.findById(courseId);
-
     if (!course) {
       req.flash("error", "The course you're trying to enroll in was not found.");
       return res.redirect(redirectUrl);
     }
-
+ 
     const alreadyEnrolled = course.students.some(
-      (s) => s.user.toString() === user._id.toString(),
+      (s) => s.user.toString() === user._id.toString()
     );
-
     if (alreadyEnrolled) {
       req.flash("info", "You are already enrolled in this course.");
       return res.redirect(redirectUrl);
     }
-
+ 
+    // ✅ THE FIX — reject direct enrollment for anything priced.
+    // Paid courses must go through /create-order -> Razorpay -> /verify-payment,
+    // which is the only path allowed to write a paid entry into course.students.
+    const coursePrice = course.actualPrice ?? course.price ?? 0;
+    if (coursePrice > 0) {
+      req.flash("warning", "Please complete payment using the \"Enroll Now\" button to access this course.");
+      return res.redirect(`/courses/${courseId}`);
+    }
+ 
     course.students.push({
       user: user._id,
-      paidPrice: Number(paidPrice),
+      paidPrice: 0,
       description: description || "",
       enrolledAt: new Date(),
       isSeen: false,
     });
-
+ 
     await course.save();
-
+ 
     req.flash("success", "Enrollment completed successfully! Your learning journey begins now. 🎉");
     return res.redirect(redirectUrl);
   } catch (error) {
@@ -1400,88 +1417,73 @@ module.exports.verifyPayment = async (req, res) => {
       razorpay_payment_id,
       razorpay_signature,
       courseId,
-      name,
-      email,
-      mobile,
       description
     } = req.body;
-    
-    // Verify signature
+ 
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !courseId) {
+      return res.status(400).json({ success: false, message: "Missing payment verification details" });
+    }
+ 
     const body = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(body.toString())
       .digest('hex');
-    
+ 
     const isAuthentic = expectedSignature === razorpay_signature;
-    
     if (!isAuthentic) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Payment verification failed' 
-      });
+      return res.status(400).json({ success: false, message: 'Payment verification failed' });
     }
-    
-    // Check if user is logged in
+ 
     if (!req.user) {
-      return res.status(401).json({ 
-        success: false, 
-        message: 'Please login to enroll' 
-      });
+      return res.status(401).json({ success: false, message: 'Please login to enroll' });
     }
-    
-    // Enroll the user
+ 
     const course = await Course.findById(courseId);
     if (!course) {
-      return res.status(404).json({ 
-        success: false, 
-        message: 'Course not found' 
-      });
+      return res.status(404).json({ success: false, message: 'Course not found' });
     }
-    
-    // Check if already enrolled
+ 
+    // Idempotency: if this exact payment (or this user) already enrolled,
+    // don't push a duplicate entry — just confirm success.
     const alreadyEnrolled = course.students.some(
-      s => s.user.toString() === req.user._id.toString()
+      (s) => s.user.toString() === req.user._id.toString()
     );
-    
     if (alreadyEnrolled) {
-      return res.json({ 
-        success: true, 
+      return res.json({
+        success: true,
         message: 'You are already enrolled in this course',
-        alreadyEnrolled: true
+        alreadyEnrolled: true,
+        redirectUrl: `/courses/${courseId}/access`
       });
     }
-    
-    // Add student to course
+ 
+    // ✅ Authoritative price comes from the DB record, not the client.
+    const verifiedPaidPrice = course.actualPrice || course.price || 0;
+ 
     course.students.push({
       user: req.user._id,
-      paidPrice: course.actualPrice || course.price || 0,
+      paidPrice: verifiedPaidPrice,
       description: description || '',
       enrolledAt: new Date(),
       isSeen: false,
       paymentId: razorpay_payment_id,
       orderId: razorpay_order_id
     });
-    
+ 
     await course.save();
-    
-    // Update user's enrolled courses if needed
-    // You can add this to your User model
-    
+ 
     res.json({
       success: true,
       message: 'Enrollment successful!',
       redirectUrl: `/courses/${courseId}/access`
     });
-    
   } catch (error) {
     console.error('Payment verification error:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Failed to verify payment. Please contact support.' 
-    });
+    res.status(500).json({ success: false, message: 'Failed to verify payment. Please contact support.' });
   }
 };
+
 
 // Get course content for enrolled users
 module.exports.getCourseContent = async (req, res) => {
@@ -1595,3 +1597,6 @@ module.exports.markLectureComplete = async (req, res) => {
     res.status(500).json({ success: false, message: 'Failed to update progress' });
   }
 };
+
+module.exports.getCourseContent = lectureController.renderCourseContent;
+module.exports.markLectureComplete = lectureController.updateProgress;
