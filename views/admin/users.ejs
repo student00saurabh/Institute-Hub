@@ -125,14 +125,14 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
     <% if (users && users.length > 0) { %>
-        <% users.forEach(user => { 
-            // Check if user has a review (any status)
+        <% users.forEach(user => { %>
+          <%  // Check if user has a review (any status)
             const userReview = userReviews ? userReviews.find(r => r.email === user.email) : null;
             const hasReview = !!userReview;
             const isApproved = userReview && userReview.isApproved;
             const isVerified = userReview && userReview.isVerified;
-            const isPending = userReview && !isVerified && !isApproved;
-        %>
+            const isPending = userReview && !isVerified && !isApproved; %>
+       
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-3">

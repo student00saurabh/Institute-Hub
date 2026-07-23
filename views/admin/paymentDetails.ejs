@@ -1,0 +1,167 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="min-h-[90vh] py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6 text-sm">
+            <ol class="inline-flex items-center gap-2">
+                <li><a href="/admin/dashboard" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors">Dashboard</a></li>
+                <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
+                <li><a href="/admin/payments" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors">Payments</a></li>
+                <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
+                <li class="text-gray-700 dark:text-gray-300 font-medium">Payment Details</li>
+            </ol>
+        </nav>
+
+        <!-- Payment Details -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+            
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Payment Details</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Transaction ID: <span class="font-mono"><%= payment.razorpayPaymentId %></span>
+                    </p>
+                </div>
+                <span class="text-sm px-3 py-1 rounded-full 
+                    <%= payment.status === 'success' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 
+                      payment.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' :
+                      payment.status === 'failed' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' :
+                      'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' %>">
+                    <%= payment.statusLabel || payment.status %>
+                </span>
+            </div>
+
+            <!-- Info Grid -->
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- User Info -->
+                <div class="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4">
+                    <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">User Information</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold">
+                                <%= payment.user?.name?.charAt(0).toUpperCase() || 'U' %>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">
+                                    <%= payment.user?.name || payment.userName || 'N/A' %>
+                                </p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    <%= payment.user?.email || payment.userEmail || '' %>
+                                </p>
+                            </div>
+                        </div>
+                        <% if (payment.user?.mobile) { %>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                                <i class="fas fa-phone mr-2"></i> <%= payment.user.mobile %>
+                            </p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Course Info -->
+                <div class="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4">
+                    <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Course Information</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3">
+                            <img src="<%= payment.course?.image?.url || 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=50&auto=format&fit=crop' %>" 
+                                 alt="<%= payment.course?.title %>" 
+                                 class="w-12 h-12 rounded-lg object-cover">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">
+                                    <%= payment.course?.title || 'N/A' %>
+                                </p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    ₹<%= (payment.amount || 0).toLocaleString() %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Details -->
+            <div class="px-6 pb-6">
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-4">Transaction Details</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Order ID</p>
+                            <p class="font-mono text-sm text-gray-900 dark:text-white"><%= payment.razorpayOrderId %></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Payment ID</p>
+                            <p class="font-mono text-sm text-gray-900 dark:text-white"><%= payment.razorpayPaymentId %></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Amount</p>
+                            <p class="text-lg font-bold text-gray-900 dark:text-white">₹<%= (payment.amount || 0).toLocaleString() %></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Date</p>
+                            <p class="text-sm text-gray-900 dark:text-white"><%= moment(payment.createdAt).format('DD MMM YYYY, hh:mm A') %></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Status</p>
+                            <span class="text-sm px-2 py-1 rounded-full 
+                                <%= payment.status === 'success' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 
+                                  payment.status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' :
+                                  payment.status === 'failed' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' :
+                                  'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' %>">
+                                <%= payment.statusLabel || payment.status %>
+                            </span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Payment Method</p>
+                            <p class="text-sm text-gray-900 dark:text-white capitalize"><%= payment.paymentMethod || 'N/A' %></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Refund Section -->
+                <% if (payment.status === 'refunded' || payment.status === 'partially_refunded') { %>
+                    <div class="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                        <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Refund Details</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Refund Amount</p>
+                                <p class="text-sm font-medium text-red-600 dark:text-red-400">₹<%= (payment.refundAmount || 0).toLocaleString() %></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Refund Reason</p>
+                                <p class="text-sm text-gray-900 dark:text-white"><%= payment.refundReason || 'N/A' %></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Refund Date</p>
+                                <p class="text-sm text-gray-900 dark:text-white"><%= payment.refundedAt ? moment(payment.refundedAt).format('DD MMM YYYY, hh:mm A') : 'N/A' %></p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Refund ID</p>
+                                <p class="text-sm font-mono text-gray-900 dark:text-white"><%= payment.refundId || 'N/A' %></p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+
+                <!-- Admin Notes -->
+                <div class="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                    <h4 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Admin Notes</h4>
+                    <p class="text-sm text-gray-700 dark:text-gray-300"><%= payment.adminNotes || 'No notes added' %></p>
+                </div>
+
+                <!-- Actions -->
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <a href="/admin/payments" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Payments
+                    </a>
+                    <a href="/admin/payments/export/csv" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+                        <i class="fas fa-file-export mr-2"></i> Export
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

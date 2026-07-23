@@ -9,6 +9,7 @@ const CourseCategory = require("../models/courseCategory");
 const { all } = require("axios");
 const crypto = require('crypto');
 const Razorpay = require("razorpay");
+const Payment = require("../models/payment");
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -1372,6 +1373,21 @@ module.exports.createRazorpayOrder = async (req, res) => {
     
     const amount = course.actualPrice || course.price || 0;
     
+
+    if (req.user) {
+            const alreadyEnrolled = course.students.some(
+                (s) => s.user.toString() === req.user._id.toString()
+            );
+            if (alreadyEnrolled) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'You are already enrolled in this course',
+                    alreadyEnrolled: true
+                });
+            }
+        }
+
+
     // ✅ FIX: Create a short receipt (max 40 characters)
     // Using timestamp and first 4 chars of course ID
     const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
@@ -1409,79 +1425,156 @@ module.exports.createRazorpayOrder = async (req, res) => {
   }
 };
 
-// Verify Razorpay payment
 module.exports.verifyPayment = async (req, res) => {
-  try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      courseId,
-      description
-    } = req.body;
- 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !courseId) {
-      return res.status(400).json({ success: false, message: "Missing payment verification details" });
+    try {
+        const {
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature,
+            courseId,
+            description
+        } = req.body;
+
+        // ✅ Import Payment model (if not already imported at top)
+        const Payment = require("../models/payment");
+
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !courseId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Missing payment verification details" 
+            });
+        }
+
+        // ✅ Verify signature
+        const body = razorpay_order_id + '|' + razorpay_payment_id;
+        const expectedSignature = crypto
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .update(body.toString())
+            .digest('hex');
+
+        const isAuthentic = expectedSignature === razorpay_signature;
+        if (!isAuthentic) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Payment verification failed' 
+            });
+        }
+
+        if (!req.user) {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Please login to enroll' 
+            });
+        }
+
+        const course = await Course.findById(courseId);
+        if (!course) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Course not found' 
+            });
+        }
+
+        const verifiedPaidPrice = course.actualPrice || course.price || 0;
+
+        // ✅ CHECK IF PAYMENT ALREADY EXISTS
+        let payment = await Payment.findOne({ razorpayOrderId: razorpay_order_id });
+
+        if (payment) {
+            if (payment.status === 'success') {
+                // Already successful - just check enrollment
+                const alreadyEnrolled = course.students.some(
+                    (s) => s.user.toString() === req.user._id.toString()
+                );
+                if (alreadyEnrolled) {
+                    return res.json({
+                        success: true,
+                        message: 'Payment already verified and enrolled',
+                        alreadyEnrolled: true,
+                        redirectUrl: `/courses/${courseId}/access`
+                    });
+                }
+                // Enroll if not already
+                course.students.push({
+                    user: req.user._id,
+                    paidPrice: verifiedPaidPrice,
+                    description: description || '',
+                    enrolledAt: new Date(),
+                    isSeen: false,
+                    paymentId: razorpay_payment_id,
+                    orderId: razorpay_order_id
+                });
+                await course.save();
+                return res.json({
+                    success: true,
+                    message: 'Enrollment completed!',
+                    redirectUrl: `/courses/${courseId}/access`
+                });
+            }
+        }
+
+        // ✅ CHECK IF ALREADY ENROLLED
+        const alreadyEnrolled = course.students.some(
+            (s) => s.user.toString() === req.user._id.toString()
+        );
+        if (alreadyEnrolled) {
+            return res.json({
+                success: true,
+                message: 'You are already enrolled in this course',
+                alreadyEnrolled: true,
+                redirectUrl: `/courses/${courseId}/access`
+            });
+        }
+
+        // ✅ SAVE OR UPDATE PAYMENT RECORD
+        if (!payment) {
+            payment = new Payment({
+                user: req.user._id,
+                course: courseId,
+                razorpayOrderId: razorpay_order_id,
+                razorpayPaymentId: razorpay_payment_id,
+                razorpaySignature: razorpay_signature,
+                amount: verifiedPaidPrice,
+                status: 'success',
+                userEmail: req.user.email,
+                userName: req.user.name,
+                description: description || '',
+                receipt: `receipt_${Date.now()}`,
+                ipAddress: req.ip || req.connection.remoteAddress,
+                userAgent: req.headers['user-agent']
+            });
+        } else {
+            payment.status = 'success';
+            payment.razorpayPaymentId = razorpay_payment_id;
+            payment.razorpaySignature = razorpay_signature;
+        }
+        await payment.save();
+
+        // ✅ ENROLL USER
+        course.students.push({
+            user: req.user._id,
+            paidPrice: verifiedPaidPrice,
+            description: description || '',
+            enrolledAt: new Date(),
+            isSeen: false,
+            paymentId: razorpay_payment_id,
+            orderId: razorpay_order_id
+        });
+        await course.save();
+
+        res.json({
+            success: true,
+            message: 'Payment verified and enrollment successful!',
+            redirectUrl: `/courses/${courseId}/access`
+        });
+
+    } catch (error) {
+        console.error('Payment verification error:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to verify payment. Please contact support.' 
+        });
     }
- 
-    const body = razorpay_order_id + '|' + razorpay_payment_id;
-    const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-      .update(body.toString())
-      .digest('hex');
- 
-    const isAuthentic = expectedSignature === razorpay_signature;
-    if (!isAuthentic) {
-      return res.status(400).json({ success: false, message: 'Payment verification failed' });
-    }
- 
-    if (!req.user) {
-      return res.status(401).json({ success: false, message: 'Please login to enroll' });
-    }
- 
-    const course = await Course.findById(courseId);
-    if (!course) {
-      return res.status(404).json({ success: false, message: 'Course not found' });
-    }
- 
-    // Idempotency: if this exact payment (or this user) already enrolled,
-    // don't push a duplicate entry — just confirm success.
-    const alreadyEnrolled = course.students.some(
-      (s) => s.user.toString() === req.user._id.toString()
-    );
-    if (alreadyEnrolled) {
-      return res.json({
-        success: true,
-        message: 'You are already enrolled in this course',
-        alreadyEnrolled: true,
-        redirectUrl: `/courses/${courseId}/access`
-      });
-    }
- 
-    // ✅ Authoritative price comes from the DB record, not the client.
-    const verifiedPaidPrice = course.actualPrice || course.price || 0;
- 
-    course.students.push({
-      user: req.user._id,
-      paidPrice: verifiedPaidPrice,
-      description: description || '',
-      enrolledAt: new Date(),
-      isSeen: false,
-      paymentId: razorpay_payment_id,
-      orderId: razorpay_order_id
-    });
- 
-    await course.save();
- 
-    res.json({
-      success: true,
-      message: 'Enrollment successful!',
-      redirectUrl: `/courses/${courseId}/access`
-    });
-  } catch (error) {
-    console.error('Payment verification error:', error);
-    res.status(500).json({ success: false, message: 'Failed to verify payment. Please contact support.' });
-  }
 };
 
 

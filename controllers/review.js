@@ -83,7 +83,7 @@ async function sendReviewEmail(user, reviewLink) {
                 </div>
               </div>
               <div class="message" style="font-size:14px;color:#94a3b8;margin-bottom:0;">
-                If you have any questions, feel free to contact us at stundent001599@gmail.com
+                If you have any questions, feel free to contact us at student001599@gmail.com
               </div>
             </div>
             <hr class="divider">
@@ -100,7 +100,7 @@ async function sendReviewEmail(user, reviewLink) {
     `;
 
     await apiInstance.sendTransacEmail({
-      sender: { email: "info@institutehub.com", name: "InstituteHub" },
+      sender: { email: "student001599@gmail.com", name: "InstituteHub" },
       to: [{ email: user.email, name: user.name || user.username }],
       subject: "⭐ Share Your Experience | InstituteHub Review",
       htmlContent: htmlContent,

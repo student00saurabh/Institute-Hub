@@ -1,0 +1,1349 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+    /* Custom Styles */
+    .settings-card {
+        transition: all 0.3s ease;
+    }
+    .settings-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    }
+    .dark .settings-card:hover {
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    
+    .tab-btn {
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    .tab-btn::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #2563EB;
+        transition: width 0.3s ease;
+    }
+    .tab-btn.active::after {
+        width: 100%;
+    }
+    .tab-btn.active {
+        color: #2563EB;
+        font-weight: 600;
+    }
+    .dark .tab-btn.active {
+        color: #60A5FA;
+    }
+    
+    .form-input {
+        transition: all 0.3s ease;
+        border: 2px solid #E5E7EB;
+    }
+    .form-input:focus {
+        border-color: #2563EB;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        outline: none;
+    }
+    .dark .form-input {
+        border-color: #374151;
+        background: #1F2937;
+        color: #F3F4F6;
+    }
+    .dark .form-input:focus {
+        border-color: #60A5FA;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+    }
+    
+    .item-card {
+        animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        max-width: 500px;
+        animation: slideInRight 0.5s ease;
+    }
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    .badge-pulse {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .image-preview {
+        transition: all 0.3s ease;
+        border: 2px dashed #E5E7EB;
+    }
+    .image-preview:hover {
+        border-color: #2563EB;
+        background: rgba(37, 99, 235, 0.05);
+    }
+    .dark .image-preview {
+        border-color: #374151;
+    }
+    .dark .image-preview:hover {
+        border-color: #60A5FA;
+        background: rgba(96, 165, 250, 0.05);
+    }
+    
+    .stat-counter {
+        font-variant-numeric: tabular-nums;
+    }
+    
+    /* Toggle Switch */
+    .toggle-checkbox:checked + .toggle-label {
+        background: #2563EB;
+    }
+    .toggle-checkbox:checked + .toggle-label .toggle-dot {
+        transform: translateX(100%);
+        background: white;
+    }
+    .toggle-label {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .toggle-dot {
+        transition: all 0.3s ease;
+    }
+</style>
+
+<div class="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Page Header with Stats -->
+        <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">App Settings</h1>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Manage your application configuration</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Last updated: <%= moment(appSettings.lastUpdatedAt).format('DD MMM YYYY, hh:mm A') %>
+                </div>
+                <button onclick="refreshSettings()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Stats Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Total Sections</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white">8</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Social Links</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= appSettings.socialLinks ? appSettings.socialLinks.length : 0 %></p>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">FAQs</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= appSettings.faqs ? appSettings.faqs.length : 0 %></p>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Offices</p>
+                        <p class="text-2xl font-bold text-gray-900 dark:text-white"><%= appSettings.offices ? appSettings.offices.length : 0 %></p>
+                    </div>
+                    <div class="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Filter Bar -->
+        <div class="mb-6 flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+                <input type="text" id="settingsSearch" placeholder="Search settings sections..." class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="expandAll()" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-expand mr-2"></i> Expand All
+                </button>
+                <button onclick="collapseAll()" class="px-4 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-compress mr-2"></i> Collapse All
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation with Icons -->
+        <div class="mb-6 overflow-x-auto">
+            <nav class="flex flex-nowrap gap-1 border-b border-gray-200 dark:border-gray-700 pb-0.5" id="settingsTabs">
+                <button type="button" class="tab-btn active px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white whitespace-nowrap" data-tab="hero">
+                    <i class="fas fa-home mr-2 text-blue-500"></i> Hero
+                    <span class="ml-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full">1</span>
+                </button>
+                <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white whitespace-nowrap" data-tab="contact">
+                    <i class="fas fa-address-card mr-2 text-green-500"></i> Contact
+                </button>
+                <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white whitespace-nowrap" data-tab="social">
+                    <i class="fas fa-share-alt mr-2 text-purple-500"></i> Social
+                    <span class="ml-1 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-full"><%= appSettings.socialLinks ? appSettings.socialLinks.length : 0 %></span>
+                </button>
+                <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white whitespace-nowrap" data-tab="offices">
+                    <i class="fas fa-building mr-2 text-orange-500"></i> Offices
+                    <span class="ml-1 text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 px-2 py-0.5 rounded-full"><%= appSettings.offices ? appSettings.offices.length : 0 %></span>
+                </button>
+                <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white whitespace-nowrap" data-tab="hours">
+                    <i class="fas fa-clock mr-2 text-teal-500"></i> Hours
+                </button>
+                <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white whitespace-nowrap" data-tab="faqs">
+                    <i class="fas fa-question-circle mr-2 text-red-500"></i> FAQs
+                    <span class="ml-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full"><%= appSettings.faqs ? appSettings.faqs.length : 0 %></span>
+                </button>
+                <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white whitespace-nowrap" data-tab="stats">
+                    <i class="fas fa-chart-bar mr-2 text-indigo-500"></i> Stats
+                </button>
+                <button type="button" class="tab-btn px-4 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white whitespace-nowrap" data-tab="features">
+                    <i class="fas fa-star mr-2 text-yellow-500"></i> Features
+                    <span class="ml-1 text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 px-2 py-0.5 rounded-full"><%= appSettings.features ? appSettings.features.length : 0 %></span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="space-y-4">
+            
+            <!-- HERO TAB -->
+            <div id="tab-hero" class="tab-content">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden settings-card">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700/30 dark:to-gray-700/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="fas fa-home text-blue-600 dark:text-blue-400"></i>
+                                    Hero Section
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Customize the homepage hero section</p>
+                            </div>
+                            <span class="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-1 rounded-full">Active</span>
+                        </div>
+                    </div>
+                    <form action="/admin/settings/hero" method="POST" enctype="multipart/form-data" class="p-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-heading text-blue-500 mr-1"></i> Heading
+                                </label>
+                                <input type="text" name="heading" value="<%= appSettings.hero?.heading || '' %>" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700" placeholder="Enter main heading">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-tag text-blue-500 mr-1"></i> Badge Text
+                                </label>
+                                <input type="text" name="badgeText" value="<%= appSettings.hero?.badgeText || '' %>" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700" placeholder="#1 Learning Platform">
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                <i class="fas fa-align-left text-blue-500 mr-1"></i> Subheading
+                            </label>
+                            <textarea name="subheading" rows="3" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700" placeholder="Enter subheading"><%= appSettings.hero?.subheading || '' %></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-hand-pointer text-blue-500 mr-1"></i> CTA Text
+                                </label>
+                                <input type="text" name="ctaText" value="<%= appSettings.hero?.ctaText || '' %>" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700" placeholder="Explore Courses">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-link text-blue-500 mr-1"></i> CTA Link
+                                </label>
+                                <input type="text" name="ctaLink" value="<%= appSettings.hero?.ctaLink || '' %>" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700" placeholder="/courses">
+                            </div>
+                        </div>
+                        <div class="mt-4 flex items-center gap-6">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <div class="relative">
+                                    <input type="checkbox" name="showStats" <%= appSettings.hero?.showStats !== false ? 'checked' : '' %> class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 dark:bg-gray-600 rounded-full peer peer-checked:bg-blue-600 transition-colors"></div>
+                                    <div class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                                </div>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Show Statistics</span>
+                            </label>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                <i class="fas fa-image text-blue-500 mr-1"></i> Background Image
+                            </label>
+                            <% if (appSettings.hero?.backgroundImage?.url) { %>
+                                <div class="mb-3 image-preview p-4 rounded-lg">
+                                    <img src="<%= appSettings.hero.backgroundImage.url %>" alt="Hero Background" class="h-40 w-auto rounded-lg object-cover border border-gray-200 dark:border-gray-600">
+                                </div>
+                            <% } %>
+                            <input type="file" name="backgroundImage" accept="image/*" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Recommended: 1920x1080px, max 2MB</p>
+                        </div>
+                        <div class="mt-6 flex gap-3">
+                            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                                <i class="fas fa-save"></i> Update Hero
+                            </button>
+                            <button type="reset" class="px-6 py-2.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-all">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- CONTACT TAB -->
+            <div id="tab-contact" class="tab-content hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden settings-card">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-700/30 dark:to-gray-700/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="fas fa-address-card text-green-600 dark:text-green-400"></i>
+                                    Contact Information
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Update contact details displayed on the site</p>
+                            </div>
+                        </div>
+                    </div>
+                    <form action="/admin/settings/contact" method="POST" class="p-6">
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-map-marker-alt text-green-500 mr-1"></i> Address
+                                </label>
+                                <input type="text" name="address" value="<%= appSettings.contact?.address || '' %>" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700" placeholder="Full address">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        <i class="fas fa-phone text-green-500 mr-1"></i> Phone
+                                    </label>
+                                    <input type="text" name="phone" value="<%= appSettings.contact?.phone || '' %>" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700" placeholder="+91 9876543210">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        <i class="fas fa-envelope text-green-500 mr-1"></i> Email
+                                    </label>
+                                    <input type="email" name="email" value="<%= appSettings.contact?.email || '' %>" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700" placeholder="info@institutehub.com">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-headset text-green-500 mr-1"></i> Support Email
+                                </label>
+                                <input type="email" name="supportEmail" value="<%= appSettings.contact?.supportEmail || '' %>" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700" placeholder="support@institutehub.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-clock text-green-500 mr-1"></i> Working Hours
+                                </label>
+                                <input type="text" name="workingHours" value="<%= appSettings.contact?.workingHours || '' %>" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700" placeholder="Monday - Friday, 9:00 AM - 6:00 PM">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <i class="fas fa-map text-green-500 mr-1"></i> Map Embed URL
+                                </label>
+                                <input type="text" name="mapEmbedUrl" value="<%= appSettings.contact?.mapEmbedUrl || '' %>" class="form-input w-full px-4 py-2.5 rounded-lg bg-gray-50 dark:bg-gray-700" placeholder="https://www.google.com/maps/embed?pb=...">
+                            </div>
+                        </div>
+                        <div class="mt-6 flex gap-3">
+                            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                                <i class="fas fa-save"></i> Update Contact
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SOCIAL LINKS TAB -->
+            <div id="tab-social" class="tab-content hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden settings-card">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-gray-700/30 dark:to-gray-700/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="fas fa-share-alt text-purple-600 dark:text-purple-400"></i>
+                                    Social Links
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Manage social media links</p>
+                            </div>
+                            <button type="button" onclick="addSocialLink()" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm">
+                                <i class="fas fa-plus"></i> Add Link
+                            </button>
+                        </div>
+                    </div>
+                    <form action="/admin/settings/social-links" method="POST" class="p-6">
+                        <div id="socialLinksContainer" class="space-y-3">
+                            <% if (appSettings.socialLinks && appSettings.socialLinks.length > 0) { %>
+                                <% appSettings.socialLinks.forEach((link, index) => { %>
+                                    <div class="social-link-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+                                        <button type="button" onclick="removeItem(this, 'social-link-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                            <input type="hidden" name="socialLinks[<%= index %>][order]" value="<%= link.order || index %>">
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-tag text-purple-500"></i> Name
+                                                </label>
+                                                <input type="text" name="socialLinks[<%= index %>][name]" value="<%= link.name || '' %>" placeholder="LinkedIn" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-icons text-purple-500"></i> Icon
+                                                </label>
+                                                <input type="text" name="socialLinks[<%= index %>][icon]" value="<%= link.icon || '' %>" placeholder="fa-linkedin-in" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-link text-purple-500"></i> URL
+                                                </label>
+                                                <input type="text" name="socialLinks[<%= index %>][url]" value="<%= link.url || '' %>" placeholder="https://..." class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-palette text-purple-500"></i> Color
+                                                </label>
+                                                <input type="color" name="socialLinks[<%= index %>][color]" value="<%= link.color || '#2563EB' %>" class="w-full h-10 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 flex items-center gap-6">
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <div class="relative">
+                                                    <input type="checkbox" name="socialLinks[<%= index %>][isActive]" <%= link.isActive !== false ? 'checked' : '' %> class="sr-only peer">
+                                                    <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-purple-600 transition-colors"></div>
+                                                    <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                                                </div>
+                                                <span class="text-xs text-gray-600 dark:text-gray-400">Active</span>
+                                            </label>
+                                            <span class="text-xs text-gray-400">Order: <%= link.order || index %></span>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-share-alt text-4xl mb-3 opacity-30"></i>
+                                    <p>No social links added yet</p>
+                                    <p class="text-sm">Click "Add Link" to get started</p>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="mt-6 flex gap-3">
+                            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                                <i class="fas fa-save"></i> Update Social Links
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- OFFICES TAB -->
+            <div id="tab-offices" class="tab-content hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden settings-card">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-gray-700/30 dark:to-gray-700/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="fas fa-building text-orange-600 dark:text-orange-400"></i>
+                                    Office Locations
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Manage office locations</p>
+                            </div>
+                            <button type="button" onclick="addOffice()" class="px-4 py-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm">
+                                <i class="fas fa-plus"></i> Add Office
+                            </button>
+                        </div>
+                    </div>
+                    <form action="/admin/settings/offices" method="POST" class="p-6">
+                        <div id="officesContainer" class="space-y-3">
+                            <% if (appSettings.offices && appSettings.offices.length > 0) { %>
+                                <% appSettings.offices.forEach((office, index) => { %>
+                                    <div class="office-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+                                        <button type="button" onclick="removeItem(this, 'office-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <input type="hidden" name="offices[<%= index %>][order]" value="<%= office.order || index %>">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-city text-orange-500"></i> City
+                                                </label>
+                                                <input type="text" name="offices[<%= index %>][city]" value="<%= office.city || '' %>" placeholder="New Delhi" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-phone text-orange-500"></i> Phone
+                                                </label>
+                                                <input type="text" name="offices[<%= index %>][phone]" value="<%= office.phone || '' %>" placeholder="+91 9876543210" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-map-pin text-orange-500"></i> Address
+                                                </label>
+                                                <input type="text" name="offices[<%= index %>][address]" value="<%= office.address || '' %>" placeholder="123, Tech Park, Sector 62" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-envelope text-orange-500"></i> Email
+                                                </label>
+                                                <input type="email" name="offices[<%= index %>][email]" value="<%= office.email || '' %>" placeholder="office@institutehub.com" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 flex items-center gap-6">
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <div class="relative">
+                                                    <input type="checkbox" name="offices[<%= index %>][isMain]" <%= office.isMain ? 'checked' : '' %> class="sr-only peer">
+                                                    <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-orange-600 transition-colors"></div>
+                                                    <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                                                </div>
+                                                <span class="text-xs text-gray-600 dark:text-gray-400">Main Office</span>
+                                            </label>
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <div class="relative">
+                                                    <input type="checkbox" name="offices[<%= index %>][isActive]" <%= office.isActive !== false ? 'checked' : '' %> class="sr-only peer">
+                                                    <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-green-600 transition-colors"></div>
+                                                    <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                                                </div>
+                                                <span class="text-xs text-gray-600 dark:text-gray-400">Active</span>
+                                            </label>
+                                            <span class="text-xs text-gray-400">Order: <%= office.order || index %></span>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-building text-4xl mb-3 opacity-30"></i>
+                                    <p>No offices added yet</p>
+                                    <p class="text-sm">Click "Add Office" to get started</p>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="mt-6 flex gap-3">
+                            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                                <i class="fas fa-save"></i> Update Offices
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SUPPORT HOURS TAB -->
+            <div id="tab-hours" class="tab-content hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden settings-card">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-gray-700/30 dark:to-gray-700/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="fas fa-clock text-teal-600 dark:text-teal-400"></i>
+                                    Support Hours
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Manage support hours</p>
+                            </div>
+                            <button type="button" onclick="addSupportHour()" class="px-4 py-2 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm">
+                                <i class="fas fa-plus"></i> Add Hour
+                            </button>
+                        </div>
+                    </div>
+                    <form action="/admin/settings/support-hours" method="POST" class="p-6">
+                        <div id="supportHoursContainer" class="space-y-3">
+                            <% if (appSettings.supportHours && appSettings.supportHours.length > 0) { %>
+                                <% appSettings.supportHours.forEach((hour, index) => { %>
+                                    <div class="support-hour-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+                                        <button type="button" onclick="removeItem(this, 'support-hour-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <input type="hidden" name="supportHours[<%= index %>][order]" value="<%= hour.order || index %>">
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-calendar-day text-teal-500"></i> Day
+                                                </label>
+                                                <input type="text" name="supportHours[<%= index %>][day]" value="<%= hour.day || '' %>" placeholder="Monday - Friday" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-hourglass-half text-teal-500"></i> Hours
+                                                </label>
+                                                <input type="text" name="supportHours[<%= index %>][hours]" value="<%= hour.hours || '' %>" placeholder="9:00 AM - 6:00 PM" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div class="flex items-center">
+                                                <label class="flex items-center gap-2 cursor-pointer">
+                                                    <div class="relative">
+                                                        <input type="checkbox" name="supportHours[<%= index %>][isClosed]" <%= hour.isClosed ? 'checked' : '' %> class="sr-only peer">
+                                                        <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-red-600 transition-colors"></div>
+                                                        <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                                                    </div>
+                                                    <span class="text-xs text-gray-600 dark:text-gray-400">Closed</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-clock text-4xl mb-3 opacity-30"></i>
+                                    <p>No support hours added yet</p>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="mt-6 flex gap-3">
+                            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                                <i class="fas fa-save"></i> Update Support Hours
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- FAQS TAB -->
+            <div id="tab-faqs" class="tab-content hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden settings-card">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-red-50 to-rose-50 dark:from-gray-700/30 dark:to-gray-700/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="fas fa-question-circle text-red-600 dark:text-red-400"></i>
+                                    FAQs
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Manage frequently asked questions</p>
+                            </div>
+                            <button type="button" onclick="addFaq()" class="px-4 py-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm">
+                                <i class="fas fa-plus"></i> Add FAQ
+                            </button>
+                        </div>
+                    </div>
+                    <form action="/admin/settings/faqs" method="POST" class="p-6">
+                        <div id="faqsContainer" class="space-y-3">
+                            <% if (appSettings.faqs && appSettings.faqs.length > 0) { %>
+                                <% appSettings.faqs.forEach((faq, index) => { %>
+                                    <div class="faq-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+                                        <button type="button" onclick="removeItem(this, 'faq-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <input type="hidden" name="faqs[<%= index %>][order]" value="<%= faq.order || index %>">
+                                        <div class="grid grid-cols-1 gap-3">
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-question text-red-500"></i> Question
+                                                </label>
+                                                <input type="text" name="faqs[<%= index %>][question]" value="<%= faq.question || '' %>" placeholder="How do I enroll in a course?" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-answer text-red-500"></i> Answer
+                                                </label>
+                                                <textarea name="faqs[<%= index %>][answer]" rows="2" placeholder="Simply browse our course catalog..." class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm"><%= faq.answer || '' %></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 flex items-center gap-6">
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <div class="relative">
+                                                    <input type="checkbox" name="faqs[<%= index %>][isActive]" <%= faq.isActive !== false ? 'checked' : '' %> class="sr-only peer">
+                                                    <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-green-600 transition-colors"></div>
+                                                    <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                                                </div>
+                                                <span class="text-xs text-gray-600 dark:text-gray-400">Active</span>
+                                            </label>
+                                            <span class="text-xs text-gray-400">Order: <%= faq.order || index %></span>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-question-circle text-4xl mb-3 opacity-30"></i>
+                                    <p>No FAQs added yet</p>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="mt-6 flex gap-3">
+                            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                                <i class="fas fa-save"></i> Update FAQs
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- STATS TAB -->
+            <div id="tab-stats" class="tab-content hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden settings-card">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-700/30 dark:to-gray-700/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="fas fa-chart-bar text-indigo-600 dark:text-indigo-400"></i>
+                                    Statistics
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Manage homepage statistics</p>
+                            </div>
+                            <button type="button" onclick="addStat()" class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm">
+                                <i class="fas fa-plus"></i> Add Stat
+                            </button>
+                        </div>
+                    </div>
+                    <form action="/admin/settings/stats" method="POST" class="p-6">
+                        <div id="statsContainer" class="space-y-3">
+                            <% if (appSettings.stats && appSettings.stats.length > 0) { %>
+                                <% appSettings.stats.forEach((stat, index) => { %>
+                                    <div class="stat-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+                                        <button type="button" onclick="removeItem(this, 'stat-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <input type="hidden" name="stats[<%= index %>][order]" value="<%= stat.order || index %>">
+                                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-tag text-indigo-500"></i> Label
+                                                </label>
+                                                <input type="text" name="stats[<%= index %>][label]" value="<%= stat.label || '' %>" placeholder="Students" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-number text-indigo-500"></i> Value
+                                                </label>
+                                                <input type="number" name="stats[<%= index %>][value]" value="<%= stat.value || 0 %>" placeholder="15000" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-plus-circle text-indigo-500"></i> Suffix
+                                                </label>
+                                                <input type="text" name="stats[<%= index %>][suffix]" value="<%= stat.suffix || '+' %>" placeholder="+" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-icons text-indigo-500"></i> Icon
+                                                </label>
+                                                <input type="text" name="stats[<%= index %>][icon]" value="<%= stat.icon || 'fa-users' %>" placeholder="fa-users" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 flex items-center gap-6">
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <div class="relative">
+                                                    <input type="checkbox" name="stats[<%= index %>][isActive]" <%= stat.isActive !== false ? 'checked' : '' %> class="sr-only peer">
+                                                    <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-green-600 transition-colors"></div>
+                                                    <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                                                </div>
+                                                <span class="text-xs text-gray-600 dark:text-gray-400">Active</span>
+                                            </label>
+                                            <span class="text-xs text-gray-400">Order: <%= stat.order || index %></span>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-chart-bar text-4xl mb-3 opacity-30"></i>
+                                    <p>No statistics added yet</p>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="mt-6 flex gap-3">
+                            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                                <i class="fas fa-save"></i> Update Stats
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- FEATURES TAB -->
+            <div id="tab-features" class="tab-content hidden">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden settings-card">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-gray-700/30 dark:to-gray-700/20">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <i class="fas fa-star text-yellow-600 dark:text-yellow-400"></i>
+                                    Features
+                                </h3>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Manage features shown on homepage</p>
+                            </div>
+                            <button type="button" onclick="addFeature()" class="px-4 py-2 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-700 hover:to-amber-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm">
+                                <i class="fas fa-plus"></i> Add Feature
+                            </button>
+                        </div>
+                    </div>
+                    <form action="/admin/settings/features" method="POST" class="p-6">
+                        <div id="featuresContainer" class="space-y-3">
+                            <% if (appSettings.features && appSettings.features.length > 0) { %>
+                                <% appSettings.features.forEach((feature, index) => { %>
+                                    <div class="feature-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+                                        <button type="button" onclick="removeItem(this, 'feature-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                        <input type="hidden" name="features[<%= index %>][order]" value="<%= feature.order || index %>">
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-heading text-yellow-500"></i> Title
+                                                </label>
+                                                <input type="text" name="features[<%= index %>][title]" value="<%= feature.title || '' %>" placeholder="HD Video Lessons" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-align-left text-yellow-500"></i> Description
+                                                </label>
+                                                <input type="text" name="features[<%= index %>][description]" value="<%= feature.description || '' %>" placeholder="Crisp, structured video lectures..." class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                                                    <i class="fas fa-icons text-yellow-500"></i> Icon
+                                                </label>
+                                                <input type="text" name="features[<%= index %>][icon]" value="<%= feature.icon || 'fa-video' %>" placeholder="fa-video" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                                            </div>
+                                        </div>
+                                        <div class="mt-3 flex items-center gap-6">
+                                            <label class="flex items-center gap-2 cursor-pointer">
+                                                <div class="relative">
+                                                    <input type="checkbox" name="features[<%= index %>][isActive]" <%= feature.isActive !== false ? 'checked' : '' %> class="sr-only peer">
+                                                    <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-green-600 transition-colors"></div>
+                                                    <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                                                </div>
+                                                <span class="text-xs text-gray-600 dark:text-gray-400">Active</span>
+                                            </label>
+                                            <span class="text-xs text-gray-400">Order: <%= feature.order || index %></span>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% } else { %>
+                                <div class="text-center py-8 text-gray-500 dark:text-gray-400">
+                                    <i class="fas fa-star text-4xl mb-3 opacity-30"></i>
+                                    <p>No features added yet</p>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="mt-6 flex gap-3">
+                            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-700 hover:to-amber-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+                                <i class="fas fa-save"></i> Update Features
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification Container -->
+<div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-3"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching with animation
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabId = this.dataset.tab;
+            
+            // Update tab styles with animation
+            tabs.forEach(t => {
+                t.classList.remove('active');
+            });
+            this.classList.add('active');
+            
+            // Show content with fade animation
+            contents.forEach(c => {
+                c.classList.add('hidden');
+                c.style.opacity = '0';
+            });
+            const target = document.getElementById('tab-' + tabId);
+            target.classList.remove('hidden');
+            setTimeout(() => {
+                target.style.opacity = '1';
+            }, 50);
+        });
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('settingsSearch');
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        const tabs = document.querySelectorAll('.tab-btn');
+        
+        tabs.forEach(tab => {
+            const text = tab.textContent.toLowerCase();
+            if (query === '' || text.includes(query)) {
+                tab.style.display = '';
+            } else {
+                tab.style.display = 'none';
+            }
+        });
+    });
+});
+
+// ============================================================
+// TOAST NOTIFICATIONS
+// ============================================================
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    const colors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        warning: 'bg-yellow-500',
+        info: 'bg-blue-500'
+    };
+    
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-times-circle',
+        warning: 'fa-exclamation-circle',
+        info: 'fa-info-circle'
+    };
+    
+    const toast = document.createElement('div');
+    toast.className = `toast-item ${colors[type]} text-white px-5 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slideIn`;
+    toast.innerHTML = `
+        <i class="fas ${icons[type]} text-xl"></i>
+        <span class="flex-1">${message}</span>
+        <button onclick="this.parentElement.remove()" class="hover:text-gray-200">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => toast.remove(), 300);
+        }
+    }, 5000);
+}
+
+// ============================================================
+// COMMON FUNCTIONS
+// ============================================================
+
+// Remove item
+function removeItem(btn, className) {
+    const item = btn.closest('.' + className);
+    if (item) {
+        item.style.opacity = '0';
+        item.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            item.remove();
+            showToast('Item removed successfully', 'success');
+        }, 200);
+    }
+}
+
+// Expand/Collapse all tabs
+function expandAll() {
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('hidden'));
+    showToast('All sections expanded', 'info');
+}
+
+function collapseAll() {
+    document.querySelectorAll('.tab-content').forEach((c, index) => {
+        if (index > 0) c.classList.add('hidden');
+    });
+    showToast('All sections collapsed', 'info');
+}
+
+// Refresh settings
+function refreshSettings() {
+    showToast('Refreshing appSettings...', 'info');
+    setTimeout(() => {
+        location.reload();
+    }, 500);
+}
+
+// ============================================================
+// SOCIAL LINKS
+// ============================================================
+function addSocialLink() {
+    const container = document.getElementById('socialLinksContainer');
+    const index = container.querySelectorAll('.social-link-item').length;
+    
+    const html = `
+        <div class="social-link-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+            <button type="button" onclick="removeItem(this, 'social-link-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="hidden" name="socialLinks[${index}][order]" value="${index}">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-tag text-purple-500"></i> Name
+                    </label>
+                    <input type="text" name="socialLinks[${index}][name]" placeholder="LinkedIn" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-icons text-purple-500"></i> Icon
+                    </label>
+                    <input type="text" name="socialLinks[${index}][icon]" placeholder="fa-linkedin-in" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-link text-purple-500"></i> URL
+                    </label>
+                    <input type="text" name="socialLinks[${index}][url]" placeholder="https://..." class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-palette text-purple-500"></i> Color
+                    </label>
+                    <input type="color" name="socialLinks[${index}][color]" value="#2563EB" class="w-full h-10 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-6">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <div class="relative">
+                        <input type="checkbox" name="socialLinks[${index}][isActive]" checked class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-purple-600 transition-colors"></div>
+                        <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                    </div>
+                    <span class="text-xs text-gray-600 dark:text-gray-400">Active</span>
+                </label>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    showToast('New social link added', 'success');
+}
+
+// ============================================================
+// OFFICES
+// ============================================================
+function addOffice() {
+    const container = document.getElementById('officesContainer');
+    const index = container.querySelectorAll('.office-item').length;
+    
+    const html = `
+        <div class="office-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+            <button type="button" onclick="removeItem(this, 'office-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-times"></i>
+            </button>
+            <input type="hidden" name="offices[${index}][order]" value="${index}">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-city text-orange-500"></i> City
+                    </label>
+                    <input type="text" name="offices[${index}][city]" placeholder="New Delhi" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-phone text-orange-500"></i> Phone
+                    </label>
+                    <input type="text" name="offices[${index}][phone]" placeholder="+91 9876543210" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-map-pin text-orange-500"></i> Address
+                    </label>
+                    <input type="text" name="offices[${index}][address]" placeholder="123, Tech Park, Sector 62" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-envelope text-orange-500"></i> Email
+                    </label>
+                    <input type="email" name="offices[${index}][email]" placeholder="office@institutehub.com" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-6">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <div class="relative">
+                        <input type="checkbox" name="offices[${index}][isMain]" class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-orange-600 transition-colors"></div>
+                        <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                    </div>
+                    <span class="text-xs text-gray-600 dark:text-gray-400">Main Office</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <div class="relative">
+                        <input type="checkbox" name="offices[${index}][isActive]" checked class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-green-600 transition-colors"></div>
+                        <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                    </div>
+                    <span class="text-xs text-gray-600 dark:text-gray-400">Active</span>
+                </label>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    showToast('New office added', 'success');
+}
+
+// ============================================================
+// SUPPORT HOURS
+// ============================================================
+function addSupportHour() {
+    const container = document.getElementById('supportHoursContainer');
+    const index = container.querySelectorAll('.support-hour-item').length;
+    
+    const html = `
+        <div class="support-hour-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+            <button type="button" onclick="removeItem(this, 'support-hour-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-times"></i>
+            </button>
+            <input type="hidden" name="supportHours[${index}][order]" value="${index}">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-calendar-day text-teal-500"></i> Day
+                    </label>
+                    <input type="text" name="supportHours[${index}][day]" placeholder="Monday - Friday" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-hourglass-half text-teal-500"></i> Hours
+                    </label>
+                    <input type="text" name="supportHours[${index}][hours]" placeholder="9:00 AM - 6:00 PM" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div class="flex items-center">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <div class="relative">
+                            <input type="checkbox" name="supportHours[${index}][isClosed]" class="sr-only peer">
+                            <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-red-600 transition-colors"></div>
+                            <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                        </div>
+                        <span class="text-xs text-gray-600 dark:text-gray-400">Closed</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    showToast('New support hour added', 'success');
+}
+
+// ============================================================
+// FAQS
+// ============================================================
+function addFaq() {
+    const container = document.getElementById('faqsContainer');
+    const index = container.querySelectorAll('.faq-item').length;
+    
+    const html = `
+        <div class="faq-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+            <button type="button" onclick="removeItem(this, 'faq-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-times"></i>
+            </button>
+            <input type="hidden" name="faqs[${index}][order]" value="${index}">
+            <div class="grid grid-cols-1 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-question text-red-500"></i> Question
+                    </label>
+                    <input type="text" name="faqs[${index}][question]" placeholder="How do I enroll in a course?" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-answer text-red-500"></i> Answer
+                    </label>
+                    <textarea name="faqs[${index}][answer]" rows="2" placeholder="Simply browse our course catalog..." class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm"></textarea>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-6">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <div class="relative">
+                        <input type="checkbox" name="faqs[${index}][isActive]" checked class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-green-600 transition-colors"></div>
+                        <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                    </div>
+                    <span class="text-xs text-gray-600 dark:text-gray-400">Active</span>
+                </label>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    showToast('New FAQ added', 'success');
+}
+
+// ============================================================
+// STATS
+// ============================================================
+function addStat() {
+    const container = document.getElementById('statsContainer');
+    const index = container.querySelectorAll('.stat-item').length;
+    
+    const html = `
+        <div class="stat-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+            <button type="button" onclick="removeItem(this, 'stat-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-times"></i>
+            </button>
+            <input type="hidden" name="stats[${index}][order]" value="${index}">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-tag text-indigo-500"></i> Label
+                    </label>
+                    <input type="text" name="stats[${index}][label]" placeholder="Students" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-number text-indigo-500"></i> Value
+                    </label>
+                    <input type="number" name="stats[${index}][value]" placeholder="15000" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-plus-circle text-indigo-500"></i> Suffix
+                    </label>
+                    <input type="text" name="stats[${index}][suffix]" placeholder="+" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-icons text-indigo-500"></i> Icon
+                    </label>
+                    <input type="text" name="stats[${index}][icon]" placeholder="fa-users" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-6">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <div class="relative">
+                        <input type="checkbox" name="stats[${index}][isActive]" checked class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-green-600 transition-colors"></div>
+                        <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                    </div>
+                    <span class="text-xs text-gray-600 dark:text-gray-400">Active</span>
+                </label>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    showToast('New stat added', 'success');
+}
+
+// ============================================================
+// FEATURES
+// ============================================================
+function addFeature() {
+    const container = document.getElementById('featuresContainer');
+    const index = container.querySelectorAll('.feature-item').length;
+    
+    const html = `
+        <div class="feature-item bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-xl p-4 item-card relative group">
+            <button type="button" onclick="removeItem(this, 'feature-item')" class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-times"></i>
+            </button>
+            <input type="hidden" name="features[${index}][order]" value="${index}">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-heading text-yellow-500"></i> Title
+                    </label>
+                    <input type="text" name="features[${index}][title]" placeholder="HD Video Lessons" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-align-left text-yellow-500"></i> Description
+                    </label>
+                    <input type="text" name="features[${index}][description]" placeholder="Crisp, structured video lectures..." class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        <i class="fas fa-icons text-yellow-500"></i> Icon
+                    </label>
+                    <input type="text" name="features[${index}][icon]" placeholder="fa-video" class="form-input w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-6">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <div class="relative">
+                        <input type="checkbox" name="features[${index}][isActive]" checked class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-300 dark:bg-gray-600 rounded-full peer peer-checked:bg-green-600 transition-colors"></div>
+                        <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                    </div>
+                    <span class="text-xs text-gray-600 dark:text-gray-400">Active</span>
+                </label>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    showToast('New feature added', 'success');
+}
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+// Show welcome toast
+setTimeout(() => {
+    showToast('Welcome to App Settings! 🚀', 'success');
+}, 500);
+</script>

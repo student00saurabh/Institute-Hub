@@ -6,6 +6,7 @@ const Subscriber = require("../models/subscriber");
 const cources = require("../models/cources");
 const Blog = require("../models/blog");
 const Review = require("../models/review");
+const Payment = require("../models/payment");
 // const Diploma = require("../models/diploma");
 const Certificate = require("../models/certification.js");
 
@@ -15,6 +16,14 @@ module.exports.adminDashboard = async (req, res) => {
     const totalUsers = await User.countDocuments();
     const totalCourses = await Course.countDocuments();
     const totalBlogs = await Blog.countDocuments();
+
+    const totalPayments = await Payment.countDocuments({ status: "success" });
+    const totalRevenue = await Payment.aggregate([
+        { $match: { status: "success" } },
+        { $group: { _id: null, total: { $sum: "$amount" } } }
+      ]);
+    const pendingReviews = await Review.countDocuments({ isApproved: false, isVerified: true });
+    const totalTeachers = await User.countDocuments({ role: { $in: ["teacher", "admin"] } });
 
     // Get recent 30 days data for growth calculation
     const thirtyDaysAgo = new Date();
@@ -162,6 +171,9 @@ module.exports.adminDashboard = async (req, res) => {
         revenueGrowth: 0,
         activeSessions: Math.floor(Math.random() * 100) + 50,
         uptime: "99.9%",
+        totalPayments: totalPayments || 0,
+        pendingReviews: pendingReviews || 0,
+        totalTeachers: totalTeachers || 0,
       },
       recentUsers,
       recentActivities: limitedActivities,

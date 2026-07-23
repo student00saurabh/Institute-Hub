@@ -2,8 +2,8 @@
 const CACHE_NAME = 'institutehub-v1';
 const urlsToCache = [
     '/',
-    '/css/styles.css',
-    '/js/main.js'
+    '/css/output.css',
+    '/js/script.js'
 ];
 
 self.addEventListener('install', event => {

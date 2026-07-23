@@ -1,0 +1,131 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="min-h-[90vh] py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6 text-sm">
+            <ol class="inline-flex items-center gap-2">
+                <li><a href="/admin/dashboard" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors">Dashboard</a></li>
+                <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
+                <li><a href="/admin/teachers" class="text-gray-500 dark:text-gray-400 hover:text-blue-600 transition-colors">Teachers</a></li>
+                <li><i class="fas fa-chevron-right text-gray-400 text-xs"></i></li>
+                <li class="text-gray-700 dark:text-gray-300 font-medium"><%= teacher.name %></li>
+            </ol>
+        </nav>
+
+        <!-- Teacher Profile -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            
+            <!-- Left: Profile Card -->
+            <div class="lg:col-span-1">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm text-center">
+                    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white text-3xl font-bold mx-auto">
+                        <%= teacher.name?.charAt(0).toUpperCase() || 'T' %>
+                    </div>
+                    <h2 class="mt-4 text-xl font-bold text-gray-900 dark:text-white"><%= teacher.name %></h2>
+                    <div class="flex items-center justify-center gap-2 mt-1">
+                        <span class="text-sm px-3 py-1 rounded-full 
+                            <%= teacher.role === 'admin' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' %>">
+                            <%= teacher.role === 'admin' ? 'Admin' : 'Teacher' %>
+                        </span>
+                        <span class="text-sm px-3 py-1 rounded-full 
+                            <%= teacher.isActive !== false ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300' %>">
+                            <%= teacher.isActive !== false ? 'Active' : 'Inactive' %>
+                        </span>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2 text-sm text-left">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-envelope text-gray-400 w-5"></i>
+                            <span class="text-gray-700 dark:text-gray-300"><%= teacher.email %></span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-phone text-gray-400 w-5"></i>
+                            <span class="text-gray-700 dark:text-gray-300"><%= teacher.mobile || 'Not provided' %></span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-calendar text-gray-400 w-5"></i>
+                            <span class="text-gray-700 dark:text-gray-300">Joined <%= moment(teacher.createdAt).format('DD MMM YYYY') %></span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-graduation-cap text-gray-400 w-5"></i>
+                            <span class="text-gray-700 dark:text-gray-300"><%= courses.length %> Courses</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-users text-gray-400 w-5"></i>
+                            <span class="text-gray-700 dark:text-gray-300"><%= totalStudents %> Students</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-rupee-sign text-gray-400 w-5"></i>
+                            <span class="text-gray-700 dark:text-gray-300">₹<%= totalRevenue.toLocaleString() %> Revenue</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Courses List -->
+            <div class="lg:col-span-3">
+                <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Courses Taught</h3>
+                        <span class="text-sm text-gray-500 dark:text-gray-400"><%= courses.length %> courses</span>
+                    </div>
+                    
+                    <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <% if (courses && courses.length > 0) { %>
+                            <% courses.forEach(course => { %>
+                                <div class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex items-center gap-4">
+                                            <img src="<%= course.image?.url || 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=50&auto=format&fit=crop' %>" 
+                                                 alt="<%= course.title %>" 
+                                                 class="w-14 h-14 rounded-lg object-cover">
+                                            <div>
+                                                <h4 class="font-medium text-gray-900 dark:text-white"><%= course.title %></h4>
+                                                <div class="flex items-center gap-3 mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                                    <span><i class="fas fa-users mr-1"></i> <%= course.students?.length || 0 %> students</span>
+                                                    <span><i class="fas fa-rupee-sign mr-1"></i> <%= course.price || 0 %></span>
+                                                    <% if (course.category) { %>
+                                                        <span class="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs">
+                                                            <%= course.category.name %>
+                                                        </span>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs px-2 py-1 rounded-full <%= course.isActive ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' %>">
+                                                <%= course.isActive ? 'Active' : 'Inactive' %>
+                                            </span>
+                                            <a href="/courses/<%= course._id %>/edit" 
+                                               class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <div class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                <p>No courses taught by this teacher</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <a href="/admin/courses/new?teacher=<%= teacher._id %>" 
+                       class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i> Assign New Course
+                    </a>
+                    <a href="/admin/users/<%= teacher._id %>" 
+                       class="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
+                        <i class="fas fa-user mr-2"></i> View Full Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
