@@ -1111,6 +1111,23 @@ module.exports.enrollCourseForm = async (req, res) => {
             .sort({ createdAt: -1 })
             .lean();
 
+        const userId = req.user ? req.user._id : null;
+
+        if (userId) {
+            const user = await User.findById(userId).select('enrolledCourses');
+        }
+
+        //check whther the user is already enrolled in this course or not
+        const isAlreadyEnrolled = await Course.findOne({
+            _id: preselectedCourseId,
+            students: userId
+        }); 
+
+        if (isAlreadyEnrolled) {
+            req.flash("info", "You are already enrolled in this course.");
+            return res.redirect(`/courses/${preselectedCourseId}`);
+        }
+
         // FALLBACK COURSES - WITH ALL DATA
         const FALLBACK_COURSES = [
             {
