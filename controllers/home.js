@@ -124,8 +124,8 @@ module.exports.homePage = async (req, res, next) => {
         if (offerCourses && offerCourses.length > 0) {
             // Format real courses as offers
             offers = offerCourses.map((course, index) => {
-                const discount = course.actualPrice > course.price 
-                    ? Math.round(((course.actualPrice - course.price) / course.actualPrice) * 100)
+                const discount = course.price > course.actualPrice
+                    ? Math.round(((course.price - course.actualPrice) / course.price) * 100)
                     : 20 + (index * 5);
             
                 const tags = ["Best Seller", "Trending", "Popular", "Limited", "New", "Featured"];
@@ -218,7 +218,7 @@ module.exports.homePage = async (req, res, next) => {
 
         // ✅ FALLBACK NEW COURSES
         const FALLBACK_NEW_COURSES = [
-            { title: "Next.js 15 Full Stack Development", instructor: "Aarav Mehta", price: 2699, rating: 4.9, students: 420, duration: "34h", img: "https://picsum.photos/seed/new1/640/420", launched: "3 days ago", category: "Web Development" },
+            { title: "Next.js 15 Full Stack Development", instructor: "Aarav Mehta", price: 2699,  rating: 4.9, students: 420, duration: "34h", img: "https://picsum.photos/seed/new1/640/420", launched: "3 days ago", category: "Web Development" },
             { title: "Prompt Engineering for Developers", instructor: "Meera Iyer", price: 1499, rating: 4.8, students: 310, duration: "16h", img: "https://picsum.photos/seed/new2/640/420", launched: "5 days ago", category: "AI & ML" },
             { title: "Advanced Figma for Product Teams", instructor: "Kabir Sethi", price: 1899, rating: 4.7, students: 265, duration: "19h", img: "https://picsum.photos/seed/new3/640/420", launched: "1 week ago", category: "UI / UX Design" },
             { title: "Kubernetes for Production", instructor: "Simran Kaur", price: 2899, rating: 4.9, students: 198, duration: "29h", img: "https://picsum.photos/seed/new4/640/420", launched: "1 week ago", category: "Cloud & DevOps" },
@@ -232,7 +232,7 @@ module.exports.homePage = async (req, res, next) => {
                 _id: course._id,
                 title: course.title,
                 instructor: course.teacher?.name || "Expert Instructor",
-                price: course.price || 0,
+                price: course.actualPrice || 0,
                 rating: course.rating || 0,
                 students: course.preStudents || course.students?.length || 0,
                 duration: course.duration ? `${course.duration}h` : `${Math.floor(Math.random() * 30) + 15}h`,
@@ -1096,15 +1096,396 @@ module.exports.toggleHomepageVisibility = async (req, res) => {
   }
 };
 
+// ============================================================
+// ENROLLMENT PAGE CONTROLLER - WITH PAYMENT
+// ============================================================
 module.exports.enrollCourseForm = async (req, res) => {
-  try {
-    const courses = await Course.find();
-    res.render("institutehub/enroll.ejs", { courses });
-  } catch (error) {
-    console.log(error);
-    req.flash("error", "Unable to load the enrollment form. Please try again.");
-    res.redirect("/");
-  }
+    try {
+        const preselectedCourseId = req.params.courseId || req.query.courseId || null;
+        
+        // Get all active courses
+        let courses = await Course.find({ isActive: true })
+            .select('title price actualPrice courceType category duration courseLevel image slug shortDescription')
+            .populate('category', 'name slug')
+            .populate('teacher', 'name')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        // FALLBACK COURSES - WITH ALL DATA
+        const FALLBACK_COURSES = [
+            {
+                _id: 'fallback-1',
+                title: 'Complete Cybersecurity Bootcamp 2026',
+                price: 2999,
+                actualPrice: 4999,
+                courceType: 'Cybersecurity',
+                category: { name: 'Cybersecurity' },
+                duration: '42h',
+                courseLevel: 'Beginner',
+                shortDescription: 'Master cybersecurity from scratch with hands-on labs and real-world scenarios.',
+                teacher: { name: 'Rohan Kapoor' },
+                image: { url: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&auto=format&fit=crop' }
+            },
+            {
+                _id: 'fallback-2',
+                title: 'Ethical Hacking & Penetration Testing',
+                price: 2499,
+                actualPrice: 4499,
+                courceType: 'Cybersecurity',
+                category: { name: 'Cybersecurity' },
+                duration: '36h',
+                courseLevel: 'Advanced',
+                shortDescription: 'Learn ethical hacking techniques and become a certified penetration tester.',
+                teacher: { name: 'Aarav Mehta' },
+                image: { url: 'https://images.unsplash.com/photo-1584968352400-97fa07a88c7f?w=400&auto=format&fit=crop' }
+            },
+            {
+                _id: 'fallback-3',
+                title: 'Web Development Masterclass 2026',
+                price: 1999,
+                actualPrice: 3999,
+                courceType: 'Web Development',
+                category: { name: 'Web Development' },
+                duration: '48h',
+                courseLevel: 'Beginner',
+                shortDescription: 'Build modern websites with HTML, CSS, JavaScript, React, and Node.js.',
+                teacher: { name: 'Priya Nair' },
+                image: { url: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&auto=format&fit=crop' }
+            },
+            {
+                _id: 'fallback-4',
+                title: 'Data Science & Machine Learning A-Z',
+                price: 3499,
+                actualPrice: 6499,
+                courceType: 'Data Science',
+                category: { name: 'Data Science' },
+                duration: '58h',
+                courseLevel: 'Intermediate',
+                shortDescription: 'Complete data science course covering Python, ML, Deep Learning, and AI.',
+                teacher: { name: 'Ananya Rao' },
+                image: { url: 'https://images.unsplash.com/photo-1518186285589-7f7765de9c6b?w=400&auto=format&fit=crop' }
+            },
+            {
+                _id: 'fallback-5',
+                title: 'AWS Cloud Architecture Mastery',
+                price: 2999,
+                actualPrice: 5499,
+                courceType: 'Cloud & DevOps',
+                category: { name: 'Cloud & DevOps' },
+                duration: '44h',
+                courseLevel: 'Intermediate',
+                shortDescription: 'Master AWS cloud architecture, services, and best practices for enterprise.',
+                teacher: { name: 'Simran Kaur' },
+                image: { url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&auto=format&fit=crop' }
+            },
+            {
+                _id: 'fallback-6',
+                title: 'UI/UX Design Pro - Complete Guide',
+                price: 1499,
+                actualPrice: 2999,
+                courceType: 'UI/UX Design',
+                category: { name: 'UI/UX Design' },
+                duration: '30h',
+                courseLevel: 'Beginner',
+                shortDescription: 'Learn UI/UX design principles, Figma, and build a professional portfolio.',
+                teacher: { name: 'Kabir Sethi' },
+                image: { url: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&auto=format&fit=crop' }
+            },
+            {
+                _id: 'fallback-7',
+                title: 'React Native Mobile App Development',
+                price: 2299,
+                actualPrice: 3999,
+                courceType: 'Mobile Apps',
+                category: { name: 'Mobile Apps' },
+                duration: '32h',
+                courseLevel: 'Intermediate',
+                shortDescription: 'Build cross-platform mobile apps with React Native and Expo.',
+                teacher: { name: 'Dev Malhotra' },
+                image: { url: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&auto=format&fit=crop' }
+            },
+            {
+                _id: 'fallback-8',
+                title: 'Digital Marketing & SEO Mastery',
+                price: 1799,
+                actualPrice: 2999,
+                courceType: 'Marketing',
+                category: { name: 'Marketing' },
+                duration: '24h',
+                courseLevel: 'Beginner',
+                shortDescription: 'Complete digital marketing course covering SEO, Social Media, and Analytics.',
+                teacher: { name: 'Ishaan Verma' },
+                image: { url: 'https://images.unsplash.com/photo-1432889821006-ca0f7af3f9fa?w=400&auto=format&fit=crop' }
+            }
+        ];
+
+        // If no courses in DB, use fallback
+        if (!courses || courses.length === 0) {
+            courses = FALLBACK_COURSES;
+        }
+
+        // Get unique categories
+        const categories = [...new Set(courses.map(c => c.courceType).filter(Boolean))];
+
+        // Get selected course
+        let selectedCourse = null;
+        if (preselectedCourseId) {
+            selectedCourse = courses.find(c => c._id.toString() === preselectedCourseId);
+        }
+
+        // If no selected course, select first one
+        if (!selectedCourse && courses.length > 0) {
+            selectedCourse = courses[0];
+        }
+
+        res.render("institutehub/enroll.ejs", {
+            courses: courses,
+            categories: categories,
+            selectedCourse: selectedCourse,
+            preselectedCourseId: preselectedCourseId,
+            currentUser: req.user || null,
+            moment: require('moment'),
+            // Razorpay keys
+            razorpayKey: process.env.RAZORPAY_KEY_ID,
+        });
+
+    } catch (error) {
+        console.error("Enrollment form error:", error);
+        req.flash("error", "Unable to load enrollment page. Please try again.");
+        res.redirect("/");
+    }
+};
+
+// ============================================================
+// CREATE RAZORPAY ORDER FOR ENROLLMENT
+// ============================================================
+module.exports.createEnrollmentOrder = async (req, res) => {
+    try {
+        const { courseId } = req.body;
+        
+        if (!courseId) {
+            return res.status(400).json({ success: false, message: 'Course ID is required' });
+        }
+
+        // Find course
+        let course = await Course.findById(courseId);
+        
+        // If not found in DB, check fallback
+        if (!course) {
+            const FALLBACK_COURSES = [
+                { _id: 'fallback-1', actualPrice: 4999, price: 2999, title: 'Complete Cybersecurity Bootcamp 2026' },
+                { _id: 'fallback-2', actualPrice: 4499, price: 2499, title: 'Ethical Hacking & Penetration Testing' },
+                { _id: 'fallback-3', actualPrice: 3999, price: 1999, title: 'Web Development Masterclass 2026' },
+                { _id: 'fallback-4', actualPrice: 6499, price: 3499, title: 'Data Science & Machine Learning A-Z' },
+                { _id: 'fallback-5', actualPrice: 5499, price: 2999, title: 'AWS Cloud Architecture Mastery' },
+                { _id: 'fallback-6', actualPrice: 2999, price: 1499, title: 'UI/UX Design Pro - Complete Guide' },
+                { _id: 'fallback-7', actualPrice: 3999, price: 2299, title: 'React Native Mobile App Development' },
+                { _id: 'fallback-8', actualPrice: 2999, price: 1799, title: 'Digital Marketing & SEO Mastery' }
+            ];
+            course = FALLBACK_COURSES.find(c => c._id === courseId);
+            
+            if (!course) {
+                return res.status(404).json({ success: false, message: 'Course not found' });
+            }
+        }
+
+        // Get amount (actualPrice or price)
+        const amount = course.actualPrice || course.price || 0;
+        
+        if (amount === 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'This is a free course. Please enroll directly.',
+                isFree: true
+            });
+        }
+
+        // Check if user is already enrolled
+        if (req.user) {
+            const existingCourse = await Course.findById(courseId);
+            if (existingCourse) {
+                const alreadyEnrolled = existingCourse.students?.some(
+                    s => s.user.toString() === req.user._id.toString()
+                );
+                if (alreadyEnrolled) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'You are already enrolled in this course',
+                        alreadyEnrolled: true
+                    });
+                }
+            }
+        }
+
+        // Create Razorpay order
+        const receipt = `ENR_${courseId.toString().slice(-6)}_${Date.now().toString().slice(-6)}`;
+        
+        const options = {
+            amount: amount * 100,
+            currency: 'INR',
+            receipt: receipt,
+            notes: {
+                courseId: courseId.toString(),
+                courseTitle: course.title?.substring(0, 30) || 'Course',
+                type: 'enrollment'
+            }
+        };
+
+        const order = await razorpay.orders.create(options);
+
+        res.json({
+            success: true,
+            orderId: order.id,
+            amount: order.amount,
+            currency: order.currency,
+            key: process.env.RAZORPAY_KEY_ID,
+            courseId: courseId,
+            courseTitle: course.title
+        });
+
+    } catch (error) {
+        console.error('Enrollment order creation error:', error);
+        res.status(500).json({
+            success: false,
+            message: error.error?.description || 'Failed to create payment order'
+        });
+    }
+};
+
+// ============================================================
+// VERIFY ENROLLMENT PAYMENT
+// ============================================================
+module.exports.verifyEnrollmentPayment = async (req, res) => {
+    try {
+        const {
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature,
+            courseId,
+            name,
+            email,
+            mobile,
+            description
+        } = req.body;
+
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !courseId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing payment verification details'
+            });
+        }
+
+        // Verify signature
+        const body = razorpay_order_id + '|' + razorpay_payment_id;
+        const expectedSignature = crypto
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .update(body.toString())
+            .digest('hex');
+
+        const isAuthentic = expectedSignature === razorpay_signature;
+        if (!isAuthentic) {
+            return res.status(400).json({
+                success: false,
+                message: 'Payment verification failed'
+            });
+        }
+
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Please login to complete enrollment'
+            });
+        }
+
+        // Find course
+        let course = await Course.findById(courseId);
+        const isFallback = !course;
+        
+        if (!course) {
+            // For fallback courses, create a virtual enrollment
+            const FALLBACK_COURSES = [
+                { _id: 'fallback-1', actualPrice: 4999, price: 2999, title: 'Complete Cybersecurity Bootcamp 2026' },
+                { _id: 'fallback-2', actualPrice: 4499, price: 2499, title: 'Ethical Hacking & Penetration Testing' },
+                { _id: 'fallback-3', actualPrice: 3999, price: 1999, title: 'Web Development Masterclass 2026' },
+                { _id: 'fallback-4', actualPrice: 6499, price: 3499, title: 'Data Science & Machine Learning A-Z' },
+                { _id: 'fallback-5', actualPrice: 5499, price: 2999, title: 'AWS Cloud Architecture Mastery' },
+                { _id: 'fallback-6', actualPrice: 2999, price: 1499, title: 'UI/UX Design Pro - Complete Guide' },
+                { _id: 'fallback-7', actualPrice: 3999, price: 2299, title: 'React Native Mobile App Development' },
+                { _id: 'fallback-8', actualPrice: 2999, price: 1799, title: 'Digital Marketing & SEO Mastery' }
+            ];
+            course = FALLBACK_COURSES.find(c => c._id === courseId);
+            
+            if (!course) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Course not found'
+                });
+            }
+        }
+
+        const paidPrice = course.actualPrice || course.price || 0;
+
+        // Check if already enrolled
+        if (!isFallback && course.students) {
+            const alreadyEnrolled = course.students.some(
+                s => s.user.toString() === req.user._id.toString()
+            );
+            if (alreadyEnrolled) {
+                return res.json({
+                    success: true,
+                    message: 'You are already enrolled in this course',
+                    alreadyEnrolled: true,
+                    redirectUrl: `/courses/${courseId}/access`
+                });
+            }
+        }
+
+        // Save payment record
+        const payment = new Payment({
+            user: req.user._id,
+            course: isFallback ? courseId : courseId,
+            razorpayOrderId: razorpay_order_id,
+            razorpayPaymentId: razorpay_payment_id,
+            razorpaySignature: razorpay_signature,
+            amount: paidPrice,
+            status: 'success',
+            userEmail: email || req.user.email,
+            userName: name || req.user.name,
+            description: description || '',
+            receipt: `receipt_${Date.now()}`,
+            ipAddress: req.ip || req.connection?.remoteAddress,
+            userAgent: req.headers['user-agent'],
+            isFallback: isFallback
+        });
+        await payment.save();
+
+        // Enroll user in real course if exists
+        if (!isFallback) {
+            course.students.push({
+                user: req.user._id,
+                paidPrice: paidPrice,
+                description: description || '',
+                enrolledAt: new Date(),
+                isSeen: false,
+                paymentId: razorpay_payment_id,
+                orderId: razorpay_order_id
+            });
+            await course.save();
+        }
+
+        res.json({
+            success: true,
+            message: 'Payment verified and enrollment successful!',
+            redirectUrl: isFallback ? `/courses` : `/courses/${courseId}/access`
+        });
+
+    } catch (error) {
+        console.error('Enrollment verification error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to verify payment. Please contact support.'
+        });
+    }
 };
 
 module.exports.enrollInNewCource = async (req, res) => {

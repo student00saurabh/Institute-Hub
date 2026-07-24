@@ -272,9 +272,9 @@
                         </div>
 
                         <div class="mt-3 flex items-baseline gap-2">
-                            <span class="text-base font-extrabold text-[#0F172A] dark:text-white">₹<%= (c.price || 0).toLocaleString() %></span>
-                            <% if (c.oldPrice && c.oldPrice > c.price) { %>
-                                <span class="text-xs text-[#94A3B8] line-through">₹<%= (c.oldPrice || 0).toLocaleString() %></span>
+                            <span class="text-base font-extrabold text-[#0F172A] dark:text-white">₹<%= (c.oldPrice || 0) %></span>
+                            <% if (c.oldPrice && c.price > c.oldPrice) { %>
+                                <span class="text-xs text-[#94A3B8] line-through">₹<%= (c.price || 0) %></span>
                             <% } %>
                         </div>
 
@@ -283,10 +283,17 @@
                                class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-semibold border border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:border-[#2563EB]/50 hover:text-[#2563EB] transition-all duration-300">
                                 View Details
                             </a>
-                            <button type="button" onclick="handleEnroll(this, '<%= c._id %>')"
-                                    class="enroll-btn flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-md shadow-[#2563EB]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
-                                Enroll Now
-                            </button>
+    <% if (c.isEnrolled) { %>
+        <a href="/courses/<%= c._id %>/access"
+           class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-bold bg-[#22C55E] text-white hover:bg-[#16A34A] shadow-md shadow-[#22C55E]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+            <i class="fas fa-play-circle mr-1"></i> Continue
+        </a>
+    <% } else { %>
+        <a href="/enroll?courseId=<%= c._id %>"
+           class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-bold bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-md shadow-[#2563EB]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+            Enroll Now
+        </a>
+    <% } %>
                         </div>
                     </div>
                 </div>
@@ -360,10 +367,17 @@
                                class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-semibold border border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:border-[#C9A227]/50 hover:text-[#C9A227] transition-all duration-300">
                                 View Details
                             </a>
-                            <button type="button" onclick="handleEnroll(this, '<%= c._id %>')"
-                                    class="enroll-btn flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-[#C9A227] text-white hover:bg-[#B8901E] shadow-md shadow-[#C9A227]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
-                                Enroll Now
-                            </button>
+                            <% if (c.isEnrolled) { %>
+        <a href="/courses/<%= c._id %>/access"
+           class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-bold bg-[#22C55E] text-white hover:bg-[#16A34A] shadow-md shadow-[#22C55E]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+            <i class="fas fa-play-circle mr-1"></i> Continue
+        </a>
+    <% } else { %>
+        <a href="/enroll?courseId=<%= c._id %>"
+           class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-bold bg-[#C9A227] text-white hover:bg-[#1D4ED8] shadow-md shadow-[#2563EB]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+            Enroll Now
+        </a>
+    <% } %>
                         </div>
                     </div>
                 </div>

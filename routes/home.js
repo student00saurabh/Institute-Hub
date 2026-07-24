@@ -98,6 +98,13 @@ router
 
 router
   .route("/enroll/:courseId")
+  .get(homeController.enrollCourseForm)
   .post(isLoggedIn, homeController.enrollInNewCource);
+
+// Create Razorpay order for enrollment
+router.post('/create-enrollment-order', isLoggedIn, homeController.createEnrollmentOrder);
+
+// Verify enrollment payment
+router.post('/verify-enrollment-payment', isLoggedIn, homeController.verifyEnrollmentPayment);
 
 module.exports = router;

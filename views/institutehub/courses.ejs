@@ -29,6 +29,20 @@
       return params.toString();
   }
 
+  function getCoursePrice(course) {
+      const payPrice = course.oldPrice;
+      const marketPrice = course.price;
+      
+      // Discount calculate karo
+      const discount = marketPrice > payPrice ? Math.round(((marketPrice - payPrice) / marketPrice) * 100) : 0;
+      
+      return {
+          payPrice: payPrice,        // ✅ User pays this
+          marketPrice: marketPrice,   // ✅ Market value (crossed)
+          discount: discount,         // ✅ Discount percentage
+          hasDiscount: discount > 0   // ✅ Is there a discount?
+      };
+  }
 %>
 
 <!-- ============================================================ -->
@@ -84,6 +98,8 @@
         <div class="relative overflow-hidden rounded-2xl">
             <div id="upcomingTrack" class="flex transition-transform duration-700 ease-in-out">
                 <% upcomingCourses.forEach((course, index) => { %>
+                   <% const price = getCoursePrice(course);
+                %>
                     <div class="min-w-full relative">
                         <div class="relative rounded-2xl overflow-hidden">
                             <img src="<%= course.img %>" alt="<%= course.title %>" class="w-full h-[280px] sm:h-[320px] object-cover" loading="lazy">
@@ -116,11 +132,14 @@
                                         <span class="text-white/60 text-sm"><i class="fas fa-users mr-1"></i> <%= (course.students || 0).toLocaleString() %> interested</span>
                                     </div>
                                     <div class="flex flex-wrap items-center gap-3 mt-4">
-                                        <span class="text-2xl font-extrabold text-[#C9A227]">₹<%= (course.price || 0).toLocaleString() %></span>
-                                        <% if (course.oldPrice && course.oldPrice > course.price) { %>
-                                            <span class="text-sm text-white/60 line-through">₹<%= (course.oldPrice || 0).toLocaleString() %></span>
-                                            <span class="px-2 py-0.5 bg-[#22C55E]/20 text-[#22C55E] text-xs font-bold rounded-full">
-                                                <%= Math.round((1 - course.price / course.oldPrice) * 100) %>% OFF
+                                        <!-- ✅ User pays this price -->
+                                        <span class="text-2xl font-extrabold text-[#C9A227]">₹<%= (price.payPrice || 0).toLocaleString() %></span>
+                                        
+                                        <!-- ✅ Market value - crossed -->
+                                        <% if (price.hasDiscount) { %>
+                                            <span class="text-sm text-white/60 line-through">₹<%= (price.marketPrice || 0).toLocaleString() %></span>
+                                            <span class="px-2.5 py-0.5 bg-[#22C55E] text-white text-xs font-bold rounded-full shadow-lg shadow-[#22C55E]/30">
+                                                <%= price.discount %>% OFF
                                             </span>
                                         <% } %>
                                     </div>
@@ -251,13 +270,15 @@
         <!-- Course Grid -->
         <div id="courseGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <% if (courses && courses.length > 0) { %>
-                <% courses.forEach((c, i) => { %>
+                <% courses.forEach((c, i) => { 
+                    const price = getCoursePrice(c);
+                %>
                     <div class="group reveal-up rounded-2xl overflow-hidden bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-[#1E293B] hover:border-[#2563EB]/40 hover:shadow-xl hover:shadow-[#2563EB]/10 hover:-translate-y-2 transition-all duration-400 course-card"
                          data-id="<%= c._id %>"
                          data-category="<%= c.category %>"
                          data-level="<%= c.level %>"
                          data-title="<%= c.title.toLowerCase() %>"
-                         data-price="<%= c.price %>"
+                         data-price="<%= price.payPrice %>"
                          data-rating="<%= c.rating %>"
                          style="transition-delay: <%= (i % 4) * 60 %>ms">
                         
@@ -266,7 +287,13 @@
                             <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white/90 dark:bg-[#0B1120]/90 text-[#0F172A] dark:text-white backdrop-blur">
                                 <%= c.level || 'Beginner' %>
                             </span>
-                            <% if (c.tags && c.tags.includes('best-seller')) { %>
+                            
+                            <!-- ✅ DISCOUNT BADGE ON IMAGE -->
+                            <% if (price.hasDiscount) { %>
+                                <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#22C55E] text-white shadow-lg shadow-[#22C55E]/30 animate-pulse">
+                                    <i class="fas fa-tag mr-0.5"></i> <%= price.discount %>% OFF
+                                </span>
+                            <% } else if (c.tags && c.tags.includes('best-seller')) { %>
                                 <span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#C9A227] text-white shadow">
                                     <i class="fas fa-crown mr-0.5"></i> Best Seller
                                 </span>
@@ -287,6 +314,7 @@
                                     <i class="fas fa-fire mr-0.5"></i> Hot
                                 </span>
                             <% } %>
+                            
                             <button type="button" onclick="toggleSave(this, event)" data-course-id="<%= c._id %>" class="save-btn absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/90 dark:bg-[#0B1120]/90 backdrop-blur flex items-center justify-center text-[#64748B] hover:text-[#EF4444] shadow transition-all duration-300">
                                 <i class="far fa-heart text-xs"></i>
                             </button>
@@ -312,12 +340,19 @@
                                 <span class="text-[#94A3B8]">(<%= (c.reviews || 0).toLocaleString() %>)</span>
                             </div>
 
-                            <div class="mt-3 flex items-baseline gap-2 flex-wrap">
-                                <span class="text-base font-extrabold text-[#0F172A] dark:text-white">₹<%= (c.price || 0).toLocaleString() %></span>
-                                <% if (c.oldPrice && c.oldPrice > c.price) { %>
-                                    <span class="text-xs text-[#94A3B8] line-through">₹<%= (c.oldPrice || 0).toLocaleString() %></span>
-                                    <span class="ml-auto text-xs font-bold text-[#22C55E]">
-                                        <%= Math.round((1 - c.price / c.oldPrice) * 100) %>% OFF
+                            <!-- ✅ CORRECTED PRICE SECTION -->
+                            <div class="mt-3 flex items-center gap-2 flex-wrap">
+                                <!-- ✅ User pays this price (Bold & Prominent) -->
+                                <span class="text-base font-extrabold text-[#0F172A] dark:text-white">₹<%= (price.payPrice || 0).toLocaleString() %></span>
+                                
+                                <!-- ✅ Market value (Crossed out) -->
+                                <% if (price.hasDiscount) { %>
+                                    <span class="text-xs text-[#94A3B8] line-through">₹<%= (price.marketPrice || 0).toLocaleString() %></span>
+                                    
+                                    <!-- ✅ Discount Percentage (Highlighted) -->
+                                    <span class="ml-auto inline-flex items-center gap-0.5 px-2 py-0.5 bg-[#22C55E]/10 text-[#22C55E] text-[10px] font-bold rounded-full border border-[#22C55E]/20">
+                                        <i class="fas fa-arrow-trend-down text-[8px]"></i>
+                                        <%= price.discount %>% OFF
                                     </span>
                                 <% } %>
                             </div>
@@ -326,9 +361,10 @@
                                 <a href="/courses/<%= c._id %>" class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-semibold border border-[#E2E8F0] dark:border-[#1E293B] text-[#0F172A] dark:text-white hover:border-[#2563EB]/50 hover:text-[#2563EB] transition-all duration-300">
                                     View Details
                                 </a>
-                                <button type="button" onclick="handleEnroll(this, '<%= c._id %>')" class="enroll-btn flex-1 px-3 py-2 rounded-xl text-xs font-bold bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-md shadow-[#2563EB]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+                                <a href="/enroll/<%= c._id %>" 
+                                   class="flex-1 text-center px-3 py-2 rounded-xl text-xs font-bold bg-[#2563EB] text-white hover:bg-[#1D4ED8] shadow-md shadow-[#2563EB]/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
                                     Enroll Now
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -468,10 +504,19 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
+    @keyframes discountPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    .discount-badge {
+        animation: discountPulse 2s ease-in-out infinite;
+    }
+
     @media (prefers-reduced-motion: reduce) {
         .reveal-up { opacity: 1 !important; transform: none !important; transition: none !important; }
         .pulse-dot { animation: none !important; }
         .save-pop i { animation: none !important; }
+        .discount-badge { animation: none !important; }
     }
 
     @media (max-width: 640px) {
@@ -537,7 +582,7 @@
             startUpcomingAutoSlide();
         }
 
-        // ========== SAVE/BUTTON FUNCTIONS ==========
+        // ========== SAVE FUNCTION ==========
         window.toggleSave = function(btn, evt) {
             if (evt) { evt.preventDefault(); evt.stopPropagation(); }
             const icon = btn.querySelector('i');
@@ -551,7 +596,6 @@
             void btn.offsetWidth;
             btn.classList.add('save-pop');
 
-            // AJAX call to save/unsave
             const courseId = btn.dataset.courseId;
             if (courseId) {
                 fetch(`/api/courses/${courseId}/save`, {
@@ -562,25 +606,9 @@
             }
         };
 
-        window.handleEnroll = function(btn, courseId) {
-            if (btn.dataset.enrolled === 'true') return;
-            btn.dataset.enrolled = 'true';
-            btn.innerHTML = '<i class="fas fa-check mr-1"></i> Enrolled';
-            btn.classList.remove('bg-[#2563EB]', 'hover:bg-[#1D4ED8]', 'shadow-[#2563EB]/25');
-            btn.classList.add('bg-[#22C55E]', 'shadow-[#22C55E]/25', 'cursor-default');
-            
-            // Redirect to course page
-            if (courseId) {
-                setTimeout(() => {
-                    window.location.href = `/courses/${courseId}`;
-                }, 500);
-            }
-        };
-
+        // ========== NOTIFY FUNCTION ==========
         window.notifyMe = function(courseId) {
-            // Show notification
             alert('You will be notified when this course launches!');
-            // In production, send to backend
             fetch(`/api/courses/${courseId}/notify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
