@@ -94,11 +94,11 @@
                                             </div>
                                             <h3 class="text-xl sm:text-2xl font-bold text-white"><%= offer.title %></h3>
                                             <div class="flex items-center gap-3 mt-2">
-                                                <span class="text-2xl font-extrabold text-[#C9A227]"><%= offer.price %></span>
-                                                <span class="text-sm text-white/60 line-through"><%= offer.original %></span>
+                                                <span class="text-2xl font-extrabold text-[#C9A227]"><%= offer.original %></span>
+                                                <span class="text-sm text-white/60 line-through"><%= offer.price %></span>
                                             </div>
                                             <div class="mt-4 flex items-center gap-3 flex-wrap">
-                                                <a href="/courses/<%= offer.courseId || '' %>" 
+                                                <a href="/enroll?courseId=<%= offer.courseId || '' %>" 
                                                    class="px-6 py-2.5 bg-[#2563EB] text-white text-sm font-semibold rounded-xl hover:bg-[#1D4ED8] transition-all duration-300 hover:scale-105 shadow-lg shadow-[#2563EB]/30">
                                                     Enroll Now
                                                 </a>
