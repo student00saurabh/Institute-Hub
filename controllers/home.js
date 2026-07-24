@@ -1101,7 +1101,9 @@ module.exports.toggleHomepageVisibility = async (req, res) => {
 // ============================================================
 module.exports.enrollCourseForm = async (req, res) => {
     try {
+        // Get courseId from params OR query
         const preselectedCourseId = req.params.courseId || req.query.courseId || null;
+        const userId = req.user ? req.user._id : null;
         
         // Get all active courses
         let courses = await Course.find({ isActive: true })
@@ -1111,24 +1113,51 @@ module.exports.enrollCourseForm = async (req, res) => {
             .sort({ createdAt: -1 })
             .lean();
 
-        const userId = req.user ? req.user._id : null;
+        // ============================================================
+        // ✅ CHECK IF USER IS ALREADY ENROLLED IN THE COURSE
+        // ============================================================
+        let isAlreadyEnrolled = false;
+        let enrolledCourse = null;
 
-        if (userId) {
-            const user = await User.findById(userId).select('enrolledCourses');
+        if (userId && preselectedCourseId) {
+            // Method 1: Check directly in Course model
+            const courseWithStudent = await Course.findOne({
+                _id: preselectedCourseId,
+                'students.user': userId
+            }).select('title _id');
+
+            if (courseWithStudent) {
+                isAlreadyEnrolled = true;
+                enrolledCourse = courseWithStudent;
+            }
+
+            // Method 2: Also check in User's enrolledCourses array (if you maintain it)
+            if (!isAlreadyEnrolled) {
+                const user = await User.findById(userId)
+                    .select('enrolledCourses')
+                    .populate('enrolledCourses.course', 'title _id');
+                
+                if (user && user.enrolledCourses) {
+                    const found = user.enrolledCourses.find(
+                        e => e.course && e.course._id.toString() === preselectedCourseId
+                    );
+                    if (found) {
+                        isAlreadyEnrolled = true;
+                        enrolledCourse = found.course;
+                    }
+                }
+            }
+
+            // ✅ If already enrolled, redirect with flash message
+            if (isAlreadyEnrolled) {
+                req.flash("info", "✅ You are already enrolled in this course. Continue learning!");
+                return res.redirect(`/courses/${preselectedCourseId}/access`);
+            }
         }
 
-        //check whther the user is already enrolled in this course or not
-        const isAlreadyEnrolled = await Course.findOne({
-            _id: preselectedCourseId,
-            students: userId
-        }); 
-
-        if (isAlreadyEnrolled) {
-            req.flash("info", "You are already enrolled in this course.");
-            return res.redirect(`/courses/${preselectedCourseId}`);
-        }
-
+        // ============================================================
         // FALLBACK COURSES - WITH ALL DATA
+        // ============================================================
         const FALLBACK_COURSES = [
             {
                 _id: 'fallback-1',
@@ -1247,7 +1276,13 @@ module.exports.enrollCourseForm = async (req, res) => {
         // Get selected course
         let selectedCourse = null;
         if (preselectedCourseId) {
+            // Check in courses array
             selectedCourse = courses.find(c => c._id.toString() === preselectedCourseId);
+            
+            // If not found in courses (might be fallback), check fallback
+            if (!selectedCourse) {
+                selectedCourse = FALLBACK_COURSES.find(c => c._id === preselectedCourseId);
+            }
         }
 
         // If no selected course, select first one
@@ -1255,6 +1290,7 @@ module.exports.enrollCourseForm = async (req, res) => {
             selectedCourse = courses[0];
         }
 
+        // ✅ Pass enrollment status to view
         res.render("institutehub/enroll.ejs", {
             courses: courses,
             categories: categories,
@@ -1262,8 +1298,10 @@ module.exports.enrollCourseForm = async (req, res) => {
             preselectedCourseId: preselectedCourseId,
             currentUser: req.user || null,
             moment: require('moment'),
-            // Razorpay keys
             razorpayKey: process.env.RAZORPAY_KEY_ID,
+            // ✅ Pass enrollment status
+            isAlreadyEnrolled: isAlreadyEnrolled,
+            enrolledCourse: enrolledCourse
         });
 
     } catch (error) {
