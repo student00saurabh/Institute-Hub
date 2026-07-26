@@ -6,18 +6,14 @@
             <!-- Brand Column -->
             <div class="space-y-4">
                 <a href="/" class="flex items-center text-xl font-extrabold group">
-<div class="relative w-10 h-10 flex items-center justify-center flex-shrink-0">
-
-    <img
-        src="/images/logo.png"
-        alt="InstituteHub"
-        class="logo-img w-9 h-9 object-contain transition-all  duration-300 dark:[filter:brightness(1.15)_contrast(1.15)_drop-shadow(0_0_8px_rgba(255,255,255,0.28))]"
-        
-    >
-
-    <div class="absolute -inset-1 rounded-xl border-2 border-transparent group-hover:border-[#C9A227]/30 transition-all duration-500"></div>
-
-</div>
+                    <div class="relative w-10 h-10 flex items-center justify-center flex-shrink-0">
+                        <img
+                            src="/images/logo.png"
+                            alt="InstituteHub"
+                            class="logo-img w-9 h-9 object-contain transition-all duration-300 dark:[filter:brightness(1.15)_contrast(1.15)_drop-shadow(0_0_8px_rgba(255,255,255,0.28))]"
+                        >
+                        <div class="absolute -inset-1 rounded-xl border-2 border-transparent group-hover:border-[#C9A227]/30 transition-all duration-500"></div>
+                    </div>
                     <span class="text-xl pt-1 font-extrabold tracking-tight">
                         <span class="text-white dark:text-white">Institute</span>
                         <span class="text-[#C9A227]">Hub</span>
@@ -121,20 +117,17 @@
                         <i class="fas fa-envelope-open-text text-[#C9A227]"></i>
                         Subscribe to our newsletter
                     </p>
-                    <form id="newsletterForm" class="flex gap-2">
+                    <div class="flex gap-2">
                         <input type="email" 
-                               id="newsletterEmail" 
-                               name="email" 
+                               id="footerNewsletterEmail" 
                                placeholder="Your email" 
-                               required
-                               class="flex-1 px-3 py-2 text-sm bg-[#1E293B] dark:bg-[#1E293B] border border-[#334155] dark:border-[#334155] rounded-lg text-white placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all">
-                        <button type="submit" 
-                                id="newsletterSubmit"
-                                class="px-3 py-2 text-sm font-medium text-white bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#3B82F6] hover:to-[#2563EB] rounded-lg transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-[#2563EB]/25">
+                               class="footer-newsletter-input flex-1 px-3 py-2 text-sm bg-[#1E293B] dark:bg-[#1E293B] border border-[#334155] dark:border-[#334155] rounded-lg text-white placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#2563EB] focus:border-transparent transition-all">
+                        <button id="footerSubscribeBtn" 
+                                class="footer-newsletter-btn px-3 py-2 text-sm font-medium text-white bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#3B82F6] hover:to-[#2563EB] rounded-lg transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-[#2563EB]/25">
                             <i class="fas fa-paper-plane"></i>
                         </button>
-                    </form>
-                    <div id="newsletterResponse" class="mt-2 text-xs hidden"></div>
+                    </div>
+                    <div id="footerNewsletterResponse" class="footer-newsletter-response mt-2 text-xs hidden"></div>
                 </div>
             </div>
         </div>
@@ -156,7 +149,63 @@
 </footer>
 
 <!-- ============================================================ -->
-<!--  SUPPORT CHATBOT — suggested Q&A, contact card & lead capture -->
+<!-- FOOTER OTP MODAL (Unique classes to avoid conflicts)          -->
+<!-- ============================================================ -->
+<div id="footerOtpModal" class="footer-otp-modal fixed inset-0 z-[9998] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+            <div id="footerOtpModalContent" class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md w-full">
+                <!-- Header -->
+                <div class="bg-gradient-to-r from-[#C9A227] to-[#B8901E] px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fas fa-envelope"></i> Verify Subscription
+                        </h3>
+                        <button type="button" onclick="closeFooterOTPModal()" class="text-white hover:text-gray-200 transition-colors">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <p class="text-sm text-white/80 mt-1" id="footerOtpEmailDisplay">Verifying email@example.com</p>
+                </div>
+                <!-- Body -->
+                <div class="px-6 py-6">
+                    <div id="footerOtpStatus" class="hidden p-3 rounded-xl mb-4 text-sm"></div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Enter 6-digit OTP</label>
+                            <div class="flex gap-2 justify-center">
+                                <input type="text" id="footerOtp1" maxlength="1" class="footer-otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveFooterOTP(this, 'footerOtp2')">
+                                <input type="text" id="footerOtp2" maxlength="1" class="footer-otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveFooterOTP(this, 'footerOtp3')">
+                                <input type="text" id="footerOtp3" maxlength="1" class="footer-otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveFooterOTP(this, 'footerOtp4')">
+                                <input type="text" id="footerOtp4" maxlength="1" class="footer-otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveFooterOTP(this, 'footerOtp5')">
+                                <input type="text" id="footerOtp5" maxlength="1" class="footer-otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveFooterOTP(this, 'footerOtp6')">
+                                <input type="text" id="footerOtp6" maxlength="1" class="footer-otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveFooterOTP(this, null)" onkeydown="handleFooterOTPBackspace(event, 'footerOtp5')">
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                                <span id="footerOtpTimer">OTP expires in <span class="font-bold text-[#C9A227]" id="footerOtpTimerCount">10:00</span></span>
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-500 dark:text-gray-400">Didn't receive OTP?</span>
+                            <button id="footerResendOTPBtn" onclick="footerResendOTP()" class="text-[#C9A227] font-semibold hover:text-[#B8901E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Resend OTP</button>
+                        </div>
+                        <p id="footerResendStatus" class="text-xs text-gray-500 dark:text-gray-400 hidden"></p>
+                        <div class="flex gap-3 mt-4">
+                            <button type="button" onclick="closeFooterOTPModal()" class="flex-1 px-4 py-2.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Cancel</button>
+                            <button type="button" id="footerVerifyOTPBtn" onclick="footerVerifyOTP()" class="flex-1 px-4 py-2.5 bg-gradient-to-r from-[#C9A227] to-[#B8901E] text-white font-semibold rounded-xl hover:from-[#B8901E] hover:to-[#A07A1A] transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="fas fa-check mr-2"></i> Verify
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!--  SUPPORT CHATBOT — Complete with Subscribe Feature            -->
 <!-- ============================================================ -->
 
 <!-- Chat Launcher -->
@@ -181,8 +230,7 @@
                 <img
                     src="/images/logo.png"
                     alt="InstituteHub"
-                    class="logo-img w-7 h-7 object-contain transition-all  duration-300 dark:[filter:brightness(1.15)_contrast(1.15)_drop-shadow(0_0_8px_rgba(255,255,255,0.28))]"
-        
+                    class="logo-img w-7 h-7 object-contain transition-all duration-300 dark:[filter:brightness(1.15)_contrast(1.15)_drop-shadow(0_0_8px_rgba(255,255,255,0.28))]"
                 >
                 <span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-[#22C55E] border-2 border-[#0F172A] rounded-full"></span>
             </div>
@@ -306,13 +354,46 @@ document.addEventListener('DOMContentLoaded', function () {
             followUps: ['courses']
         },
         {
+            id: 'duration', label: 'Course Duration', icon: 'fa-hourglass-half', color: '#0D9488',
+            keywords: ['duration', 'how long', 'months', 'weeks', 'time to complete', 'length of course'],
+            answer: "Most programs run <b>3 to 6 months</b> depending on the track and whether you choose weekday, weekend or self-paced learning. Share the course you're interested in and we'll tell you the exact duration.",
+            followUps: ['courses', 'fees']
+        },
+        {
+            id: 'eligibility', label: 'Eligibility', icon: 'fa-user-check', color: '#4F46E5',
+            keywords: ['eligibility', 'eligible', 'who can join', 'qualification', 'prerequisite', 'prerequisites', 'background needed', 'beginner'],
+            answer: "There's no strict eligibility bar — our courses are designed for both <b>complete beginners</b> and working professionals looking to upskill. Basic computer familiarity is enough to get started.",
+            followUps: ['courses', 'demo']
+        },
+        {
+            id: 'discount', label: 'Discounts & Offers', icon: 'fa-tag', color: '#EA580C',
+            keywords: ['discount', 'scholarship', 'offer', 'coupon', 'group discount', 'referral'],
+            answer: "We regularly run <b>early-bird and group discounts</b>, and referring a friend can unlock extra savings for both of you. Ask our team about any active offer on your chosen course.",
+            followUps: ['fees', 'contact']
+        },
+        {
+            id: 'international', label: 'International Students', icon: 'fa-earth-asia', color: '#0284C7',
+            keywords: ['international', 'outside india', 'abroad', 'global students', 'overseas', 'nri'],
+            answer: "Yes! Our <b>live online batches</b> are open to learners outside India too — timings can be adjusted where possible, and payments can be made internationally.",
+            followUps: ['mode', 'payment']
+        },
+        {
+            id: 'subscribe', 
+            label: '📧 Subscribe', 
+            icon: 'fa-envelope-open-text', 
+            color: '#C9A227',
+            keywords: ['subscribe', 'newsletter', 'email updates', 'notification', 'subscription'],
+            isSubscribe: true,
+            followUps: []
+        },
+        {
             id: 'contact', label: 'Contact Us', icon: 'fa-headset', color: '#C9A227',
             keywords: ['contact', 'reach', 'phone', 'call', 'email', 'address', 'talk to someone', 'support'],
             isContact: true,
             followUps: []
         }
     ];
-    const MAIN_MENU = ['courses', 'fees', 'mode', 'certification', 'placement', 'trainers', 'payment', 'corporate', 'contact'];
+    const MAIN_MENU = ['courses', 'fees', 'duration', 'eligibility', 'mode', 'certification', 'placement', 'trainers', 'payment', 'discount', 'corporate', 'international', 'subscribe', 'contact'];
 
     // ---------- DOM refs ----------
     const toggleBtn = document.getElementById('chatbotToggle');
@@ -439,6 +520,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return { icon: 'fa-list-ul', label: 'Main Menu', onClick: () => renderChips(MAIN_MENU) };
     }
 
+    // ── Handle FAQ Select (with Subscribe) ──
     function handleFaqSelect(id, userLabelOverride) {
         const faq = faqData.find(f => f.id === id);
         if (!faq) return;
@@ -447,6 +529,8 @@ document.addEventListener('DOMContentLoaded', function () {
         respondWithDelay(() => {
             if (faq.isContact) {
                 renderContactAnswer();
+            } else if (faq.isSubscribe) {
+                renderSubscribeFlow();
             } else {
                 addBotMessage(faq.answer);
                 const chips = [...(faq.followUps || [])];
@@ -498,7 +582,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
-    // Friendly greeting detector
     function isGreeting(text) {
         const t = text.trim().toLowerCase();
         const greetings = ['hi', 'hii', 'hiii', 'hiiii', 'hello', 'helo', 'hey', 'heya', 'yo',
@@ -516,14 +599,12 @@ document.addEventListener('DOMContentLoaded', function () {
         return replies[Math.floor(Math.random() * replies.length)];
     }
 
-    // Basic disrespectful-language guard — extend this list for your audience as needed.
     const ABUSIVE_WORDS = ['stupid', 'idiot', 'nonsense', 'useless', 'bakwas', 'bakwaas', 'bewakoof', 'pagal'];
     function containsAbusiveLanguage(text) {
         const lower = text.toLowerCase();
         return ABUSIVE_WORDS.some(w => new RegExp('\\b' + w + '\\b', 'i').test(lower));
     }
 
-    // Live search across courses & blogs — same data source as the site search bar
     function renderSearchResults(items, query) {
         const cardsHtml = items.map(item => {
             const accent = item.type === 'course' ? '#2563EB' : '#7C3AED';
@@ -552,12 +633,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function handleFreeText(text) {
-        // Priority 1 — the listed quick-reply questions/answers always win first
         const match = matchFaq(text);
         if (match) {
             respondWithDelay(() => {
                 if (match.isContact) {
                     renderContactAnswer();
+                } else if (match.isSubscribe) {
+                    renderSubscribeFlow();
                 } else {
                     addBotMessage(match.answer);
                     renderChips(match.followUps || [], [mainMenuChip()]);
@@ -566,7 +648,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Priority 2 — greetings
         if (isGreeting(text)) {
             respondWithDelay(() => {
                 addBotMessage(pickGreetingReply());
@@ -575,7 +656,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Priority 3 — keep the conversation respectful
         if (containsAbusiveLanguage(text)) {
             respondWithDelay(() => {
                 addBotMessage("Let's keep our chat friendly and respectful 🙏 I'm happy to help — pick a topic below or ask me about a course or blog.");
@@ -584,7 +664,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Priority 4 — search courses & blogs, same as the site search bar
         const typing = showTyping();
         const startedAt = Date.now();
         try {
@@ -615,10 +694,273 @@ document.addEventListener('DOMContentLoaded', function () {
         handleFreeText(text);
     });
 
-    // ---------- initial greeting ----------
-    function initChat() {
-        addBotMessage(`Hi${hasName ? ' ' + escapeHtml(currUser.name.split(' ')[0]) : ''} 👋 I'm the InstituteHub Assistant. Pick a topic below, or type your question — I can even look up a specific course or blog for you.`);
-        renderChips(MAIN_MENU);
+    // ================================================================
+    // SUBSCRIBE FLOW (Chatbot)
+    // ================================================================
+    function renderSubscribeFlow() {
+        const isLoggedIn = !!currUser;
+        const userEmail = isLoggedIn && currUser.email ? currUser.email : '';
+        
+        if (isLoggedIn && userEmail) {
+            fetch(`/api/subscription-status?email=${encodeURIComponent(userEmail)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.exists && data.isVerified) {
+                        addBotMessage(`✅ You are already subscribed to our newsletter!`);
+                        renderChips(MAIN_MENU);
+                    } else if (data.exists && !data.isVerified) {
+                        offerPendingSubscriptionOptions(userEmail);
+                    } else {
+                        renderSubscribeForm(userEmail);
+                    }
+                })
+                .catch(() => renderSubscribeForm(userEmail));
+        } else {
+            renderSubscribeForm('');
+        }
+    }
+
+    function renderSubscribeForm(prefillEmail) {
+        const wrap = document.createElement('div');
+        wrap.className = 'cb-msg cb-msg-bot';
+        wrap.id = 'cbActiveForm';
+        wrap.innerHTML = `
+            <div class="cb-avatar">${BOT_AVATAR}</div>
+            <div class="cb-bubble cb-bubble-bot w-full">
+                <p class="mb-3">📬 Subscribe to our newsletter and get latest updates, course announcements & exclusive offers!</p>
+                <input id="cbSubscribeEmail" type="email" placeholder="Enter your email" value="${prefillEmail ? escapeHtml(prefillEmail) : ''}" class="cb-input mb-2">
+                <div id="cbSubscribeError" class="cb-form-error hidden"></div>
+                <button id="cbSubscribeBtn" type="button" class="cb-cta-btn"><i class="fas fa-paper-plane"></i> Subscribe</button>
+            </div>`;
+        messagesEl.appendChild(wrap);
+        scrollToBottom();
+        
+        document.getElementById('cbSubscribeBtn').addEventListener('click', async function() {
+            const email = document.getElementById('cbSubscribeEmail').value.trim();
+            const err = document.getElementById('cbSubscribeError');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!email || !emailRegex.test(email)) {
+                showFormError(err, 'Please enter a valid email address.');
+                return;
+            }
+            
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            
+            try {
+                const res = await fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success || data.hasPendingOtp) {
+                    removeActiveForm();
+                    if (data.hasPendingOtp) {
+                        addBotMessage(`📧 OTP already sent to <b>${email}</b>. Check your inbox.`);
+                    } else {
+                        addBotMessage(`📧 OTP sent to <b>${email}</b>! Enter the 6-digit code below.`);
+                    }
+                    renderChatbotOTPInput(email);
+                } else {
+                    showFormError(err, data.message || 'Failed to subscribe.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Subscribe';
+                }
+            } catch (error) {
+                showFormError(err, 'Unable to process subscription.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Subscribe';
+            }
+        });
+    }
+
+    function renderChatbotOTPInput(email) {
+        const wrap = document.createElement('div');
+        wrap.className = 'cb-msg cb-msg-bot';
+        wrap.id = 'cbActiveForm';
+        wrap.innerHTML = `
+            <div class="cb-avatar">${BOT_AVATAR}</div>
+            <div class="cb-bubble cb-bubble-bot w-full">
+                <p class="mb-2 text-sm">Enter 6-digit OTP from <b>${escapeHtml(email)}</b></p>
+                <div class="flex gap-2 justify-center mb-2">
+                    <input type="text" id="cbOtp1" maxlength="1" class="cb-otp-input w-8 h-8 text-center text-xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveCbOTP(this, 'cbOtp2')">
+                    <input type="text" id="cbOtp2" maxlength="1" class="cb-otp-input w-8 h-8 text-center text-xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveCbOTP(this, 'cbOtp3')">
+                    <input type="text" id="cbOtp3" maxlength="1" class="cb-otp-input w-8 h-8 text-center text-xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveCbOTP(this, 'cbOtp4')">
+                    <input type="text" id="cbOtp4" maxlength="1" class="cb-otp-input w-8 h-8 text-center text-xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveCbOTP(this, 'cbOtp5')">
+                    <input type="text" id="cbOtp5" maxlength="1" class="cb-otp-input w-8 h-8 text-center text-xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveCbOTP(this, 'cbOtp6')">
+                    <input type="text" id="cbOtp6" maxlength="1" class="cb-otp-input w-8 h-8 text-center text-xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveCbOTP(this, null)" onkeydown="handleCbOTPBackspace(event, 'cbOtp5')">
+                </div>
+                <div id="cbOtpError" class="cb-form-error hidden"></div>
+                <div class="flex items-center justify-between text-sm">
+                    <span id="cbOtpTimer" class="text-gray-500 dark:text-gray-400">OTP expires in <span class="font-bold text-[#C9A227]" id="cbOtpTimerCount">10:00</span></span>
+                    <button id="cbResendOtpBtn" onclick="cbResendOTP('${email}')" class="text-[#C9A227] font-semibold hover:text-[#B8901E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Resend OTP</button>
+                </div>
+                <button id="cbVerifyOtpBtn" type="button" class="cb-cta-btn mt-3"><i class="fas fa-check"></i> Verify OTP</button>
+            </div>`;
+        messagesEl.appendChild(wrap);
+        scrollToBottom();
+        
+        let totalSeconds = 600;
+        const timerDisplay = document.getElementById('cbOtpTimerCount');
+        const resendBtn = document.getElementById('cbResendOtpBtn');
+        if (resendBtn) resendBtn.disabled = true;
+        const timerInterval = setInterval(() => {
+            totalSeconds--;
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            if (timerDisplay) timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            if (totalSeconds <= 0) {
+                clearInterval(timerInterval);
+                if (resendBtn) { resendBtn.disabled = false; resendBtn.textContent = 'Resend OTP'; }
+                if (timerDisplay) timerDisplay.textContent = 'Expired';
+            }
+        }, 1000);
+        
+        document.getElementById('cbVerifyOtpBtn').addEventListener('click', async function() {
+            let otp = '';
+            for (let i = 1; i <= 6; i++) {
+                const input = document.getElementById(`cbOtp${i}`);
+                if (input) otp += input.value;
+            }
+            if (otp.length !== 6) {
+                const err = document.getElementById('cbOtpError');
+                showFormError(err, 'Please enter all 6 digits.');
+                return;
+            }
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            try {
+                const res = await fetch('/api/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, otp: otp })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    removeActiveForm();
+                    addBotMessage(`🎉 ${data.message}`);
+                    renderChips(MAIN_MENU);
+                } else {
+                    const err = document.getElementById('cbOtpError');
+                    showFormError(err, data.message || 'Invalid OTP.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-check"></i> Verify OTP';
+                }
+            } catch (error) {
+                const err = document.getElementById('cbOtpError');
+                showFormError(err, 'Unable to verify OTP.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Verify OTP';
+            }
+        });
+    }
+
+    function moveCbOTP(current, nextId) {
+        if (current.value.length === 1 && nextId) {
+            const next = document.getElementById(nextId);
+            if (next) next.focus();
+        }
+    }
+    function handleCbOTPBackspace(event, prevId) {
+        if (event.key === 'Backspace' && event.target.value === '' && prevId) {
+            const prev = document.getElementById(prevId);
+            if (prev) { prev.focus(); prev.select(); }
+        }
+    }
+    async function cbResendOTP(email) {
+        const btn = document.getElementById('cbResendOtpBtn');
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+        try {
+            const res = await fetch('/api/resend-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email })
+            });
+            const data = await res.json();
+            if (data.success) {
+                let totalSeconds = 600;
+                const timerDisplay = document.getElementById('cbOtpTimerCount');
+                const interval = setInterval(() => {
+                    totalSeconds--;
+                    const mins = Math.floor(totalSeconds / 60);
+                    const secs = totalSeconds % 60;
+                    if (timerDisplay) timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                    if (totalSeconds <= 0) {
+                        clearInterval(interval);
+                        btn.disabled = false;
+                        btn.textContent = 'Resend OTP';
+                        if (timerDisplay) timerDisplay.textContent = 'Expired';
+                    }
+                }, 1000);
+                const err = document.getElementById('cbOtpError');
+                if (err) { err.classList.add('hidden'); err.textContent = ''; }
+                btn.textContent = 'Resend OTP';
+                btn.disabled = true;
+                setTimeout(() => { btn.disabled = false; btn.textContent = 'Resend OTP'; }, 60000);
+            } else {
+                const err = document.getElementById('cbOtpError');
+                showFormError(err, data.message || 'Failed to resend.');
+                btn.disabled = false;
+                btn.textContent = 'Resend OTP';
+            }
+        } catch (error) {
+            const err = document.getElementById('cbOtpError');
+            showFormError(err, 'Unable to resend OTP.');
+            btn.disabled = false;
+            btn.textContent = 'Resend OTP';
+        }
+    }
+
+    // ================================================================
+    // PENDING SUBSCRIPTION — actionable options instead of a dead-end message
+    // ================================================================
+    function offerPendingSubscriptionOptions(email) {
+        addBotMessage(`📧 Looks like <b>${escapeHtml(email)}</b> already has a pending subscription — it's just waiting on OTP verification. What would you like to do?`);
+        renderChips([], [
+            { icon: 'fa-key', label: 'Enter OTP now', onClick: () => renderChatbotOTPInput(email) },
+            { icon: 'fa-rotate-right', label: 'Resend OTP', onClick: () => handleResendPendingOTP(email) },
+            { icon: 'fa-headset', label: "Didn't get it? Contact us", onClick: () => startLeadFlow(`I subscribed with ${email} but haven't received the verification OTP. Please help.`) },
+            mainMenuChip()
+        ]);
+    }
+
+    async function handleResendPendingOTP(email) {
+        chipsEl.innerHTML = '';
+        const typing = showTyping();
+        try {
+            const res = await fetch('/api/resend-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json().catch(() => ({}));
+            typing.remove();
+            if (data.success) {
+                addBotMessage(`✅ A new OTP has been sent to <b>${escapeHtml(email)}</b>. Enter it below.`);
+                renderChatbotOTPInput(email);
+            } else {
+                addBotMessage(data.message || "We couldn't resend the OTP right now — it may have been sent too recently. Please wait a bit, or reach out to our support team.");
+                renderChips([], [
+                    { icon: 'fa-headset', label: 'Contact support', onClick: () => startLeadFlow(`I need help with my subscription OTP for ${email}.`) },
+                    { icon: 'fa-key', label: 'Enter OTP anyway', onClick: () => renderChatbotOTPInput(email) },
+                    mainMenuChip()
+                ]);
+            }
+        } catch (err) {
+            typing.remove();
+            addBotMessage("We couldn't reach the server to resend the OTP. Please try again shortly.");
+            renderChips([], [
+                { icon: 'fa-headset', label: 'Contact support', onClick: () => startLeadFlow(`I need help with my subscription OTP for ${email}.`) },
+                mainMenuChip()
+            ]);
+        }
     }
 
     // ================================================================
@@ -800,6 +1142,255 @@ document.addEventListener('DOMContentLoaded', function () {
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
         }
     }
+
+    // ================================================================
+    // FOOTER NEWSLETTER SUBSCRIBE (standalone widget, works for ANY email)
+    // ================================================================
+    const footerEmailInput   = document.getElementById('footerNewsletterEmail');
+    const footerSubscribeBtn = document.getElementById('footerSubscribeBtn');
+    const footerResponseEl   = document.getElementById('footerNewsletterResponse');
+    let footerPendingEmail   = '';
+    let footerOtpTimerInterval = null;
+
+    function showFooterResponse(msg, type) {
+        if (!footerResponseEl) return;
+        footerResponseEl.textContent = msg;
+        footerResponseEl.className = 'footer-newsletter-response mt-2 text-xs font-medium ' +
+            (type === 'error' ? 'text-red-400' : type === 'success' ? 'text-green-400' : 'text-[#93C5FD]');
+        footerResponseEl.classList.remove('hidden');
+    }
+
+    async function handleFooterSubscribe() {
+        if (!footerEmailInput) return;
+        const email = footerEmailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!email || !emailRegex.test(email)) {
+            showFooterResponse('Please enter a valid email address.', 'error');
+            return;
+        }
+
+        const btn = footerSubscribeBtn;
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        try {
+            const res = await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }) // no auth / user restriction — anyone can subscribe any email
+            });
+            const data = await res.json().catch(() => ({}));
+
+            if (data.success || data.hasPendingOtp) {
+                footerPendingEmail = email;
+                showFooterResponse(
+                    data.hasPendingOtp
+                        ? `An OTP is already on its way to ${email}. Enter it below.`
+                        : `OTP sent to ${email}! Please verify to complete your subscription.`,
+                    data.hasPendingOtp ? 'info' : 'success'
+                );
+                openFooterOTPModal(email);
+            } else if (data.message && /already subscribed/i.test(data.message)) {
+                showFooterResponse(data.message, 'success');
+            } else {
+                showFooterResponse(data.message || 'Failed to subscribe. Please try again.', 'error');
+            }
+        } catch (err) {
+            showFooterResponse('Unable to process your subscription right now. Please try again.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    }
+
+    if (footerSubscribeBtn) {
+        footerSubscribeBtn.addEventListener('click', handleFooterSubscribe);
+    }
+    if (footerEmailInput) {
+        footerEmailInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); handleFooterSubscribe(); }
+        });
+    }
+
+    // ---------- Footer OTP Modal ----------
+    function openFooterOTPModal(email) {
+        const modal = document.getElementById('footerOtpModal');
+        const emailDisplay = document.getElementById('footerOtpEmailDisplay');
+        const status = document.getElementById('footerOtpStatus');
+        const resendStatus = document.getElementById('footerResendStatus');
+        if (emailDisplay) emailDisplay.textContent = `Verifying ${email}`;
+        if (status) { status.classList.add('hidden'); status.textContent = ''; }
+        if (resendStatus) { resendStatus.classList.add('hidden'); resendStatus.textContent = ''; }
+        ['footerOtp1', 'footerOtp2', 'footerOtp3', 'footerOtp4', 'footerOtp5', 'footerOtp6'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        const verifyBtn = document.getElementById('footerVerifyOTPBtn');
+        if (verifyBtn) { verifyBtn.disabled = false; verifyBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Verify'; }
+        if (modal) modal.classList.remove('hidden');
+        startFooterOtpTimer();
+        setTimeout(() => { const first = document.getElementById('footerOtp1'); if (first) first.focus(); }, 100);
+    }
+
+    window.closeFooterOTPModal = function () {
+        const modal = document.getElementById('footerOtpModal');
+        if (modal) modal.classList.add('hidden');
+        if (footerOtpTimerInterval) clearInterval(footerOtpTimerInterval);
+    };
+
+    function startFooterOtpTimer() {
+        if (footerOtpTimerInterval) clearInterval(footerOtpTimerInterval);
+        let totalSeconds = 600;
+        const timerDisplay = document.getElementById('footerOtpTimerCount');
+        const resendBtn = document.getElementById('footerResendOTPBtn');
+        if (resendBtn) resendBtn.disabled = true;
+        if (timerDisplay) timerDisplay.textContent = '10:00';
+        footerOtpTimerInterval = setInterval(() => {
+            totalSeconds--;
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            if (timerDisplay) timerDisplay.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            if (totalSeconds <= 0) {
+                clearInterval(footerOtpTimerInterval);
+                if (timerDisplay) timerDisplay.textContent = 'Expired';
+            }
+        }, 1000);
+        setTimeout(() => { if (resendBtn) resendBtn.disabled = false; }, 60000);
+    }
+
+    window.moveFooterOTP = function (el, nextId) {
+        el.value = el.value.replace(/[^0-9]/g, '').slice(0, 1);
+        if (el.value && nextId) {
+            const next = document.getElementById(nextId);
+            if (next) next.focus();
+        }
+    };
+
+    window.handleFooterOTPBackspace = function (event, prevId) {
+        if (event.key === 'Backspace' && !event.target.value && prevId) {
+            const prev = document.getElementById(prevId);
+            if (prev) prev.focus();
+        }
+    };
+
+    function showFooterOtpStatus(msg, type) {
+        const status = document.getElementById('footerOtpStatus');
+        if (!status) return;
+        status.textContent = msg;
+        status.className = 'p-3 rounded-xl mb-4 text-sm ' + (type === 'error' ? 'bg-red-500/10 text-red-600 dark:text-red-400' : 'bg-green-500/10 text-green-600 dark:text-green-400');
+        status.classList.remove('hidden');
+    }
+
+    window.footerVerifyOTP = async function () {
+        let otp = '';
+        for (let i = 1; i <= 6; i++) {
+            const el = document.getElementById(`footerOtp${i}`);
+            if (el) otp += el.value;
+        }
+        if (otp.length !== 6) {
+            showFooterOtpStatus('Please enter all 6 digits.', 'error');
+            return;
+        }
+        const btn = document.getElementById('footerVerifyOTPBtn');
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Verifying...';
+        try {
+            const res = await fetch('/api/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: footerPendingEmail, otp })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (data.success) {
+                if (footerOtpTimerInterval) clearInterval(footerOtpTimerInterval);
+                window.closeFooterOTPModal();
+                showFooterResponse(data.message || 'Subscribed successfully! Welcome aboard 🎉', 'success');
+                if (footerEmailInput) footerEmailInput.value = '';
+            } else {
+                showFooterOtpStatus(data.message || 'Invalid OTP. Please try again.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        } catch (err) {
+            showFooterOtpStatus('Unable to verify OTP right now. Please try again.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    };
+
+    window.footerResendOTP = async function () {
+        if (!footerPendingEmail) return;
+        const btn = document.getElementById('footerResendOTPBtn');
+        const resendStatus = document.getElementById('footerResendStatus');
+        btn.disabled = true;
+        try {
+            const res = await fetch('/api/resend-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: footerPendingEmail })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (resendStatus) {
+                resendStatus.textContent = data.success ? 'A new OTP has been sent to your email.' : (data.message || 'Failed to resend OTP.');
+                resendStatus.classList.remove('hidden');
+            }
+            if (data.success) startFooterOtpTimer();
+            else btn.disabled = false;
+        } catch (err) {
+            if (resendStatus) {
+                resendStatus.textContent = 'Unable to resend OTP right now.';
+                resendStatus.classList.remove('hidden');
+            }
+            btn.disabled = false;
+        } finally {
+            setTimeout(() => { btn.disabled = false; }, 60000);
+        }
+    };
+
+    // Allow clicking the dark backdrop to close the OTP modal
+    (function bindFooterModalBackdrop() {
+        const modal = document.getElementById('footerOtpModal');
+        if (!modal) return;
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal || (e.target.classList && e.target.classList.contains('bg-gray-900/60'))) {
+                window.closeFooterOTPModal();
+            }
+        });
+    })();
+
+    // ── INITIAL GREETING ──
+    function initChat() {
+        let greeting = `Hi${hasName ? ' ' + escapeHtml(currUser.name.split(' ')[0]) : ''} 👋 I'm the InstituteHub Assistant. Pick a topic below, or type your question — I can even look up a specific course or blog for you.`;
+        
+        // Check subscription status for logged-in user
+        if (isLoggedIn && hasEmail) {
+            fetch(`/api/subscription-status?email=${encodeURIComponent(currUser.email)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.exists && data.isVerified) {
+                        greeting += `\n\n✅ You're already subscribed to our newsletter!`;
+                        addBotMessage(greeting.replace(/\n/g, '<br>'));
+                        renderChips(MAIN_MENU);
+                    } else if (data.exists && !data.isVerified) {
+                        addBotMessage(greeting.replace(/\n/g, '<br>'));
+                        offerPendingSubscriptionOptions(currUser.email);
+                    } else {
+                        addBotMessage(greeting.replace(/\n/g, '<br>'));
+                        renderChips(MAIN_MENU);
+                    }
+                })
+                .catch(() => {
+                    addBotMessage(greeting.replace(/\n/g, '<br>'));
+                    renderChips(MAIN_MENU);
+                });
+        } else {
+            addBotMessage(greeting.replace(/\n/g, '<br>'));
+            renderChips(MAIN_MENU);
+        }
+    }
 });
 </script>
 
@@ -914,7 +1505,7 @@ document.addEventListener('DOMContentLoaded', function () {
     30% { transform: translateY(-4px); opacity: 1; }
 }
 
-/* ---------- Chip row (horizontal scroller for suggested questions) ---------- */
+/* ---------- Chip row ---------- */
 .cb-chip-row {
     scroll-behavior: smooth;
     scroll-snap-type: x proximity;
@@ -1029,6 +1620,55 @@ a.cb-contact-row:hover { background: #EFF6FF; }
 .cb-cta-btn:hover { box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4); transform: translateY(-1px); }
 .cb-cta-btn:active { transform: scale(0.97); }
 .cb-cta-btn:disabled { opacity: 0.7; }
+
+/* ---------- Chatbot OTP Input ---------- */
+.cb-otp-input {
+    transition: all 0.2s ease;
+}
+.cb-otp-input:focus {
+    border-color: #C9A227;
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.3);
+}
+.cb-otp-input:focus-visible {
+    outline: none;
+}
+
+/* ---------- Footer Newsletter ---------- */
+.footer-newsletter-input:focus {
+    outline: none;
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+.footer-newsletter-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.footer-newsletter-response {
+    transition: all 0.3s ease;
+}
+
+/* ---------- Footer OTP Modal ---------- */
+.footer-otp-modal {
+    animation: footerOtpFadeIn 0.3s ease;
+}
+@keyframes footerOtpFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+.footer-otp-modal .footer-otp-input {
+    transition: all 0.2s ease;
+}
+.footer-otp-modal .footer-otp-input:focus {
+    border-color: #C9A227;
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.3);
+}
+@media (max-width: 480px) {
+    .footer-otp-modal .footer-otp-input {
+        width: 40px;
+        height: 48px;
+        font-size: 1.25rem;
+    }
+}
 
 /* ---------- Scrollbars ---------- */
 .cb-scroll::-webkit-scrollbar { width: 5px; }

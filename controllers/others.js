@@ -2,6 +2,7 @@ const User = require("../models/user");
 const Contact = require("../models/contact");
 const Subscriber = require("../models/subscriber");
 const AppSetting = require("../models/appSetting");
+const crypto = require("crypto");
 
 // ========== SECURITY CONFIGURATION ==========
 const BLOCKED_WORDS = [
@@ -23,6 +24,13 @@ const SPAM_PATTERNS = [
 ];
 
 const RATE_LIMIT = { MAX_REQUESTS: 5, TIME_WINDOW: 15 * 60 };
+
+// ========== SUBSCRIBE OTP CONFIGURATION ==========
+const OTP_EXPIRY_MINUTES = 10;
+const OTP_LENGTH = 6;
+const MAX_OTP_ATTEMPTS = 5;
+const RESEND_COOLDOWN_SECONDS = 60; // 1 minute
+const MAX_RESEND_PER_EMAIL = 3;
 
 // ========== FALLBACK DATA ==========
 const FALLBACK_CONTACT = {
@@ -97,6 +105,14 @@ function getClientIp(req) {
          'unknown';
 }
 
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function generateToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
 // ============================================================
 // CONTACT PAGE (Render)
 // ============================================================
@@ -109,7 +125,6 @@ module.exports.contactPage = async (req, res) => {
       console.error("Error fetching settings:", err);
     }
 
-    // ✅ Contact Info - DB se ya fallback
     const contactInfo = {
       address: settings?.contact?.address || FALLBACK_CONTACT.address,
       phone: settings?.contact?.phone || FALLBACK_CONTACT.phone,
@@ -118,27 +133,22 @@ module.exports.contactPage = async (req, res) => {
       workingHours: settings?.contact?.workingHours || FALLBACK_CONTACT.workingHours
     };
 
-    // ✅ Offices - DB se ya fallback
     let offices = settings?.offices?.filter(o => o.isActive !== false) || [];
     if (offices.length === 0) offices = FALLBACK_OFFICES;
     offices.sort((a, b) => (a.order || 0) - (b.order || 0));
 
-    // ✅ FAQs - DB se ya fallback
     let faqs = settings?.faqs?.filter(f => f.isActive !== false) || [];
     if (faqs.length === 0) faqs = FALLBACK_FAQS;
     faqs.sort((a, b) => (a.order || 0) - (b.order || 0));
 
-    // ✅ Support Hours - DB se ya fallback
     let supportHours = settings?.supportHours || [];
     if (supportHours.length === 0) supportHours = FALLBACK_SUPPORT_HOURS;
     supportHours.sort((a, b) => (a.order || 0) - (b.order || 0));
 
-    // ✅ Social Links - DB se ya fallback
     let socialLinks = settings?.socialLinks?.filter(s => s.isActive !== false) || [];
     if (socialLinks.length === 0) socialLinks = FALLBACK_SOCIAL_LINKS;
     socialLinks.sort((a, b) => (a.order || 0) - (b.order || 0));
 
-    // ✅ User data (logged in user ke liye)
     let userData = null;
     if (req.user) {
       userData = {
@@ -148,7 +158,6 @@ module.exports.contactPage = async (req, res) => {
       };
     }
 
-    // ✅ Sirf wahi data pass karo jo EJS mein directly available nahi hai
     res.render("others/contact.ejs", {
       contactInfo,
       offices,
@@ -159,7 +168,6 @@ module.exports.contactPage = async (req, res) => {
       totalContacts: await Contact.countDocuments(),
       recentContacts: await Contact.find().sort({ createdAt: -1 }).limit(5).lean(),
       moment: require("moment")
-      // ⚠️ currentUser MAT BHEJO - yeh app.js se res.locals.currUser ke through available hai
     });
 
   } catch (error) {
@@ -257,26 +265,22 @@ module.exports.contact = async (req, res) => {
     try {
         const { name, email, mobile, subject, message } = req.body;
 
-        // ========== 1. REQUIRED FIELDS VALIDATION ==========
         if (!name || !email || !subject || !message) {
             req.flash("warning", "Please fill in all required fields to send your message.");
             return res.redirect("/contact");
         }
 
-        // ========== 2. NAME VALIDATION ==========
         if (name.length < 2 || name.length > 100) {
             req.flash("warning", "Name must be between 2 and 100 characters.");
             return res.redirect("/contact");
         }
 
-        // ========== 3. EMAIL VALIDATION ==========
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             req.flash("warning", "Please enter a valid email address.");
             return res.redirect("/contact");
         }
 
-        // ========== 4. MOBILE VALIDATION (if provided) ==========
         if (mobile && mobile.trim() !== "") {
             const phoneRegex = /^[0-9]{10}$/;
             const cleanMobile = mobile.replace(/[^0-9]/g, '');
@@ -286,7 +290,6 @@ module.exports.contact = async (req, res) => {
             }
         }
 
-        // ========== 5. SUBJECT VALIDATION ==========
         const validSubjects = [
             "General Inquiry",
             "Course Information",
@@ -304,7 +307,6 @@ module.exports.contact = async (req, res) => {
             return res.redirect("/contact");
         }
 
-        // ========== 6. MESSAGE VALIDATION ==========
         if (message.length < 5) {
             req.flash("warning", "Message must be at least 5 characters.");
             return res.redirect("/contact");
@@ -314,13 +316,11 @@ module.exports.contact = async (req, res) => {
             return res.redirect("/contact");
         }
 
-        // ========== 7. SPAM CHECK ==========
         if (containsSpam(message) || containsSpam(subject) || containsSpam(name)) {
             req.flash("error", "Your message contains inappropriate content. Please rephrase and try again.");
             return res.redirect("/contact");
         }
 
-        // ========== 8. SAVE CONTACT ==========
         await Contact.create({
             user: req.user?._id || null,
             name: name.trim(),
@@ -339,7 +339,6 @@ module.exports.contact = async (req, res) => {
     } catch (error) {
         console.error("Contact form error:", error);
         
-        // Check if it's a validation error
         if (error.name === "ValidationError") {
             const messages = Object.values(error.errors).map(err => err.message);
             req.flash("error", messages.join(". "));
@@ -351,44 +350,760 @@ module.exports.contact = async (req, res) => {
 };
 
 // ============================================================
-// SUBSCRIBE
+// SUBSCRIBE - Send OTP (API)
 // ============================================================
 module.exports.subscribe = async (req, res) => {
   try {
     const { email } = req.body;
+    const clientIp = getClientIp(req);
 
+    // ========== 1. VALIDATE EMAIL ==========
     if (!email) {
-      req.flash("warning", "Email address is required to subscribe.");
-      return res.redirect("/contact");
+      return res.status(400).json({
+        success: false,
+        message: "Email address is required to subscribe."
+      });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      req.flash("warning", "Please enter a valid email address.");
-      return res.redirect("/contact");
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email address."
+      });
     }
 
-    const existingUser = await Subscriber.findOne({ email: email.toLowerCase() });
-    if (existingUser) {
-      req.flash("info", "This email is already subscribed.");
-      return res.redirect("/contact");
-    }
+    const cleanEmail = email.toLowerCase().trim();
 
-    await Subscriber.create({
-      email: email.toLowerCase(),
-      subscribedAt: new Date(),
-      isActive: true
+    // ========== 2. CHECK RATE LIMIT (IP based) ==========
+    const ipRateLimit = await Subscriber.countDocuments({
+      ipAddress: clientIp,
+      lastOtpSent: { $gte: new Date(Date.now() - 15 * 60 * 1000) } // 15 minutes
     });
 
-    req.flash("success", "Successfully subscribed to our newsletter!");
-    res.redirect("/contact");
+    if (ipRateLimit >= 5) {
+      return res.status(429).json({
+        success: false,
+        message: "Too many attempts from this IP. Please try again after 15 minutes."
+      });
+    }
+
+    // ========== 3. CHECK IF ALREADY VERIFIED ==========
+    const existingVerified = await Subscriber.findOne({
+      email: cleanEmail,
+      isVerified: true
+    });
+
+    if (existingVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "This email is already subscribed and verified."
+      });
+    }
+
+    // ========== 4. CHECK PENDING VERIFICATION ==========
+    let subscriber = await Subscriber.findOne({ email: cleanEmail });
+
+    if (subscriber && subscriber.isVerified === false) {
+      // Check if OTP is still valid
+      if (subscriber.otpExpires && subscriber.otpExpires > new Date()) {
+        return res.status(400).json({
+          success: false,
+          message: "An OTP has already been sent to this email. Please check your inbox or request a new OTP.",
+          hasPendingOtp: true,
+          email: cleanEmail,
+          canResend: subscriber.resendCount < MAX_RESEND_PER_EMAIL
+        });
+      }
+
+      // OTP expired - allow resend
+      if (subscriber.resendCount >= MAX_RESEND_PER_EMAIL) {
+        return res.status(400).json({
+          success: false,
+          message: "Maximum resend attempts exceeded. Please try again after 24 hours.",
+          isBlocked: true
+        });
+      }
+
+      // Update existing subscriber
+      const otp = generateOTP();
+      const token = generateToken();
+      
+      subscriber.otp = otp;
+      subscriber.otpToken = token;
+      subscriber.otpExpires = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
+      subscriber.otpAttempts = 0;
+      subscriber.resendCount = (subscriber.resendCount || 0) + 1;
+      subscriber.lastOtpSent = new Date();
+      subscriber.ipAddress = clientIp;
+      subscriber.resendCooldownUntil = new Date(Date.now() + RESEND_COOLDOWN_SECONDS * 1000);
+
+      await subscriber.save();
+
+      // Send OTP email
+      await sendOTPEmail(cleanEmail, otp, subscriber);
+
+      return res.status(200).json({
+        success: true,
+        message: "A new OTP has been sent to your email.",
+        email: cleanEmail,
+        hasPendingOtp: true,
+        resendCount: subscriber.resendCount,
+        maxResend: MAX_RESEND_PER_EMAIL,
+        cooldownSeconds: RESEND_COOLDOWN_SECONDS
+      });
+    }
+
+    // ========== 5. CREATE NEW SUBSCRIBER ==========
+    const otp = generateOTP();
+    const token = generateToken();
+
+    subscriber = new Subscriber({
+      email: cleanEmail,
+      otp: otp,
+      otpToken: token,
+      otpExpires: new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000),
+      otpAttempts: 0,
+      resendCount: 0,
+      lastOtpSent: new Date(),
+      ipAddress: clientIp,
+      isVerified: false,
+      isActive: false
+    });
+
+    await subscriber.save();
+
+    // Send OTP email
+    await sendOTPEmail(cleanEmail, otp, subscriber);
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP sent successfully! Please check your email.",
+      email: cleanEmail,
+      hasPendingOtp: true
+    });
 
   } catch (error) {
-    console.error("Newsletter Error:", error);
-    req.flash("error", "Unable to process your subscription. Please try again later.");
-    res.redirect("/contact");
+    console.error("Subscribe error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to process your subscription. Please try again later."
+    });
   }
 };
+
+// ============================================================
+// VERIFY OTP (API)
+// ============================================================
+module.exports.verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const clientIp = getClientIp(req);
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and OTP are required."
+      });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Validate OTP format
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid 6-digit OTP."
+      });
+    }
+
+    // Find subscriber
+    const subscriber = await Subscriber.findOne({ email: cleanEmail });
+
+    if (!subscriber) {
+      return res.status(404).json({
+        success: false,
+        message: "No subscription found for this email."
+      });
+    }
+
+    // Check if already verified
+    if (subscriber.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "This email is already verified."
+      });
+    }
+
+    // Check OTP expiry
+    if (subscriber.otpExpires && subscriber.otpExpires < new Date()) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP has expired. Please request a new OTP.",
+        expired: true
+      });
+    }
+
+    // Check OTP attempts
+    if (subscriber.otpAttempts >= MAX_OTP_ATTEMPTS) {
+      return res.status(400).json({
+        success: false,
+        message: `Too many failed attempts. Please request a new OTP.`,
+        maxAttemptsReached: true
+      });
+    }
+
+    // Verify OTP
+    if (subscriber.otp !== otp) {
+      subscriber.otpAttempts = (subscriber.otpAttempts || 0) + 1;
+      await subscriber.save();
+
+      return res.status(400).json({
+        success: false,
+        message: `Invalid OTP. ${MAX_OTP_ATTEMPTS - (subscriber.otpAttempts || 0)} attempts remaining.`,
+        attemptsRemaining: MAX_OTP_ATTEMPTS - (subscriber.otpAttempts || 0)
+      });
+    }
+
+    // ✅ SUCCESS - Verify subscriber
+    subscriber.isVerified = true;
+    subscriber.isActive = true;
+    subscriber.verifiedAt = new Date();
+    subscriber.otp = undefined;
+    subscriber.otpToken = undefined;
+    subscriber.otpExpires = undefined;
+    subscriber.otpAttempts = 0;
+    subscriber.resendCount = 0;
+    subscriber.verificationIp = clientIp;
+
+    await subscriber.save();
+
+    // Send welcome email
+    await sendWelcomeEmail(subscriber);
+
+    return res.status(200).json({
+      success: true,
+      message: "🎉 Email verified successfully! You are now subscribed.",
+      subscribed: true
+    });
+
+  } catch (error) {
+    console.error("Verify OTP error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to verify OTP. Please try again."
+    });
+  }
+};
+
+// ============================================================
+// RESEND OTP (API)
+// ============================================================
+module.exports.resendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const clientIp = getClientIp(req);
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required."
+      });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+
+    const subscriber = await Subscriber.findOne({ email: cleanEmail });
+
+    if (!subscriber) {
+      return res.status(404).json({
+        success: false,
+        message: "No subscription found for this email."
+      });
+    }
+
+    if (subscriber.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "This email is already verified."
+      });
+    }
+
+    // Check cooldown
+    if (subscriber.resendCooldownUntil && subscriber.resendCooldownUntil > new Date()) {
+      const remainingSeconds = Math.ceil((subscriber.resendCooldownUntil - new Date()) / 1000);
+      return res.status(429).json({
+        success: false,
+        message: `Please wait ${remainingSeconds} seconds before requesting a new OTP.`,
+        cooldownSeconds: remainingSeconds
+      });
+    }
+
+    // Check max resend attempts
+    if (subscriber.resendCount >= MAX_RESEND_PER_EMAIL) {
+      return res.status(400).json({
+        success: false,
+        message: "Maximum resend attempts exceeded. Please try again after 24 hours.",
+        isBlocked: true
+      });
+    }
+
+    // Generate new OTP
+    const otp = generateOTP();
+    const token = generateToken();
+
+    subscriber.otp = otp;
+    subscriber.otpToken = token;
+    subscriber.otpExpires = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
+    subscriber.otpAttempts = 0;
+    subscriber.resendCount = (subscriber.resendCount || 0) + 1;
+    subscriber.lastOtpSent = new Date();
+    subscriber.resendCooldownUntil = new Date(Date.now() + RESEND_COOLDOWN_SECONDS * 1000);
+    subscriber.ipAddress = clientIp;
+
+    await subscriber.save();
+
+    // Send OTP email
+    await sendOTPEmail(cleanEmail, otp, subscriber);
+
+    return res.status(200).json({
+      success: true,
+      message: "New OTP sent successfully!",
+      resendCount: subscriber.resendCount,
+      maxResend: MAX_RESEND_PER_EMAIL,
+      cooldownSeconds: RESEND_COOLDOWN_SECONDS
+    });
+
+  } catch (error) {
+    console.error("Resend OTP error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to resend OTP. Please try again."
+    });
+  }
+};
+
+// ============================================================
+// CHECK SUBSCRIPTION STATUS (API)
+// ============================================================
+module.exports.checkSubscriptionStatus = async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required."
+      });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+
+    const subscriber = await Subscriber.findOne({ email: cleanEmail });
+
+    if (!subscriber) {
+      return res.status(404).json({
+        success: false,
+        message: "No subscription found.",
+        exists: false
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      exists: true,
+      isVerified: subscriber.isVerified || false,
+      isActive: subscriber.isActive || false,
+      hasPendingOtp: !subscriber.isVerified && !!subscriber.otp,
+      resendCount: subscriber.resendCount || 0,
+      maxResend: MAX_RESEND_PER_EMAIL
+    });
+
+  } catch (error) {
+    console.error("Check subscription error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to check subscription status."
+    });
+  }
+};
+
+// ============================================================
+// EMAIL FUNCTIONS
+// ============================================================
+async function sendOTPEmail(email, otp, subscriber) {
+  try {
+    const brevo = require("@getbrevo/brevo");
+    const apiInstance = new brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(
+      brevo.TransactionalEmailsApiApiKeys.apiKey,
+      process.env.BREVO_API_KEY
+    );
+
+    const domain = process.env.DOMAIN || 'http://localhost:8080';
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Verify Your Subscription | InstituteHub</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          background: #F8FAFC;
+          padding: 40px 0;
+          color: #0F172A;
+        }
+        .email-container {
+          max-width: 560px;
+          margin: 0 auto;
+          background: #FFFFFF;
+          border-radius: 16px;
+          box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+          overflow: hidden;
+          border: 1px solid #E2E8F0;
+        }
+        .email-header {
+          background: linear-gradient(135deg, #0F172A 0%, #2563EB 100%);
+          padding: 32px 40px 28px;
+          text-align: center;
+          border-bottom: 3px solid #C9A227;
+        }
+        .email-header .logo {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          color: #FFFFFF;
+          text-decoration: none;
+          font-size: 24px;
+          font-weight: 800;
+          letter-spacing: -0.5px;
+        }
+        .email-header .logo-icon {
+          width: 44px;
+          height: 44px;
+          background: linear-gradient(135deg, #2563EB, #C9A227);
+          border-radius: 12px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+        }
+        .email-header .logo span { color: #C9A227; }
+        .email-header .subtitle {
+          color: #93C5FD;
+          font-size: 13px;
+          margin-top: 6px;
+          font-weight: 400;
+          letter-spacing: 0.3px;
+        }
+        .email-body { padding: 40px 40px 32px; }
+        .email-body .greeting {
+          font-size: 18px;
+          font-weight: 600;
+          color: #0F172A;
+          margin-bottom: 16px;
+        }
+        .email-body .greeting span { color: #2563EB; }
+        .email-body .message {
+          font-size: 15px;
+          line-height: 1.7;
+          color: #334155;
+          margin-bottom: 24px;
+        }
+        .otp-box {
+          background: #F8FAFC;
+          border: 2px dashed #2563EB;
+          border-radius: 12px;
+          padding: 24px;
+          text-align: center;
+          margin: 20px 0;
+        }
+        .otp-box .label {
+          font-size: 12px;
+          color: #64748B;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 600;
+        }
+        .otp-code {
+          font-size: 40px;
+          font-weight: 800;
+          letter-spacing: 8px;
+          color: #0F172A;
+          font-family: 'Courier New', monospace;
+          margin-top: 4px;
+        }
+        .otp-code span { color: #2563EB; }
+        .security-box {
+          background: #F0FDF4;
+          border: 1px solid #BBF7D0;
+          border-radius: 10px;
+          padding: 14px 18px;
+          margin: 20px 0;
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+        }
+        .security-box .icon { color: #22C55E; font-size: 18px; flex-shrink: 0; }
+        .security-box .text { font-size: 13px; color: #166534; line-height: 1.5; }
+        .security-box .text strong { color: #0F172A; }
+        .divider { border: none; border-top: 1px solid #E2E8F0; margin: 24px 0; }
+        .email-footer {
+          background: #F8FAFC;
+          padding: 24px 40px;
+          text-align: center;
+          border-top: 1px solid #E2E8F0;
+        }
+        .email-footer .brand { font-size: 15px; font-weight: 700; color: #0F172A; }
+        .email-footer .brand span { color: #C9A227; }
+        .email-footer .tagline { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+        .email-footer .contact { margin-top: 8px; font-size: 12px; color: #94A3B8; }
+        .email-footer .contact a { color: #2563EB; text-decoration: none; }
+        .email-footer .copyright { font-size: 11px; color: #94A3B8; margin-top: 10px; }
+        @media (max-width: 600px) {
+          body { padding: 16px; }
+          .email-header { padding: 24px 20px 20px; }
+          .email-body { padding: 28px 20px 24px; }
+          .email-footer { padding: 20px 20px; }
+          .email-header .logo { font-size: 20px; }
+          .otp-code { font-size: 32px; letter-spacing: 6px; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="email-container">
+        <div class="email-header">
+          <a href="${domain}" class="logo">
+            Institute<span>Hub</span>
+          </a>
+          <div class="subtitle">🔐 Verify Your Subscription</div>
+        </div>
+        <div class="email-body">
+          <div class="greeting">Hello <span>Subscriber</span>, 👋</div>
+          <div class="message">
+            Thank you for subscribing to <strong>InstituteHub</strong> newsletter! Please verify your email address to start receiving updates.
+          </div>
+          <div class="otp-box">
+            <div class="label">🔑 Your Verification Code</div>
+            <div class="otp-code">${otp}</div>
+          </div>
+          <div class="security-box">
+            <span class="icon">🛡️</span>
+            <div class="text">
+              <strong>Security notice:</strong> This code is valid for <strong>${OTP_EXPIRY_MINUTES} minutes</strong> and will expire at ${new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000).toLocaleTimeString()}.
+            </div>
+          </div>
+          <hr class="divider">
+          <div style="font-size:13px; color:#64748B; line-height:1.6;">
+            <p style="margin:0;">
+              Didn't request this? You can safely ignore this email.
+              <br>
+              Need help? Contact us at 
+              <a href="mailto:student001599@gmail.com" style="color:#2563EB; text-decoration:none;">student001599@gmail.com</a>
+            </p>
+          </div>
+        </div>
+        <div class="email-footer">
+          <div class="brand">Institute<span>Hub</span></div>
+          <div class="tagline">Empowering the next generation of professionals</div>
+          <div class="contact">📧 <a href="mailto:student001599@gmail.com">student001599@gmail.com</a></div>
+          <div class="copyright">&copy; ${new Date().getFullYear()} InstituteHub. All rights reserved.</div>
+        </div>
+      </div>
+    </body>
+    </html>
+    `;
+
+    await apiInstance.sendTransacEmail({
+      sender: { email: "student001599@gmail.com", name: "InstituteHub" },
+      to: [{ email: email }],
+      subject: "🔐 Verify Your Subscription | InstituteHub",
+      htmlContent: htmlContent,
+    });
+
+    console.log(`✅ Subscription OTP sent to: ${email}`);
+  } catch (error) {
+    console.error("❌ OTP email error:", error);
+    throw new Error("Failed to send OTP email");
+  }
+}
+
+async function sendWelcomeEmail(subscriber) {
+  try {
+    const brevo = require("@getbrevo/brevo");
+    const apiInstance = new brevo.TransactionalEmailsApi();
+    apiInstance.setApiKey(
+      brevo.TransactionalEmailsApiApiKeys.apiKey,
+      process.env.BREVO_API_KEY
+    );
+
+    const domain = process.env.DOMAIN || 'http://localhost:8080';
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Welcome to InstituteHub Newsletter</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          background: #F8FAFC;
+          padding: 40px 0;
+          color: #0F172A;
+        }
+        .email-container {
+          max-width: 560px;
+          margin: 0 auto;
+          background: #FFFFFF;
+          border-radius: 16px;
+          box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+          overflow: hidden;
+          border: 1px solid #E2E8F0;
+        }
+        .email-header {
+          background: linear-gradient(135deg, #0F172A 0%, #2563EB 100%);
+          padding: 32px 40px 28px;
+          text-align: center;
+          border-bottom: 3px solid #22C55E;
+        }
+        .email-header .logo {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          color: #FFFFFF;
+          text-decoration: none;
+          font-size: 24px;
+          font-weight: 800;
+          letter-spacing: -0.5px;
+        }
+        .email-header .logo-icon {
+          width: 44px;
+          height: 44px;
+          background: linear-gradient(135deg, #2563EB, #C9A227);
+          border-radius: 12px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+        }
+        .email-header .logo span { color: #C9A227; }
+        .email-header .subtitle {
+          color: #93C5FD;
+          font-size: 13px;
+          margin-top: 6px;
+          font-weight: 400;
+          letter-spacing: 0.3px;
+        }
+        .email-body { padding: 40px 40px 32px; }
+        .email-body .greeting {
+          font-size: 18px;
+          font-weight: 600;
+          color: #0F172A;
+          margin-bottom: 16px;
+        }
+        .email-body .greeting span { color: #2563EB; }
+        .email-body .message {
+          font-size: 15px;
+          line-height: 1.7;
+          color: #334155;
+          margin-bottom: 20px;
+        }
+        .success-icon { text-align: center; font-size: 56px; margin-bottom: 16px; }
+        .btn-wrapper { text-align: center; margin: 28px 0; }
+        .btn-primary {
+          display: inline-block;
+          padding: 14px 44px;
+          background: linear-gradient(135deg, #2563EB, #1D4ED8);
+          color: #FFFFFF !important;
+          font-size: 16px;
+          font-weight: 600;
+          text-decoration: none;
+          border-radius: 12px;
+          box-shadow: 0 8px 24px rgba(37, 99, 235, 0.30);
+          transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+          background: linear-gradient(135deg, #3B82F6, #2563EB);
+          box-shadow: 0 12px 32px rgba(37, 99, 235, 0.40);
+          transform: translateY(-2px);
+        }
+        .divider { border: none; border-top: 1px solid #E2E8F0; margin: 24px 0; }
+        .email-footer {
+          background: #F8FAFC;
+          padding: 24px 40px;
+          text-align: center;
+          border-top: 1px solid #E2E8F0;
+        }
+        .email-footer .brand { font-size: 15px; font-weight: 700; color: #0F172A; }
+        .email-footer .brand span { color: #C9A227; }
+        .email-footer .tagline { font-size: 12px; color: #94A3B8; margin-top: 2px; }
+        .email-footer .contact { margin-top: 8px; font-size: 12px; color: #94A3B8; }
+        .email-footer .contact a { color: #2563EB; text-decoration: none; }
+        .email-footer .copyright { font-size: 11px; color: #94A3B8; margin-top: 10px; }
+        @media (max-width: 600px) {
+          body { padding: 16px; }
+          .email-header { padding: 24px 20px 20px; }
+          .email-body { padding: 28px 20px 24px; }
+          .email-footer { padding: 20px 20px; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="email-container">
+        <div class="email-header">
+          <a href="${domain}" class="logo">
+            Institute<span>Hub</span>
+          </a>
+          <div class="subtitle">✅ Subscription Confirmed</div>
+        </div>
+        <div class="email-body">
+          <div class="success-icon">✅</div>
+          <div class="greeting">Hello <span>Subscriber</span>,</div>
+          <div class="message">
+            Your email has been successfully verified! You are now subscribed to the <strong>InstituteHub</strong> newsletter.
+            <br><br>
+            You'll receive the latest updates, course announcements, and exclusive offers directly in your inbox.
+          </div>
+          <div class="btn-wrapper">
+            <a href="${domain}" class="btn-primary">🚀 Visit InstituteHub</a>
+          </div>
+          <hr class="divider">
+          <div style="font-size:13px; color:#64748B; line-height:1.6;">
+            <p style="margin:0;">
+              Need help? Contact us at 
+              <a href="mailto:student001599@gmail.com" style="color:#2563EB; text-decoration:none;">student001599@gmail.com</a>
+            </p>
+          </div>
+        </div>
+        <div class="email-footer">
+          <div class="brand">Institute<span>Hub</span></div>
+          <div class="tagline">Empowering the next generation of professionals</div>
+          <div class="contact">📧 <a href="mailto:student001599@gmail.com">student001599@gmail.com</a></div>
+          <div class="copyright">&copy; ${new Date().getFullYear()} InstituteHub. All rights reserved.</div>
+        </div>
+      </div>
+    </body>
+    </html>
+    `;
+
+    await apiInstance.sendTransacEmail({
+      sender: { email: "student001599@gmail.com", name: "InstituteHub" },
+      to: [{ email: subscriber.email }],
+      subject: "✅ Welcome to InstituteHub Newsletter!",
+      htmlContent: htmlContent,
+    });
+
+    console.log(`✅ Welcome email sent to: ${subscriber.email}`);
+  } catch (error) {
+    console.error("❌ Welcome email error:", error);
+  }
+}
 
 // ============================================================
 // CAREERS PAGE
