@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
-const { isLoggedIn, isAdmin, validateBlog } = require("../middleware.js");
+const { isLoggedIn, isAdmin } = require("../middleware.js");
 const blogsController = require("../controllers/blog.js");
 
 const multer = require("multer");
@@ -17,7 +17,6 @@ router
     isLoggedIn,
     isAdmin,
     upload.single("image"),
-    validateBlog,
     wrapAsync(blogsController.createBlog),
   );
 
@@ -39,7 +38,7 @@ router
     isLoggedIn,
     isAdmin,
     upload.single("image"),
-    validateBlog,
+    // validateBlog,
     wrapAsync(blogsController.updateBlog),
   )
   .patch(isLoggedIn, isAdmin, wrapAsync(blogsController.activateBlog))

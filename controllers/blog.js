@@ -512,6 +512,32 @@ module.exports.createBlog = async (req, res, next) => {
 
     newblog.id = generateIdFromTitle(req.body.title);
 
+    // ✅ FIX: Convert externalLinks string to array
+    if (req.body.externalLinks) {
+      if (typeof req.body.externalLinks === 'string') {
+        req.body.externalLinks = req.body.externalLinks
+          .split('\n')
+          .map(link => link.trim())
+          .filter(link => link.length > 0);
+      }
+    } else {
+      req.body.externalLinks = [];
+    }
+
+    // ✅ FIX: Convert tags string to array
+    if (req.body.tags) {
+      if (typeof req.body.tags === 'string') {
+        req.body.tags = req.body.tags
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(tag => tag.length > 0);
+      }
+    } else {
+      req.body.tags = [];
+    }
+
+
+
     if (req.file) {
       const url = req.file.path;
       const filename = req.file.filename;
@@ -591,13 +617,37 @@ module.exports.updateBlog = async (req, res) => {
       return res.redirect("/admin/blogs");
     }
 
+    // ✅ FIX: Convert externalLinks string to array
+    if (req.body.externalLinks) {
+      if (typeof req.body.externalLinks === 'string') {
+        // Split by newline and filter empty lines
+        req.body.externalLinks = req.body.externalLinks
+          .split('\n')
+          .map(link => link.trim())
+          .filter(link => link.length > 0);
+      }
+    } else {
+      req.body.externalLinks = [];
+    }
+
+    // ✅ FIX: Convert tags string to array
+    if (req.body.tags) {
+      if (typeof req.body.tags === 'string') {
+        req.body.tags = req.body.tags
+          .split(',')
+          .map(tag => tag.trim())
+          .filter(tag => tag.length > 0);
+      }
+    } else {
+      req.body.tags = [];
+    }
+
     // Update blog fields
     Object.assign(blog, req.body);
     blog.updatedAt = Date.now();
 
     // If new image is uploaded
     if (req.file) {
-      // Delete old image from Cloudinary
       if (blog.image && blog.image.filename) {
         await cloudinary.uploader.destroy(blog.image.filename);
       }
@@ -609,11 +659,7 @@ module.exports.updateBlog = async (req, res) => {
 
     await blog.save();
 
-    req.flash(
-      "success",
-      "Your blog has been successfully updated.",
-    );
-
+    req.flash("success", "Your blog has been successfully updated.");
     res.redirect(`/blogs/${blog._id}`);
   } catch (err) {
     console.error("Error updating blog:", err);

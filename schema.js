@@ -10,4 +10,7 @@ module.exports.blogsSchema = Joi.object({
   image: Joi.string().allow("", null).optional(),
   imageTitle: Joi.string().allow("", null).optional(),
   Keywords: Joi.string().required(),
+  externalLinks: Joi.array().items(Joi.string()).optional(),
+  optionalDetails: Joi.string().allow("", null).optional(),
+  tags: Joi.array().items(Joi.string()).optional(),
 });

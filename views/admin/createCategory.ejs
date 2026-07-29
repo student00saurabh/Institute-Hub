@@ -1,5 +1,197 @@
 <% layout("/layouts/boilerplate") %>
 
+<%
+  // ============================================================
+  // ✅ COLOR HELPER FUNCTION (EJS)
+  // ============================================================
+  function getColorHex(color) {
+      const colorMap = {
+          'blue': '#2563EB',
+          'indigo': '#4F46E5',
+          'purple': '#7C3AED',
+          'pink': '#DB2777',
+          'red': '#EF4444',
+          'orange': '#F97316',
+          'yellow': '#EAB308',
+          'green': '#22C55E',
+          'teal': '#14B8A6',
+          'cyan': '#06B6D4',
+          'gray': '#6B7280'
+      };
+      return colorMap[color] || '#2563EB';
+  }
+
+  // ============================================================
+  // ALL CATEGORY GROUPS WITH ICONS
+  // ============================================================
+  const CATEGORY_GROUPS = [
+    {
+      name: 'Academic & Education',
+      icon: 'fa-graduation-cap',
+      color: 'blue',
+      description: 'School, college, university, online education, and academic programs'
+    },
+    {
+      name: 'Competitive & Entrance Exams',
+      icon: 'fa-file-pen',
+      color: 'indigo',
+      description: 'UPSC, SSC, Banking, JEE, NEET, GATE, CAT, CLAT and other entrance exams'
+    },
+    {
+      name: 'Career & Jobs',
+      icon: 'fa-briefcase',
+      color: 'green',
+      description: 'Job opportunities, career advice, interview tips, resume writing'
+    },
+    {
+      name: 'Engineering & Technology',
+      icon: 'fa-microchip',
+      color: 'purple',
+      description: 'Computer Science, Civil, Mechanical, AI, Data Science, Cybersecurity'
+    },
+    {
+      name: 'Health & Medical',
+      icon: 'fa-heartbeat',
+      color: 'red',
+      description: 'Medical education, nursing, pharmacy, public health, healthcare'
+    },
+    {
+      name: 'Business & Management',
+      icon: 'fa-chart-line',
+      color: 'teal',
+      description: 'MBA, Finance, Marketing, HR, Operations, Business Analytics'
+    },
+    {
+      name: 'Arts & Humanities',
+      icon: 'fa-palette',
+      color: 'pink',
+      description: 'Fine arts, literature, history, philosophy, psychology, languages'
+    },
+    {
+      name: 'News & Current Affairs',
+      icon: 'fa-newspaper',
+      color: 'orange',
+      description: 'Latest news, education news, job news, technology, sports, entertainment'
+    },
+    {
+      name: 'Teaching & Education Profession',
+      icon: 'fa-chalkboard-user',
+      color: 'yellow',
+      description: 'Teaching tips, classroom management, teacher training, lesson planning'
+    },
+    {
+      name: 'Science & Research',
+      icon: 'fa-flask',
+      color: 'cyan',
+      description: 'Physics, Chemistry, Biology, Mathematics, Astronomy, Research'
+    },
+    {
+      name: 'General Interest',
+      icon: 'fa-globe',
+      color: 'gray',
+      description: 'Lifestyle, travel, food, culture, books, movies, technology, environment'
+    },
+    {
+      name: 'Other',
+      icon: 'fa-ellipsis-h',
+      color: 'gray',
+      description: 'Other categories that don\'t fit in any specific group'
+    }
+  ];
+
+  // All available icons for categories
+  const AVAILABLE_ICONS = [
+    // Security & Protection
+    { value: 'fa-shield-alt', label: '🛡️ Shield', group: 'Security' },
+    { value: 'fa-shield', label: '🛡️ Shield Outline', group: 'Security' },
+    { value: 'fa-shield-halved', label: '🛡️ Shield Half', group: 'Security' },
+    { value: 'fa-lock', label: '🔒 Lock', group: 'Security' },
+    { value: 'fa-lock-open', label: '🔓 Lock Open', group: 'Security' },
+    { value: 'fa-key', label: '🔑 Key', group: 'Security' },
+    { value: 'fa-fingerprint', label: '🖐️ Fingerprint', group: 'Security' },
+    { value: 'fa-user-secret', label: '🕵️ Secret User', group: 'Security' },
+    { value: 'fa-skull', label: '💀 Skull', group: 'Security' },
+    { value: 'fa-bug', label: '🐛 Bug', group: 'Security' },
+    
+    // Technology
+    { value: 'fa-laptop-code', label: '💻 Laptop Code', group: 'Technology' },
+    { value: 'fa-code', label: '💻 Code', group: 'Technology' },
+    { value: 'fa-terminal', label: '⌨️ Terminal', group: 'Technology' },
+    { value: 'fa-database', label: '🗄️ Database', group: 'Technology' },
+    { value: 'fa-cloud', label: '☁️ Cloud', group: 'Technology' },
+    { value: 'fa-server', label: '🖥️ Server', group: 'Technology' },
+    { value: 'fa-network-wired', label: '🌐 Network', group: 'Technology' },
+    { value: 'fa-wifi', label: '📶 WiFi', group: 'Technology' },
+    { value: 'fa-globe', label: '🌍 Globe', group: 'Technology' },
+    { value: 'fa-microchip', label: '💠 Microchip', group: 'Technology' },
+    { value: 'fa-robot', label: '🤖 Robot', group: 'Technology' },
+    { value: 'fa-brain', label: '🧠 Brain', group: 'Technology' },
+    
+    // Education
+    { value: 'fa-graduation-cap', label: '🎓 Graduation Cap', group: 'Education' },
+    { value: 'fa-certificate', label: '📜 Certificate', group: 'Education' },
+    { value: 'fa-book', label: '📚 Book', group: 'Education' },
+    { value: 'fa-book-open', label: '📖 Book Open', group: 'Education' },
+    { value: 'fa-university', label: '🏛️ University', group: 'Education' },
+    { value: 'fa-chalkboard-teacher', label: '👨‍🏫 Teacher', group: 'Education' },
+    { value: 'fa-pencil-alt', label: '✏️ Pencil', group: 'Education' },
+    { value: 'fa-award', label: '🏆 Award', group: 'Education' },
+    { value: 'fa-user-graduate', label: '🎓 Graduate', group: 'Education' },
+    { value: 'fa-school', label: '🏫 School', group: 'Education' },
+    
+    // Career & Business
+    { value: 'fa-briefcase', label: '💼 Briefcase', group: 'Career' },
+    { value: 'fa-building', label: '🏢 Building', group: 'Career' },
+    { value: 'fa-landmark', label: '🏛️ Landmark', group: 'Career' },
+    { value: 'fa-file-pen', label: '📝 File Pen', group: 'Career' },
+    { value: 'fa-handshake', label: '🤝 Handshake', group: 'Career' },
+    { value: 'fa-compass', label: '🧭 Compass', group: 'Career' },
+    { value: 'fa-rocket', label: '🚀 Rocket', group: 'Career' },
+    { value: 'fa-chart-line', label: '📈 Chart Line', group: 'Career' },
+    { value: 'fa-chart-bar', label: '📊 Chart Bar', group: 'Career' },
+    { value: 'fa-chart-pie', label: '📊 Chart Pie', group: 'Career' },
+    { value: 'fa-crown', label: '👑 Crown', group: 'Career' },
+    { value: 'fa-user-tie', label: '👔 User Tie', group: 'Career' },
+    
+    // Tools & Actions
+    { value: 'fa-bolt', label: '⚡ Bolt', group: 'Tools' },
+    { value: 'fa-fire', label: '🔥 Fire', group: 'Tools' },
+    { value: 'fa-cogs', label: '⚙️ Cogs', group: 'Tools' },
+    { value: 'fa-tools', label: '🔧 Tools', group: 'Tools' },
+    { value: 'fa-search', label: '🔍 Search', group: 'Tools' },
+    { value: 'fa-eye', label: '👁️ Eye', group: 'Tools' },
+    { value: 'fa-bullseye', label: '🎯 Bullseye', group: 'Tools' },
+    { value: 'fa-flag', label: '🚩 Flag', group: 'Tools' },
+    { value: 'fa-plus-circle', label: '➕ Plus Circle', group: 'Tools' },
+    
+    // Miscellaneous
+    { value: 'fa-folder', label: '📁 Folder', group: 'Misc' },
+    { value: 'fa-folder-open', label: '📂 Folder Open', group: 'Misc' },
+    { value: 'fa-tag', label: '🏷️ Tag', group: 'Misc' },
+    { value: 'fa-tags', label: '🏷️ Tags', group: 'Misc' },
+    { value: 'fa-star', label: '⭐ Star', group: 'Misc' },
+    { value: 'fa-heart', label: '❤️ Heart', group: 'Misc' },
+    { value: 'fa-crown', label: '👑 Crown', group: 'Misc' },
+    { value: 'fa-ellipsis-h', label: '⋯ More', group: 'Misc' },
+    { value: 'fa-newspaper', label: '📰 Newspaper', group: 'Misc' },
+    { value: 'fa-palette', label: '🎨 Palette', group: 'Misc' },
+    { value: 'fa-flask', label: '🧪 Flask', group: 'Misc' },
+    { value: 'fa-atom', label: '⚛️ Atom', group: 'Misc' },
+    { value: 'fa-dna', label: '🧬 DNA', group: 'Misc' },
+    { value: 'fa-leaf', label: '🍃 Leaf', group: 'Misc' },
+    { value: 'fa-tree', label: '🌳 Tree', group: 'Misc' },
+    { value: 'fa-plane', label: '✈️ Plane', group: 'Misc' },
+    { value: 'fa-utensils', label: '🍽️ Utensils', group: 'Misc' },
+    { value: 'fa-film', label: '🎬 Film', group: 'Misc' },
+    { value: 'fa-music', label: '🎵 Music', group: 'Misc' },
+    { value: 'fa-futbol', label: '⚽ Football', group: 'Misc' },
+    { value: 'fa-clock-rotate-left', label: '🔄 History', group: 'Misc' },
+    { value: 'fa-scale-balanced', label: '⚖️ Scale', group: 'Misc' },
+    { value: 'fa-gavel', label: '🔨 Gavel', group: 'Misc' },
+    { value: 'fa-people-group', label: '👥 People Group', group: 'Misc' }
+  ];
+%>
+
 <div class="min-h-[90vh] py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
         
@@ -8,7 +200,7 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C9A227] to-[#B8901E] flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                             </svg>
@@ -38,10 +230,37 @@
                         Category Name <span class="text-red-500">*</span>
                     </label>
                     <input type="text" id="name" name="name" required
-                           placeholder="e.g., Penetration Testing, Red Teaming, OSCP Preparation"
-                           class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200">
+                           placeholder="e.g., Web Development, Data Science, Cybersecurity"
+                           class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200">
                     <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                         <i class="fas fa-info-circle mr-1"></i> Unique name for the category (2-50 characters)
+                    </p>
+                </div>
+
+                <!-- Category Group -->
+                <div>
+                    <label for="categoryGroup" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        Category Group <span class="text-red-500">*</span>
+                    </label>
+                    <select id="categoryGroup" name="categoryGroup" required
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 appearance-none cursor-pointer">
+                        <option value="">Select a group</option>
+                        <% CATEGORY_GROUPS.forEach(group => { %>
+                            <option value="<%= group.name %>" 
+                                    data-icon="<%= group.icon %>"
+                                    data-color="<%= group.color %>">
+                                <i class="fas <%= group.icon %>"></i> <%= group.name %>
+                            </option>
+                        <% }) %>
+                    </select>
+                    <div id="groupDescription" class="mt-2 p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-700 hidden">
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-1 text-[#C9A227]"></i>
+                            <span id="groupDescText"></span>
+                        </p>
+                    </div>
+                    <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i> Select the group this category belongs to
                     </p>
                 </div>
 
@@ -52,7 +271,7 @@
                     </label>
                     <textarea id="description" name="description" rows="3"
                               placeholder="Brief description of this category..."
-                              class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 resize-none"></textarea>
+                              class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 resize-none"></textarea>
                     <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                         <i class="fas fa-info-circle mr-1"></i> Short description (max 200 characters)
                     </p>
@@ -66,73 +285,21 @@
                             Icon <span class="text-red-500">*</span>
                         </label>
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 text-xl flex-shrink-0" id="iconPreview">
+                            <div class="w-12 h-12 rounded-xl bg-[#C9A227]/10 dark:bg-[#C9A227]/20 flex items-center justify-center text-[#C9A227] dark:text-[#C9A227] text-xl flex-shrink-0" id="iconPreview">
                                 <i class="fas fa-shield-alt"></i>
                             </div>
                             <select id="icon" name="icon" 
-                                    class="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer">
-                                <optgroup label="🛡️ Security Icons">
-                                    <option value="fa-shield-alt" selected>🛡️ fa-shield-alt</option>
-                                    <option value="fa-shield">🛡️ fa-shield</option>
-                                    <option value="fa-shield-halved">🛡️ fa-shield-halved</option>
-                                    <option value="fa-lock">🔒 fa-lock</option>
-                                    <option value="fa-lock-open">🔓 fa-lock-open</option>
-                                    <option value="fa-key">🔑 fa-key</option>
-                                    <option value="fa-fingerprint">🖐️ fa-fingerprint</option>
-                                    <option value="fa-user-secret">🕵️ fa-user-secret</option>
-                                    <option value="fa-skull">💀 fa-skull</option>
-                                    <option value="fa-bug">🐛 fa-bug</option>
-                                </optgroup>
-                                <optgroup label="💻 Technology Icons">
-                                    <option value="fa-laptop-code">💻 fa-laptop-code</option>
-                                    <option value="fa-code">💻 fa-code</option>
-                                    <option value="fa-terminal">⌨️ fa-terminal</option>
-                                    <option value="fa-database">🗄️ fa-database</option>
-                                    <option value="fa-cloud">☁️ fa-cloud</option>
-                                    <option value="fa-server">🖥️ fa-server</option>
-                                    <option value="fa-network-wired">🌐 fa-network-wired</option>
-                                    <option value="fa-wifi">📶 fa-wifi</option>
-                                    <option value="fa-globe">🌍 fa-globe</option>
-                                </optgroup>
-                                <optgroup label="🎓 Education Icons">
-                                    <option value="fa-graduation-cap">🎓 fa-graduation-cap</option>
-                                    <option value="fa-certificate">📜 fa-certificate</option>
-                                    <option value="fa-book">📚 fa-book</option>
-                                    <option value="fa-book-open">📖 fa-book-open</option>
-                                    <option value="fa-university">🏛️ fa-university</option>
-                                    <option value="fa-chalkboard-teacher">👨‍🏫 fa-chalkboard-teacher</option>
-                                    <option value="fa-pencil-alt">✏️ fa-pencil-alt</option>
-                                    <option value="fa-award">🏆 fa-award</option>
-                                </optgroup>
-                                <optgroup label="🎯 Tools & Actions">
-                                    <option value="fa-bolt">⚡ fa-bolt</option>
-                                    <option value="fa-fire">🔥 fa-fire</option>
-                                    <option value="fa-rocket">🚀 fa-rocket</option>
-                                    <option value="fa-cogs">⚙️ fa-cogs</option>
-                                    <option value="fa-tools">🔧 fa-tools</option>
-                                    <option value="fa-search">🔍 fa-search</option>
-                                    <option value="fa-eye">👁️ fa-eye</option>
-                                    <option value="fa-bullseye">🎯 fa-bullseye</option>
-                                    <option value="fa-flag">🚩 fa-flag</option>
-                                </optgroup>
-                                <optgroup label="📊 Analytics & Data">
-                                    <option value="fa-chart-line">📈 fa-chart-line</option>
-                                    <option value="fa-chart-bar">📊 fa-chart-bar</option>
-                                    <option value="fa-chart-pie">📊 fa-chart-pie</option>
-                                    <option value="fa-brain">🧠 fa-brain</option>
-                                    <option value="fa-robot">🤖 fa-robot</option>
-                                    <option value="fa-microchip">💠 fa-microchip</option>
-                                </optgroup>
-                                <optgroup label="📁 Miscellaneous">
-                                    <option value="fa-folder">📁 fa-folder</option>
-                                    <option value="fa-folder-open">📂 fa-folder-open</option>
-                                    <option value="fa-tag">🏷️ fa-tag</option>
-                                    <option value="fa-tags">🏷️ fa-tags</option>
-                                    <option value="fa-star">⭐ fa-star</option>
-                                    <option value="fa-heart">❤️ fa-heart</option>
-                                    <option value="fa-plus-circle">➕ fa-plus-circle</option>
-                                    <option value="fa-crown">👑 fa-crown</option>
-                                </optgroup>
+                                    class="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 appearance-none cursor-pointer">
+                                <% const iconGroups = [...new Set(AVAILABLE_ICONS.map(i => i.group))]; %>
+                                <% iconGroups.forEach(group => { %>
+                                    <optgroup label="<%= group %>">
+                                        <% AVAILABLE_ICONS.filter(i => i.group === group).forEach(icon => { %>
+                                            <option value="<%= icon.value %>">
+                                                <%= icon.label %>
+                                            </option>
+                                        <% }) %>
+                                    </optgroup>
+                                <% }) %>
                             </select>
                         </div>
                         <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
@@ -145,25 +312,27 @@
                         <label for="color" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                             Color <span class="text-red-500">*</span>
                         </label>
-                        <select id="color" name="color"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer">
-                            <option value="blue" class="bg-blue-500 text-white">🔵 Blue</option>
-                            <option value="indigo" class="bg-indigo-500 text-white">🟣 Indigo</option>
-                            <option value="purple" class="bg-purple-500 text-white">🟣 Purple</option>
-                            <option value="pink" class="bg-pink-500 text-white">🩷 Pink</option>
-                            <option value="red" class="bg-red-500 text-white">🔴 Red</option>
-                            <option value="orange" class="bg-orange-500 text-white">🟠 Orange</option>
-                            <option value="yellow" class="bg-yellow-500 text-white">🟡 Yellow</option>
-                            <option value="green" class="bg-green-500 text-white">🟢 Green</option>
-                            <option value="teal" class="bg-teal-500 text-white">🟢 Teal</option>
-                            <option value="cyan" class="bg-cyan-500 text-white">🟦 Cyan</option>
-                            <option value="gray" class="bg-gray-500 text-white">⚪ Gray</option>
-                        </select>
-                        <div class="mt-2 flex items-center gap-2">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Preview:</span>
-                            <span id="colorPreview" class="inline-block w-6 h-6 rounded-full bg-blue-500 border border-gray-300 dark:border-gray-600"></span>
-                            <span id="colorName" class="text-xs text-gray-600 dark:text-gray-400">Blue</span>
+                        <div class="flex items-center gap-3">
+                            <div id="colorPreview" class="w-12 h-12 rounded-xl border-2 border-gray-300 dark:border-gray-600 flex-shrink-0" style="background-color: #2563EB;">
+                            </div>
+                            <select id="color" name="color"
+                                    class="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 appearance-none cursor-pointer">
+                                <option value="blue" style="background-color:#2563EB;color:white;">🔵 Blue</option>
+                                <option value="indigo" style="background-color:#4F46E5;color:white;">🟣 Indigo</option>
+                                <option value="purple" style="background-color:#7C3AED;color:white;">🟣 Purple</option>
+                                <option value="pink" style="background-color:#DB2777;color:white;">🩷 Pink</option>
+                                <option value="red" style="background-color:#EF4444;color:white;">🔴 Red</option>
+                                <option value="orange" style="background-color:#F97316;color:white;">🟠 Orange</option>
+                                <option value="yellow" style="background-color:#EAB308;color:white;">🟡 Yellow</option>
+                                <option value="green" style="background-color:#22C55E;color:white;">🟢 Green</option>
+                                <option value="teal" style="background-color:#14B8A6;color:white;">🟢 Teal</option>
+                                <option value="cyan" style="background-color:#06B6D4;color:white;">🟦 Cyan</option>
+                                <option value="gray" style="background-color:#6B7280;color:white;">⚪ Gray</option>
+                            </select>
                         </div>
+                        <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-1"></i> Select a color for the category badge
+                        </p>
                     </div>
                 </div>
 
@@ -174,7 +343,7 @@
                             Display Order
                         </label>
                         <input type="number" id="displayOrder" name="displayOrder" value="0" min="0" step="1"
-                               class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200">
                         <div class="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                             <p class="text-xs text-blue-800 dark:text-blue-300">
                                 <i class="fas fa-info-circle mr-1"></i> 
@@ -195,7 +364,7 @@
                         </label>
                         <div class="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/30">
                             <input type="checkbox" id="isActive" name="isActive" checked
-                                   class="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-purple-600 focus:ring-purple-500 dark:focus:ring-purple-400">
+                                   class="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-[#C9A227] focus:ring-[#C9A227] dark:focus:ring-[#C9A227]">
                             <label for="isActive" class="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 Active
                             </label>
@@ -209,7 +378,7 @@
                 <!-- Form Actions -->
                 <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button type="submit"
-                            class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-3.5 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                            class="flex-1 bg-gradient-to-r from-[#C9A227] to-[#B8901E] hover:from-[#B8901E] hover:to-[#A07A1A] text-white font-medium py-3.5 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
@@ -224,31 +393,31 @@
         </div>
 
         <!-- Help Tips -->
-        <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+        <div class="mt-6 bg-[#C9A227]/10 dark:bg-[#C9A227]/20 rounded-xl p-6 border border-[#C9A227]/30" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
             <div class="flex items-start gap-4">
-                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[#C9A227]/20 dark:bg-[#C9A227]/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#C9A227]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-blue-900 dark:text-blue-300">Category Management Tips</h3>
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white">Category Management Tips</h3>
                     <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Meaningful Names</p>
-                            <p class="mt-0.5 text-xs opacity-80">Use clear, descriptive category names</p>
+                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> Meaningful Names</p>
+                            <p class="mt-0.5 text-xs opacity-70">Use clear, descriptive category names</p>
                         </div>
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Icon Selection</p>
-                            <p class="mt-0.5 text-xs opacity-80">Choose icons that represent the category well</p>
+                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> Icon Selection</p>
+                            <p class="mt-0.5 text-xs opacity-70">Choose icons that represent the category well</p>
                         </div>
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Order Matters</p>
-                            <p class="mt-0.5 text-xs opacity-80">Set display order for logical grouping (0 = first)</p>
+                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> Order Matters</p>
+                            <p class="mt-0.5 text-xs opacity-70">Set display order for logical grouping (0 = first)</p>
                         </div>
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Active Status</p>
-                            <p class="mt-0.5 text-xs opacity-80">Deactivate unused categories instead of deleting</p>
+                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> Active Status</p>
+                            <p class="mt-0.5 text-xs opacity-70">Deactivate unused categories instead of deleting</p>
                         </div>
                     </div>
                 </div>
@@ -259,7 +428,39 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Icon preview on selection change
+    // ── Category Group Description ──
+    const groupSelect = document.getElementById('categoryGroup');
+    const groupDesc = document.getElementById('groupDescription');
+    const groupDescText = document.getElementById('groupDescText');
+    
+    const groupDescriptions = {
+        'Academic & Education': 'School, college, university, online education, and academic programs',
+        'Competitive & Entrance Exams': 'UPSC, SSC, Banking, JEE, NEET, GATE, CAT, CLAT and other entrance exams',
+        'Career & Jobs': 'Job opportunities, career advice, interview tips, resume writing',
+        'Engineering & Technology': 'Computer Science, Civil, Mechanical, AI, Data Science, Cybersecurity',
+        'Health & Medical': 'Medical education, nursing, pharmacy, public health, healthcare',
+        'Business & Management': 'MBA, Finance, Marketing, HR, Operations, Business Analytics',
+        'Arts & Humanities': 'Fine arts, literature, history, philosophy, psychology, languages',
+        'News & Current Affairs': 'Latest news, education news, job news, technology, sports, entertainment',
+        'Teaching & Education Profession': 'Teaching tips, classroom management, teacher training, lesson planning',
+        'Science & Research': 'Physics, Chemistry, Biology, Mathematics, Astronomy, Research',
+        'General Interest': 'Lifestyle, travel, food, culture, books, movies, technology, environment',
+        'Other': 'Other categories that don\'t fit in any specific group'
+    };
+
+    if (groupSelect) {
+        groupSelect.addEventListener('change', function() {
+            const selectedGroup = this.value;
+            if (selectedGroup && groupDescriptions[selectedGroup]) {
+                groupDesc.classList.remove('hidden');
+                groupDescText.textContent = groupDescriptions[selectedGroup];
+            } else {
+                groupDesc.classList.add('hidden');
+            }
+        });
+    }
+
+    // ── Icon preview on selection change ──
     const iconSelect = document.getElementById('icon');
     const iconPreview = document.querySelector('#iconPreview i');
     
@@ -270,38 +471,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Color preview on selection change
+    // ── Color preview on selection change ──
     const colorSelect = document.getElementById('color');
     const colorPreview = document.getElementById('colorPreview');
-    const colorName = document.getElementById('colorName');
     
     const colorMap = {
-        'blue': { bg: 'bg-blue-500', name: 'Blue' },
-        'indigo': { bg: 'bg-indigo-500', name: 'Indigo' },
-        'purple': { bg: 'bg-purple-500', name: 'Purple' },
-        'pink': { bg: 'bg-pink-500', name: 'Pink' },
-        'red': { bg: 'bg-red-500', name: 'Red' },
-        'orange': { bg: 'bg-orange-500', name: 'Orange' },
-        'yellow': { bg: 'bg-yellow-500', name: 'Yellow' },
-        'green': { bg: 'bg-green-500', name: 'Green' },
-        'teal': { bg: 'bg-teal-500', name: 'Teal' },
-        'cyan': { bg: 'bg-cyan-500', name: 'Cyan' },
-        'gray': { bg: 'bg-gray-500', name: 'Gray' }
+        'blue': '#2563EB',
+        'indigo': '#4F46E5',
+        'purple': '#7C3AED',
+        'pink': '#DB2777',
+        'red': '#EF4444',
+        'orange': '#F97316',
+        'yellow': '#EAB308',
+        'green': '#22C55E',
+        'teal': '#14B8A6',
+        'cyan': '#06B6D4',
+        'gray': '#6B7280'
     };
 
-    if (colorSelect && colorPreview && colorName) {
-        // Initial preview
-        const initialColor = colorSelect.value || 'blue';
-        const initialColorInfo = colorMap[initialColor] || colorMap['blue'];
-        colorPreview.className = `inline-block w-6 h-6 rounded-full ${initialColorInfo.bg} border border-gray-300 dark:border-gray-600`;
-        colorName.textContent = initialColorInfo.name;
-
-        // Update on change
+    if (colorSelect && colorPreview) {
         colorSelect.addEventListener('change', function() {
             const colorValue = this.value || 'blue';
-            const colorInfo = colorMap[colorValue] || colorMap['blue'];
-            colorPreview.className = `inline-block w-6 h-6 rounded-full ${colorInfo.bg} border border-gray-300 dark:border-gray-600`;
-            colorName.textContent = colorInfo.name;
+            colorPreview.style.backgroundColor = colorMap[colorValue] || '#2563EB';
         });
     }
 });
@@ -352,5 +543,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     .dark select::-webkit-scrollbar-thumb:hover {
         background: #718096;
+    }
+
+    /* Theme color */
+    .bg-theme-gradient {
+        background: linear-gradient(135deg, #C9A227, #B8901E);
     }
 </style>

@@ -8,7 +8,7 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C9A227] to-[#B8901E] flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                             </svg>
@@ -25,7 +25,7 @@
                         <i class="fas fa-eye mr-2"></i> View Blog
                     </a>
                     <a href="/admin/blogs" 
-                       class="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg">
+                       class="px-5 py-2.5 bg-gradient-to-r from-[#C9A227] to-[#B8901E] hover:from-[#B8901E] hover:to-[#A07A1A] text-white font-medium rounded-xl transition-all duration-200 shadow-md hover:shadow-lg">
                         <i class="fas fa-arrow-left mr-2"></i> Back to Blogs
                     </a>
                 </div>
@@ -51,7 +51,7 @@
                         name="title"
                         id="title"
                         value="<%= blog.title %>"
-                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200"
                         placeholder="Enter blog title..."
                         required
                     >
@@ -68,67 +68,168 @@
                     <select 
                         name="category" 
                         id="category" 
-                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 appearance-none cursor-pointer"
                         required
                     >
                         <option value="">Select a category</option>
-                        <optgroup label="🔐 Cybersecurity Training">
-                            <option value="OSCP" <%= blog.category === 'OSCP' ? 'selected' : '' %>>OSCP Preparation</option>
-                            <option value="CEH" <%= blog.category === 'CEH' ? 'selected' : '' %>>CEH Certification</option>
-                            <option value="CPENT" <%= blog.category === 'CPENT' ? 'selected' : '' %>>CPENT Training</option>
-                            <option value="RHCSA" <%= blog.category === 'RHCSA' ? 'selected' : '' %>>RHCSA Certification</option>
-                            <option value="CompTIA" <%= blog.category === 'CompTIA' ? 'selected' : '' %>>CompTIA Security+</option>
-                            <option value="CISSP" <%= blog.category === 'CISSP' ? 'selected' : '' %>>CISSP Certification</option>
+                        
+                        <!-- 📚 Academic & Education -->
+                        <optgroup label="📚 Academic & Education">
+                            <option value="School Education" <%= blog.category === 'School Education' ? 'selected' : '' %>>School Education</option>
+                            <option value="Higher Education" <%= blog.category === 'Higher Education' ? 'selected' : '' %>>Higher Education (College/University)</option>
+                            <option value="Distance Learning" <%= blog.category === 'Distance Learning' ? 'selected' : '' %>>Distance Learning</option>
+                            <option value="Online Education" <%= blog.category === 'Online Education' ? 'selected' : '' %>>Online Education</option>
+                            <option value="Educational Technology" <%= blog.category === 'Educational Technology' ? 'selected' : '' %>>Educational Technology (EdTech)</option>
+                            <option value="Teaching Methods" <%= blog.category === 'Teaching Methods' ? 'selected' : '' %>>Teaching Methods & Pedagogy</option>
+                            <option value="Curriculum Development" <%= blog.category === 'Curriculum Development' ? 'selected' : '' %>>Curriculum Development</option>
+                            <option value="Education Policy" <%= blog.category === 'Education Policy' ? 'selected' : '' %>>Education Policy & Reform</option>
+                            <option value="Special Education" <%= blog.category === 'Special Education' ? 'selected' : '' %>>Special Education</option>
+                            <option value="Early Childhood Education" <%= blog.category === 'Early Childhood Education' ? 'selected' : '' %>>Early Childhood Education</option>
                         </optgroup>
-                        <optgroup label="🛡️ Security Operations">
-                            <option value="Red Teaming" <%= blog.category === 'Red Teaming' ? 'selected' : '' %>>Red Teaming</option>
-                            <option value="Penetration Testing" <%= blog.category === 'Penetration Testing' ? 'selected' : '' %>>Penetration Testing</option>
-                            <option value="Vulnerability Assessment" <%= blog.category === 'Vulnerability Assessment' ? 'selected' : '' %>>Vulnerability Assessment</option>
-                            <option value="Incident Response" <%= blog.category === 'Incident Response' ? 'selected' : '' %>>Incident Response</option>
-                            <option value="Digital Forensics" <%= blog.category === 'Digital Forensics' ? 'selected' : '' %>>Digital Forensics</option>
-                            <option value="OSINT" <%= blog.category === 'OSINT' ? 'selected' : '' %>>OSINT</option>
+
+                        <!-- 🎓 Competitive & Entrance Exams -->
+                        <optgroup label="🎓 Competitive & Entrance Exams">
+                            <option value="UPSC" <%= blog.category === 'UPSC' ? 'selected' : '' %>>UPSC Civil Services</option>
+                            <option value="SSC" <%= blog.category === 'SSC' ? 'selected' : '' %>>SSC (Staff Selection Commission)</option>
+                            <option value="Banking Exams" <%= blog.category === 'Banking Exams' ? 'selected' : '' %>>Banking Exams (IBPS, SBI, RBI)</option>
+                            <option value="Railway Exams" <%= blog.category === 'Railway Exams' ? 'selected' : '' %>>Railway Exams (RRB)</option>
+                            <option value="State PSC" <%= blog.category === 'State PSC' ? 'selected' : '' %>>State PSC Exams</option>
+                            <option value="Defense Exams" <%= blog.category === 'Defense Exams' ? 'selected' : '' %>>Defense Exams (NDA, CDS, AFCAT)</option>
+                            <option value="JEE" <%= blog.category === 'JEE' ? 'selected' : '' %>>JEE (Main & Advanced)</option>
+                            <option value="NEET" <%= blog.category === 'NEET' ? 'selected' : '' %>>NEET Medical Entrance</option>
+                            <option value="GATE" <%= blog.category === 'GATE' ? 'selected' : '' %>>GATE Engineering Entrance</option>
+                            <option value="CAT" <%= blog.category === 'CAT' ? 'selected' : '' %>>CAT / MBA Entrance</option>
+                            <option value="CLAT" <%= blog.category === 'CLAT' ? 'selected' : '' %>>CLAT Law Entrance</option>
+                            <option value="NTA Exams" <%= blog.category === 'NTA Exams' ? 'selected' : '' %>>NTA Exams (UGC NET, etc.)</option>
+                            <option value="Other Entrance" <%= blog.category === 'Other Entrance' ? 'selected' : '' %>>Other Entrance Exams</option>
                         </optgroup>
-                        <optgroup label="💻 Technical Domains">
-                            <option value="Web Security" <%= blog.category === 'Web Security' ? 'selected' : '' %>>Web Security</option>
-                            <option value="Network Security" <%= blog.category === 'Network Security' ? 'selected' : '' %>>Network Security</option>
-                            <option value="Cloud Security" <%= blog.category === 'Cloud Security' ? 'selected' : '' %>>Cloud Security</option>
-                            <option value="Mobile Security" <%= blog.category === 'Mobile Security' ? 'selected' : '' %>>Mobile Security</option>
-                            <option value="Linux Security" <%= blog.category === 'Linux Security' ? 'selected' : '' %>>Linux Security</option>
-                            <option value="DevSecOps" <%= blog.category === 'DevSecOps' ? 'selected' : '' %>>DevSecOps</option>
-                            <option value="IoT Security" <%= blog.category === 'IoT Security' ? 'selected' : '' %>>IoT Security</option>
-                            <option value="Blockchain Security" <%= blog.category === 'Blockchain Security' ? 'selected' : '' %>>Blockchain Security</option>
-                        </optgroup>
-                        <optgroup label="📚 Career & Education">
-                            <option value="Career" <%= blog.category === 'Career' ? 'selected' : '' %>>Career Advice</option>
-                            <option value="Interview Tips" <%= blog.category === 'Interview Tips' ? 'selected' : '' %>>Interview Preparation</option>
+
+                        <!-- 💼 Career & Jobs -->
+                        <optgroup label="💼 Career & Jobs">
                             <option value="Job Opportunities" <%= blog.category === 'Job Opportunities' ? 'selected' : '' %>>Job Opportunities</option>
-                            <option value="Certification Guidance" <%= blog.category === 'Certification Guidance' ? 'selected' : '' %>>Certification Guidance</option>
-                            <option value="Cyber Security Trends" <%= blog.category === 'Cyber Security Trends' ? 'selected' : '' %>>Cyber Security Trends</option>
+                            <option value="Career Advice" <%= blog.category === 'Career Advice' ? 'selected' : '' %>>Career Advice & Guidance</option>
+                            <option value="Interview Tips" <%= blog.category === 'Interview Tips' ? 'selected' : '' %>>Interview Preparation</option>
+                            <option value="Resume Writing" <%= blog.category === 'Resume Writing' ? 'selected' : '' %>>Resume & CV Writing</option>
+                            <option value="Government Jobs" <%= blog.category === 'Government Jobs' ? 'selected' : '' %>>Government Jobs</option>
+                            <option value="Private Jobs" <%= blog.category === 'Private Jobs' ? 'selected' : '' %>>Private Sector Jobs</option>
+                            <option value="Internships" <%= blog.category === 'Internships' ? 'selected' : '' %>>Internships & Training</option>
+                            <option value="Freelancing" <%= blog.category === 'Freelancing' ? 'selected' : '' %>>Freelancing & Remote Work</option>
+                            <option value="Entrepreneurship" <%= blog.category === 'Entrepreneurship' ? 'selected' : '' %>>Entrepreneurship & Startups</option>
+                            <option value="Career Change" <%= blog.category === 'Career Change' ? 'selected' : '' %>>Career Change & Transition</option>
                         </optgroup>
-                        <optgroup label="📰 News & Updates">
-                            <option value="News" <%= blog.category === 'News' ? 'selected' : '' %>>Industry News</option>
-                            <option value="Events" <%= blog.category === 'Events' ? 'selected' : '' %>>Events & Webinars</option>
-                            <option value="Product Updates" <%= blog.category === 'Product Updates' ? 'selected' : '' %>>Platform Updates</option>
-                            <option value="Research" <%= blog.category === 'Research' ? 'selected' : '' %>>Security Research</option>
+
+                        <!-- 🏗️ Engineering & Technology -->
+                        <optgroup label="🏗️ Engineering & Technology">
+                            <option value="Computer Science" <%= blog.category === 'Computer Science' ? 'selected' : '' %>>Computer Science & IT</option>
+                            <option value="Civil Engineering" <%= blog.category === 'Civil Engineering' ? 'selected' : '' %>>Civil Engineering</option>
+                            <option value="Mechanical Engineering" <%= blog.category === 'Mechanical Engineering' ? 'selected' : '' %>>Mechanical Engineering</option>
+                            <option value="Electrical Engineering" <%= blog.category === 'Electrical Engineering' ? 'selected' : '' %>>Electrical Engineering</option>
+                            <option value="Electronics Engineering" <%= blog.category === 'Electronics Engineering' ? 'selected' : '' %>>Electronics & Communication</option>
+                            <option value="Chemical Engineering" <%= blog.category === 'Chemical Engineering' ? 'selected' : '' %>>Chemical Engineering</option>
+                            <option value="Aerospace Engineering" <%= blog.category === 'Aerospace Engineering' ? 'selected' : '' %>>Aerospace Engineering</option>
+                            <option value="Biotechnology" <%= blog.category === 'Biotechnology' ? 'selected' : '' %>>Biotechnology</option>
+                            <option value="Environmental Engineering" <%= blog.category === 'Environmental Engineering' ? 'selected' : '' %>>Environmental Engineering</option>
+                            <option value="Artificial Intelligence" <%= blog.category === 'Artificial Intelligence' ? 'selected' : '' %>>Artificial Intelligence & ML</option>
+                            <option value="Data Science" <%= blog.category === 'Data Science' ? 'selected' : '' %>>Data Science & Analytics</option>
+                            <option value="Cybersecurity" <%= blog.category === 'Cybersecurity' ? 'selected' : '' %>>Cybersecurity</option>
+                            <option value="Cloud Computing" <%= blog.category === 'Cloud Computing' ? 'selected' : '' %>>Cloud Computing</option>
+                            <option value="DevOps" <%= blog.category === 'DevOps' ? 'selected' : '' %>>DevOps</option>
                         </optgroup>
-                        <optgroup label="📖 Tutorials & Guides">
-                            <option value="Tutorial" <%= blog.category === 'Tutorial' ? 'selected' : '' %>>Tutorials</option>
-                            <option value="Lab Guides" <%= blog.category === 'Lab Guides' ? 'selected' : '' %>>Lab Guides</option>
-                            <option value="Tool Tutorials" <%= blog.category === 'Tool Tutorials' ? 'selected' : '' %>>Tool Tutorials</option>
-                            <option value="Walkthroughs" <%= blog.category === 'Walkthroughs' ? 'selected' : '' %>>CTF Walkthroughs</option>
-                            <option value="Cheatsheets" <%= blog.category === 'Cheatsheets' ? 'selected' : '' %>>Cheatsheets & References</option>
+
+                        <!-- 🏥 Health & Medical -->
+                        <optgroup label="🏥 Health & Medical">
+                            <option value="Medical Education" <%= blog.category === 'Medical Education' ? 'selected' : '' %>>Medical Education (MBBS, BDS)</option>
+                            <option value="Nursing" <%= blog.category === 'Nursing' ? 'selected' : '' %>>Nursing</option>
+                            <option value="Pharmacy" <%= blog.category === 'Pharmacy' ? 'selected' : '' %>>Pharmacy</option>
+                            <option value="Public Health" <%= blog.category === 'Public Health' ? 'selected' : '' %>>Public Health</option>
+                            <option value="Healthcare Management" <%= blog.category === 'Healthcare Management' ? 'selected' : '' %>>Healthcare Management</option>
+                            <option value="Ayurveda" <%= blog.category === 'Ayurveda' ? 'selected' : '' %>>Ayurveda & Alternative Medicine</option>
+                            <option value="Veterinary" <%= blog.category === 'Veterinary' ? 'selected' : '' %>>Veterinary Science</option>
+                            <option value="Health & Wellness" <%= blog.category === 'Health & Wellness' ? 'selected' : '' %>>Health & Wellness</option>
+                            <option value="Medical Research" <%= blog.category === 'Medical Research' ? 'selected' : '' %>>Medical Research</option>
                         </optgroup>
-                        <optgroup label="🧠 Industry Insights">
-                            <option value="Expert Insights" <%= blog.category === 'Expert Insights' ? 'selected' : '' %>>Expert Insights</option>
-                            <option value="Case Studies" <%= blog.category === 'Case Studies' ? 'selected' : '' %>>Case Studies</option>
-                            <option value="Best Practices" <%= blog.category === 'Best Practices' ? 'selected' : '' %>>Best Practices</option>
-                            <option value="Compliance" <%= blog.category === 'Compliance' ? 'selected' : '' %>>Compliance & Governance</option>
-                            <option value="Risk Management" <%= blog.category === 'Risk Management' ? 'selected' : '' %>>Risk Management</option>
+
+                        <!-- 📊 Business & Management -->
+                        <optgroup label="📊 Business & Management">
+                            <option value="MBA" <%= blog.category === 'MBA' ? 'selected' : '' %>>MBA & Business Management</option>
+                            <option value="Finance" <%= blog.category === 'Finance' ? 'selected' : '' %>>Finance & Accounting</option>
+                            <option value="Marketing" <%= blog.category === 'Marketing' ? 'selected' : '' %>>Marketing & Sales</option>
+                            <option value="Human Resources" <%= blog.category === 'Human Resources' ? 'selected' : '' %>>Human Resources (HR)</option>
+                            <option value="Operations" <%= blog.category === 'Operations' ? 'selected' : '' %>>Operations Management</option>
+                            <option value="Business Analytics" <%= blog.category === 'Business Analytics' ? 'selected' : '' %>>Business Analytics</option>
+                            <option value="International Business" <%= blog.category === 'International Business' ? 'selected' : '' %>>International Business</option>
+                            <option value="Entrepreneurship" <%= blog.category === 'Entrepreneurship' ? 'selected' : '' %>>Entrepreneurship</option>
+                            <option value="Leadership" <%= blog.category === 'Leadership' ? 'selected' : '' %>>Leadership & Management</option>
                         </optgroup>
-                        <optgroup label="📝 Miscellaneous">
-                            <option value="Student Stories" <%= blog.category === 'Student Stories' ? 'selected' : '' %>>Student Success Stories</option>
-                            <option value="Community" <%= blog.category === 'Community' ? 'selected' : '' %>>Community & Networking</option>
-                            <option value="Cybersecurity Basics" <%= blog.category === 'Cybersecurity Basics' ? 'selected' : '' %>>Cybersecurity Basics</option>
+
+                        <!-- 🎨 Arts & Humanities -->
+                        <optgroup label="🎨 Arts & Humanities">
+                            <option value="Fine Arts" <%= blog.category === 'Fine Arts' ? 'selected' : '' %>>Fine Arts</option>
+                            <option value="Performing Arts" <%= blog.category === 'Performing Arts' ? 'selected' : '' %>>Performing Arts</option>
+                            <option value="Literature" <%= blog.category === 'Literature' ? 'selected' : '' %>>Literature & Writing</option>
+                            <option value="History" <%= blog.category === 'History' ? 'selected' : '' %>>History</option>
+                            <option value="Philosophy" <%= blog.category === 'Philosophy' ? 'selected' : '' %>>Philosophy</option>
+                            <option value="Psychology" <%= blog.category === 'Psychology' ? 'selected' : '' %>>Psychology</option>
+                            <option value="Sociology" <%= blog.category === 'Sociology' ? 'selected' : '' %>>Sociology</option>
+                            <option value="Political Science" <%= blog.category === 'Political Science' ? 'selected' : '' %>>Political Science</option>
+                            <option value="Geography" <%= blog.category === 'Geography' ? 'selected' : '' %>>Geography</option>
+                            <option value="Languages" <%= blog.category === 'Languages' ? 'selected' : '' %>>Languages & Linguistics</option>
+                        </optgroup>
+
+                        <!-- 📰 News & Current Affairs -->
+                        <optgroup label="📰 News & Current Affairs">
+                            <option value="Latest News" <%= blog.category === 'Latest News' ? 'selected' : '' %>>Latest News</option>
+                            <option value="Education News" <%= blog.category === 'Education News' ? 'selected' : '' %>>Education News</option>
+                            <option value="Exam News" <%= blog.category === 'Exam News' ? 'selected' : '' %>>Exam Updates & Notifications</option>
+                            <option value="Job News" <%= blog.category === 'Job News' ? 'selected' : '' %>>Job News & Vacancies</option>
+                            <option value="Technology News" <%= blog.category === 'Technology News' ? 'selected' : '' %>>Technology News</option>
+                            <option value="Health News" <%= blog.category === 'Health News' ? 'selected' : '' %>>Health News</option>
+                            <option value="Business News" <%= blog.category === 'Business News' ? 'selected' : '' %>>Business & Economy News</option>
+                            <option value="World News" <%= blog.category === 'World News' ? 'selected' : '' %>>World News</option>
+                            <option value="Sports News" <%= blog.category === 'Sports News' ? 'selected' : '' %>>Sports News</option>
+                            <option value="Entertainment News" <%= blog.category === 'Entertainment News' ? 'selected' : '' %>>Entertainment News</option>
+                        </optgroup>
+
+                        <!-- 📝 Teaching & Education Profession -->
+                        <optgroup label="📝 Teaching & Education Profession">
+                            <option value="Teaching Tips" <%= blog.category === 'Teaching Tips' ? 'selected' : '' %>>Teaching Tips & Strategies</option>
+                            <option value="Classroom Management" <%= blog.category === 'Classroom Management' ? 'selected' : '' %>>Classroom Management</option>
+                            <option value="Lesson Planning" <%= blog.category === 'Lesson Planning' ? 'selected' : '' %>>Lesson Planning</option>
+                            <option value="Teacher Training" <%= blog.category === 'Teacher Training' ? 'selected' : '' %>>Teacher Training & Development</option>
+                            <option value="Teaching Exams" <%= blog.category === 'Teaching Exams' ? 'selected' : '' %>>Teaching Exams (CTET, UGC NET)</option>
+                            <option value="Higher Education Teaching" <%= blog.category === 'Higher Education Teaching' ? 'selected' : '' %>>Higher Education Teaching</option>
+                            <option value="Online Teaching" <%= blog.category === 'Online Teaching' ? 'selected' : '' %>>Online Teaching</option>
+                            <option value="Educational Resources" <%= blog.category === 'Educational Resources' ? 'selected' : '' %>>Educational Resources & Materials</option>
+                        </optgroup>
+
+                        <!-- 🧪 Science & Research -->
+                        <optgroup label="🧪 Science & Research">
+                            <option value="Physics" <%= blog.category === 'Physics' ? 'selected' : '' %>>Physics</option>
+                            <option value="Chemistry" <%= blog.category === 'Chemistry' ? 'selected' : '' %>>Chemistry</option>
+                            <option value="Biology" <%= blog.category === 'Biology' ? 'selected' : '' %>>Biology</option>
+                            <option value="Mathematics" <%= blog.category === 'Mathematics' ? 'selected' : '' %>>Mathematics</option>
+                            <option value="Astronomy" <%= blog.category === 'Astronomy' ? 'selected' : '' %>>Astronomy & Space Science</option>
+                            <option value="Environmental Science" <%= blog.category === 'Environmental Science' ? 'selected' : '' %>>Environmental Science</option>
+                            <option value="Scientific Research" <%= blog.category === 'Scientific Research' ? 'selected' : '' %>>Scientific Research</option>
+                            <option value="Innovation" <%= blog.category === 'Innovation' ? 'selected' : '' %>>Innovation & Discovery</option>
+                        </optgroup>
+
+                        <!-- 🌐 General Interest -->
+                        <optgroup label="🌐 General Interest">
+                            <option value="Lifestyle" <%= blog.category === 'Lifestyle' ? 'selected' : '' %>>Lifestyle & Personal Development</option>
+                            <option value="Travel" <%= blog.category === 'Travel' ? 'selected' : '' %>>Travel & Exploration</option>
+                            <option value="Food" <%= blog.category === 'Food' ? 'selected' : '' %>>Food & Culinary</option>
+                            <option value="Culture" <%= blog.category === 'Culture' ? 'selected' : '' %>>Culture & Heritage</option>
+                            <option value="Books" <%= blog.category === 'Books' ? 'selected' : '' %>>Books & Reading</option>
+                            <option value="Movies" <%= blog.category === 'Movies' ? 'selected' : '' %>>Movies & Entertainment</option>
+                            <option value="Technology" <%= blog.category === 'Technology' ? 'selected' : '' %>>Technology & Gadgets</option>
+                            <option value="Environment" <%= blog.category === 'Environment' ? 'selected' : '' %>>Environment & Sustainability</option>
+                            <option value="Social Issues" <%= blog.category === 'Social Issues' ? 'selected' : '' %>>Social Issues & Awareness</option>
+                            <option value="Opinion" <%= blog.category === 'Opinion' ? 'selected' : '' %>>Opinion & Editorial</option>
+                        </optgroup>
+
+                        <!-- 📝 Other -->
+                        <optgroup label="📝 Other">
                             <option value="Others" <%= blog.category === 'Others' ? 'selected' : '' %>>Others</option>
                         </optgroup>
                     </select>
@@ -146,7 +247,7 @@
                         name="shortdescription"
                         id="shortdescription"
                         rows="3"
-                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 resize-none"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 resize-none"
                         placeholder="A short summary of the blog (appears in blog listings)..."
                         required
                     ><%= blog.shortdescription %></textarea>
@@ -160,11 +261,35 @@
                     </div>
                 </div>
 
+                <!-- Tags -->
+                <div>
+                    <label for="tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <i class="fas fa-tags mr-2 text-[#C9A227]"></i> Tags
+                        <span class="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
+                    </label>
+                    <input
+                        type="text"
+                        name="tags"
+                        id="tags"
+                        value="<%= blog.tags ? blog.tags.join(', ') : '' %>"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200"
+                        placeholder="Enter tags separated by commas (e.g., education, exam, career, technology)"
+                    >
+                    <div class="flex justify-between items-center mt-1.5">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-1"></i> Separate tags with commas. 2-10 tags recommended.
+                        </p>
+                        <span id="tagCounter" class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                            <%= blog.tags ? blog.tags.length : 0 %> tags
+                        </span>
+                    </div>
+                </div>
+
                 <!-- Current Image Preview -->
                 <% if (originalImageUrl) { %>
                     <div class="bg-gray-50 dark:bg-gray-700/30 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                            <i class="fas fa-image mr-2 text-purple-500"></i> Current Image
+                            <i class="fas fa-image mr-2 text-[#C9A227]"></i> Current Image
                         </label>
                         <div class="flex flex-col sm:flex-row items-start gap-4">
                             <div class="w-full sm:w-40 h-40 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 flex-shrink-0">
@@ -193,10 +318,10 @@
                 <div class="space-y-4">
                     <div>
                         <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            <i class="fas fa-upload mr-2 text-purple-500"></i> Upload New Image
+                            <i class="fas fa-upload mr-2 text-[#C9A227]"></i> Upload New Image
                             <span class="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
                         </label>
-                        <div class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 hover:border-purple-400 dark:hover:border-purple-500 transition-colors bg-gray-50 dark:bg-gray-700/30">
+                        <div class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 hover:border-[#C9A227] dark:hover:border-[#C9A227] transition-colors bg-gray-50 dark:bg-gray-700/30">
                             <input type="file" 
                                    id="image" 
                                    name="image" 
@@ -208,7 +333,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    <span class="font-medium text-purple-600 dark:text-purple-400">Click to upload</span> or drag and drop
+                                    <span class="font-medium text-[#C9A227] dark:text-[#C9A227]">Click to upload</span> or drag and drop
                                 </p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                     PNG, JPG, GIF up to 5MB (Recommended: 1200×630px)
@@ -241,7 +366,7 @@
                     <!-- Image Alt Text -->
                     <div>
                         <label for="imageTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            <i class="fas fa-font mr-2 text-purple-500"></i> Image Alt Text
+                            <i class="fas fa-font mr-2 text-[#C9A227]"></i> Image Alt Text
                             <span class="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
                         </label>
                         <input
@@ -249,11 +374,11 @@
                             name="imageTitle"
                             id="imageTitle"
                             value="<%= blog.imageTitle || '' %>"
-                            class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200"
                             placeholder="Describe the image for SEO and accessibility..."
                         >
                         <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-info-circle mr-1"></i> Helps with search engines and screen readers. Example: "Person writing code on laptop"
+                            <i class="fas fa-info-circle mr-1"></i> Helps with search engines and screen readers.
                         </p>
                     </div>
                 </div>
@@ -261,14 +386,14 @@
                 <!-- Keywords -->
                 <div>
                     <label for="Keywords" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        <i class="fas fa-tags mr-2 text-purple-500"></i> Keywords <span class="text-red-500">*</span>
+                        <i class="fas fa-tags mr-2 text-[#C9A227]"></i> Keywords <span class="text-red-500">*</span>
                     </label>
                     <textarea
                         name="Keywords"
                         id="Keywords"
                         rows="2"
-                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 resize-none"
-                        placeholder="Enter keywords separated by commas (e.g., cybersecurity, ethical hacking, penetration testing)"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 resize-none"
+                        placeholder="Enter keywords separated by commas (e.g., education, exam preparation, career guidance)"
                         required
                     ><%= blog.Keywords %></textarea>
                     <div class="flex justify-between items-center mt-1.5">
@@ -284,13 +409,13 @@
                 <!-- Full Content -->
                 <div>
                     <label for="content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        <i class="fas fa-file-alt mr-2 text-purple-500"></i> Content <span class="text-red-500">*</span>
+                        <i class="fas fa-file-alt mr-2 text-[#C9A227]"></i> Content <span class="text-red-500">*</span>
                     </label>
                     <textarea
                         name="content"
                         id="content"
                         rows="12"
-                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 resize-none font-mono text-sm"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 resize-none font-mono text-sm"
                         placeholder="Write your full blog content here... Use HTML formatting"
                         required
                     ><%- blog.content %></textarea>
@@ -298,15 +423,20 @@
                     <!-- Formatting Tips -->
                     <div class="mt-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
                         <h5 class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center">
-                            <i class="fas fa-code mr-2 text-purple-500"></i> Formatting Tips:
+                            <i class="fas fa-code mr-2 text-[#C9A227]"></i> Formatting Tips:
                         </h5>
                         <div class="flex flex-wrap gap-2 text-xs">
                             <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;h2&gt;Heading&lt;/h2&gt;</code></span>
+                            <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;h3&gt;Subheading&lt;/h3&gt;</code></span>
                             <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;b&gt;Bold&lt;/b&gt;</code></span>
                             <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;i&gt;Italic&lt;/i&gt;</code></span>
                             <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;a href="url"&gt;Link&lt;/a&gt;</code></span>
                             <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;ul&gt;&lt;li&gt;List&lt;/li&gt;&lt;/ul&gt;</code></span>
+                            <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;ol&gt;&lt;li&gt;Ordered List&lt;/li&gt;&lt;/ol&gt;</code></span>
                             <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;img src="url" alt="text"&gt;</code></span>
+                            <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;blockquote&gt;Quote&lt;/blockquote&gt;</code></span>
+                            <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;pre&gt;Code block&lt;/pre&gt;</code></span>
+                            <span class="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-gray-700 dark:text-gray-300"><code>&lt;hr&gt;</code> (Horizontal rule)</span>
                         </div>
                     </div>
                     
@@ -320,10 +450,46 @@
                     </div>
                 </div>
 
+                <!-- External Links -->
+                <div>
+                    <label for="externalLinks" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <i class="fas fa-link mr-2 text-[#C9A227]"></i> External Links
+                        <span class="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
+                    </label>
+                    <textarea
+                        name="externalLinks"
+                        id="externalLinks"
+                        rows="2"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 resize-none"
+                        placeholder="Enter external links (one per line) for references and further reading"
+                    ><%= blog.externalLinks ? blog.externalLinks.join('\n') : '' %></textarea>
+                    <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i> Add reference links, sources, or further reading materials
+                    </p>
+                </div>
+
+                <!-- Optional Details -->
+                <div>
+                    <label for="optionalDetails" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        <i class="fas fa-plus-circle mr-2 text-[#C9A227]"></i> Additional Notes
+                        <span class="text-gray-500 dark:text-gray-400 font-normal">(Optional)</span>
+                    </label>
+                    <textarea
+                        name="optionalDetails"
+                        id="optionalDetails"
+                        rows="2"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 resize-none"
+                        placeholder="Any additional details, notes, or internal comments about this blog"
+                    ><%= blog.optionalDetails || '' %></textarea>
+                    <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i> Optional internal notes or additional information
+                    </p>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button type="submit" id="submitBtn"
-                        class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                        class="flex-1 bg-gradient-to-r from-[#C9A227] to-[#B8901E] hover:from-[#B8901E] hover:to-[#A07A1A] text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
@@ -341,31 +507,39 @@
         </div>
 
         <!-- Help Tips -->
-        <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+        <div class="mt-6 bg-[#C9A227]/10 dark:bg-[#C9A227]/20 rounded-xl p-6 border border-[#C9A227]/30" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
             <div class="flex items-start gap-4">
-                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[#C9A227]/20 dark:bg-[#C9A227]/30 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#C9A227]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                     </svg>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-blue-900 dark:text-blue-300">Editing Tips</h3>
+                    <h3 class="text-base font-bold text-gray-900 dark:text-white">Editing Tips</h3>
                     <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Title & Description</p>
-                            <p class="mt-0.5 text-xs opacity-80">Make them compelling to increase readership</p>
+                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> Title & Description</p>
+                            <p class="mt-0.5 text-xs opacity-70">Make them compelling to increase readership</p>
                         </div>
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Keywords</p>
-                            <p class="mt-0.5 text-xs opacity-80">Use specific terms your audience searches for</p>
+                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> Keywords</p>
+                            <p class="mt-0.5 text-xs opacity-70">Use specific terms your audience searches for</p>
                         </div>
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Images</p>
-                            <p class="mt-0.5 text-xs opacity-80">High-quality images improve engagement by 47%</p>
+                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> Images</p>
+                            <p class="mt-0.5 text-xs opacity-70">High-quality images improve engagement by 47%</p>
                         </div>
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Content</p>
-                            <p class="mt-0.5 text-xs opacity-80">Use subheadings and paragraphs for readability</p>
+                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> Content</p>
+                            <p class="mt-0.5 text-xs opacity-70">Use subheadings and paragraphs for readability</p>
+                        </div>
+                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> External Links</p>
+                            <p class="mt-0.5 text-xs opacity-70">Add credible references and sources</p>
+                        </div>
+                        <div class="text-sm text-gray-700 dark:text-gray-300">
+                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> SEO Optimization</p>
+                            <p class="mt-0.5 text-xs opacity-70">Use keywords naturally in your content</p>
                         </div>
                     </div>
                 </div>
@@ -417,6 +591,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // ========== TAG COUNTER ==========
+    const tagsInput = document.getElementById('tags');
+    const tagCounter = document.getElementById('tagCounter');
+    
+    if (tagsInput && tagCounter) {
+        tagsInput.addEventListener('input', function() {
+            const tags = this.value.split(',').filter(t => t.trim() !== '');
+            tagCounter.textContent = tags.length + ' tags';
+            
+            if (tags.length >= 2 && tags.length <= 10) {
+                tagCounter.className = 'text-xs font-medium text-green-600 dark:text-green-400';
+            } else if (tags.length > 10) {
+                tagCounter.className = 'text-xs font-medium text-yellow-600 dark:text-yellow-400';
+            } else {
+                tagCounter.className = 'text-xs font-medium text-gray-500 dark:text-gray-400';
+            }
+        });
+    }
+
+    // ========== KEYWORD COUNTER ==========
     const keywordsInput = document.getElementById('Keywords');
     const keywordCounter = document.getElementById('keywordCounter');
     
@@ -435,6 +629,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // ========== CONTENT WORD COUNTER ==========
     const contentInput = document.getElementById('content');
     const contentCounter = document.getElementById('contentCounter');
     
@@ -489,21 +684,6 @@ document.addEventListener('DOMContentLoaded', function() {
         fileInput.value = '';
         previewContainer.classList.add('hidden');
     };
-
-    // ========== VALIDATION ==========
-    const inputs = form.querySelectorAll('input, textarea, select');
-    inputs.forEach(input => {
-        input.addEventListener('invalid', function(e) {
-            e.preventDefault();
-            this.classList.add('border-red-500', 'ring-2', 'ring-red-200');
-        });
-        
-        input.addEventListener('input', function() {
-            if (this.classList.contains('border-red-500')) {
-                this.classList.remove('border-red-500', 'ring-2', 'ring-red-200');
-            }
-        });
-    });
 });
 </script>
 
@@ -526,7 +706,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* File input hover effect */
     .border-dashed:hover {
-        border-color: #a855f7;
+        border-color: #C9A227;
     }
 
     /* Custom scrollbar for textareas */
@@ -567,5 +747,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     .animate-spin {
         animation: spin 1s linear infinite;
+    }
+
+    /* optgroup styling */
+    select optgroup {
+        font-weight: 600;
+        color: #1f2937;
+        background: #f9fafb;
+    }
+
+    .dark select optgroup {
+        color: #e5e7eb;
+        background: #1f2937;
+    }
+
+    select option {
+        font-weight: 400;
+        padding: 8px;
     }
 </style>

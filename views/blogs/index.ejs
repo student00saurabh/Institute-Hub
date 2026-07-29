@@ -12,6 +12,150 @@
       if (tag) params.set('tag', tag);
       return params.toString();
   }
+
+  // ============================================================
+  // ✅ ALL CATEGORIES - Same as forms
+  // ============================================================
+  const ALL_CATEGORIES = [
+    // 📚 Academic & Education
+    { name: 'School Education', icon: 'fa-school', group: 'Academic & Education' },
+    { name: 'Higher Education', icon: 'fa-university', group: 'Academic & Education' },
+    { name: 'Distance Learning', icon: 'fa-laptop-house', group: 'Academic & Education' },
+    { name: 'Online Education', icon: 'fa-chalkboard-teacher', group: 'Academic & Education' },
+    { name: 'Educational Technology', icon: 'fa-microchip', group: 'Academic & Education' },
+    { name: 'Teaching Methods', icon: 'fa-chalkboard', group: 'Academic & Education' },
+    { name: 'Curriculum Development', icon: 'fa-book-open', group: 'Academic & Education' },
+    { name: 'Education Policy', icon: 'fa-gavel', group: 'Academic & Education' },
+    { name: 'Special Education', icon: 'fa-hand-holding-heart', group: 'Academic & Education' },
+    { name: 'Early Childhood Education', icon: 'fa-child', group: 'Academic & Education' },
+
+    // 🎓 Competitive & Entrance Exams
+    { name: 'UPSC', icon: 'fa-flag', group: 'Competitive & Entrance Exams' },
+    { name: 'SSC', icon: 'fa-users', group: 'Competitive & Entrance Exams' },
+    { name: 'Banking Exams', icon: 'fa-university', group: 'Competitive & Entrance Exams' },
+    { name: 'Railway Exams', icon: 'fa-train', group: 'Competitive & Entrance Exams' },
+    { name: 'State PSC', icon: 'fa-building-columns', group: 'Competitive & Entrance Exams' },
+    { name: 'Defense Exams', icon: 'fa-shield-halved', group: 'Competitive & Entrance Exams' },
+    { name: 'JEE', icon: 'fa-calculator', group: 'Competitive & Entrance Exams' },
+    { name: 'NEET', icon: 'fa-heartbeat', group: 'Competitive & Entrance Exams' },
+    { name: 'GATE', icon: 'fa-microchip', group: 'Competitive & Entrance Exams' },
+    { name: 'CAT', icon: 'fa-chart-line', group: 'Competitive & Entrance Exams' },
+    { name: 'CLAT', icon: 'fa-scale-balanced', group: 'Competitive & Entrance Exams' },
+    { name: 'NTA Exams', icon: 'fa-file-alt', group: 'Competitive & Entrance Exams' },
+    { name: 'Other Entrance', icon: 'fa-ellipsis-h', group: 'Competitive & Entrance Exams' },
+
+    // 💼 Career & Jobs
+    { name: 'Job Opportunities', icon: 'fa-briefcase', group: 'Career & Jobs' },
+    { name: 'Career Advice', icon: 'fa-compass', group: 'Career & Jobs' },
+    { name: 'Interview Tips', icon: 'fa-handshake', group: 'Career & Jobs' },
+    { name: 'Resume Writing', icon: 'fa-file-pen', group: 'Career & Jobs' },
+    { name: 'Government Jobs', icon: 'fa-landmark', group: 'Career & Jobs' },
+    { name: 'Private Jobs', icon: 'fa-building', group: 'Career & Jobs' },
+    { name: 'Internships', icon: 'fa-clock', group: 'Career & Jobs' },
+    { name: 'Freelancing', icon: 'fa-laptop', group: 'Career & Jobs' },
+    { name: 'Entrepreneurship', icon: 'fa-rocket', group: 'Career & Jobs' },
+    { name: 'Career Change', icon: 'fa-arrows-rotate', group: 'Career & Jobs' },
+
+    // 🏗️ Engineering & Technology
+    { name: 'Computer Science', icon: 'fa-desktop', group: 'Engineering & Technology' },
+    { name: 'Civil Engineering', icon: 'fa-city', group: 'Engineering & Technology' },
+    { name: 'Mechanical Engineering', icon: 'fa-gear', group: 'Engineering & Technology' },
+    { name: 'Electrical Engineering', icon: 'fa-bolt', group: 'Engineering & Technology' },
+    { name: 'Electronics Engineering', icon: 'fa-microchip', group: 'Engineering & Technology' },
+    { name: 'Chemical Engineering', icon: 'fa-flask', group: 'Engineering & Technology' },
+    { name: 'Aerospace Engineering', icon: 'fa-rocket', group: 'Engineering & Technology' },
+    { name: 'Biotechnology', icon: 'fa-dna', group: 'Engineering & Technology' },
+    { name: 'Environmental Engineering', icon: 'fa-leaf', group: 'Engineering & Technology' },
+    { name: 'Artificial Intelligence', icon: 'fa-brain', group: 'Engineering & Technology' },
+    { name: 'Data Science', icon: 'fa-chart-pie', group: 'Engineering & Technology' },
+    { name: 'Cybersecurity', icon: 'fa-shield-halved', group: 'Engineering & Technology' },
+    { name: 'Cloud Computing', icon: 'fa-cloud', group: 'Engineering & Technology' },
+    { name: 'DevOps', icon: 'fa-code-branch', group: 'Engineering & Technology' },
+
+    // 🏥 Health & Medical
+    { name: 'Medical Education', icon: 'fa-stethoscope', group: 'Health & Medical' },
+    { name: 'Nursing', icon: 'fa-user-nurse', group: 'Health & Medical' },
+    { name: 'Pharmacy', icon: 'fa-prescription-bottle', group: 'Health & Medical' },
+    { name: 'Public Health', icon: 'fa-people-group', group: 'Health & Medical' },
+    { name: 'Healthcare Management', icon: 'fa-hospital', group: 'Health & Medical' },
+    { name: 'Ayurveda', icon: 'fa-leaf', group: 'Health & Medical' },
+    { name: 'Veterinary', icon: 'fa-paw', group: 'Health & Medical' },
+    { name: 'Health & Wellness', icon: 'fa-heart', group: 'Health & Medical' },
+    { name: 'Medical Research', icon: 'fa-microscope', group: 'Health & Medical' },
+
+    // 📊 Business & Management
+    { name: 'MBA', icon: 'fa-graduation-cap', group: 'Business & Management' },
+    { name: 'Finance', icon: 'fa-chart-line', group: 'Business & Management' },
+    { name: 'Marketing', icon: 'fa-bullhorn', group: 'Business & Management' },
+    { name: 'Human Resources', icon: 'fa-user-tie', group: 'Business & Management' },
+    { name: 'Operations', icon: 'fa-cogs', group: 'Business & Management' },
+    { name: 'Business Analytics', icon: 'fa-chart-bar', group: 'Business & Management' },
+    { name: 'International Business', icon: 'fa-globe', group: 'Business & Management' },
+    { name: 'Entrepreneurship', icon: 'fa-rocket', group: 'Business & Management' },
+    { name: 'Leadership', icon: 'fa-crown', group: 'Business & Management' },
+
+    // 🎨 Arts & Humanities
+    { name: 'Fine Arts', icon: 'fa-palette', group: 'Arts & Humanities' },
+    { name: 'Performing Arts', icon: 'fa-music', group: 'Arts & Humanities' },
+    { name: 'Literature', icon: 'fa-book', group: 'Arts & Humanities' },
+    { name: 'History', icon: 'fa-clock-rotate-left', group: 'Arts & Humanities' },
+    { name: 'Philosophy', icon: 'fa-brain', group: 'Arts & Humanities' },
+    { name: 'Psychology', icon: 'fa-brain', group: 'Arts & Humanities' },
+    { name: 'Sociology', icon: 'fa-people-arrows', group: 'Arts & Humanities' },
+    { name: 'Political Science', icon: 'fa-gavel', group: 'Arts & Humanities' },
+    { name: 'Geography', icon: 'fa-earth-asia', group: 'Arts & Humanities' },
+    { name: 'Languages', icon: 'fa-language', group: 'Arts & Humanities' },
+
+    // 📰 News & Current Affairs
+    { name: 'Latest News', icon: 'fa-newspaper', group: 'News & Current Affairs' },
+    { name: 'Education News', icon: 'fa-school', group: 'News & Current Affairs' },
+    { name: 'Exam News', icon: 'fa-file-pen', group: 'News & Current Affairs' },
+    { name: 'Job News', icon: 'fa-briefcase', group: 'News & Current Affairs' },
+    { name: 'Technology News', icon: 'fa-microchip', group: 'News & Current Affairs' },
+    { name: 'Health News', icon: 'fa-heartbeat', group: 'News & Current Affairs' },
+    { name: 'Business News', icon: 'fa-chart-line', group: 'News & Current Affairs' },
+    { name: 'World News', icon: 'fa-globe', group: 'News & Current Affairs' },
+    { name: 'Sports News', icon: 'fa-futbol', group: 'News & Current Affairs' },
+    { name: 'Entertainment News', icon: 'fa-film', group: 'News & Current Affairs' },
+
+    // 📝 Teaching & Education Profession
+    { name: 'Teaching Tips', icon: 'fa-chalkboard-user', group: 'Teaching & Education Profession' },
+    { name: 'Classroom Management', icon: 'fa-people-group', group: 'Teaching & Education Profession' },
+    { name: 'Lesson Planning', icon: 'fa-clipboard-list', group: 'Teaching & Education Profession' },
+    { name: 'Teacher Training', icon: 'fa-user-graduate', group: 'Teaching & Education Profession' },
+    { name: 'Teaching Exams', icon: 'fa-file-pen', group: 'Teaching & Education Profession' },
+    { name: 'Higher Education Teaching', icon: 'fa-university', group: 'Teaching & Education Profession' },
+    { name: 'Online Teaching', icon: 'fa-laptop', group: 'Teaching & Education Profession' },
+    { name: 'Educational Resources', icon: 'fa-book', group: 'Teaching & Education Profession' },
+
+    // 🧪 Science & Research
+    { name: 'Physics', icon: 'fa-atom', group: 'Science & Research' },
+    { name: 'Chemistry', icon: 'fa-flask', group: 'Science & Research' },
+    { name: 'Biology', icon: 'fa-dna', group: 'Science & Research' },
+    { name: 'Mathematics', icon: 'fa-calculator', group: 'Science & Research' },
+    { name: 'Astronomy', icon: 'fa-meteor', group: 'Science & Research' },
+    { name: 'Environmental Science', icon: 'fa-leaf', group: 'Science & Research' },
+    { name: 'Scientific Research', icon: 'fa-microscope', group: 'Science & Research' },
+    { name: 'Innovation', icon: 'fa-lightbulb', group: 'Science & Research' },
+
+    // 🌐 General Interest
+    { name: 'Lifestyle', icon: 'fa-spa', group: 'General Interest' },
+    { name: 'Travel', icon: 'fa-plane', group: 'General Interest' },
+    { name: 'Food', icon: 'fa-utensils', group: 'General Interest' },
+    { name: 'Culture', icon: 'fa-landmark', group: 'General Interest' },
+    { name: 'Books', icon: 'fa-book-open', group: 'General Interest' },
+    { name: 'Movies', icon: 'fa-film', group: 'General Interest' },
+    { name: 'Technology', icon: 'fa-microchip', group: 'General Interest' },
+    { name: 'Environment', icon: 'fa-tree', group: 'General Interest' },
+    { name: 'Social Issues', icon: 'fa-hand-holding-heart', group: 'General Interest' },
+    { name: 'Opinion', icon: 'fa-pen-fancy', group: 'General Interest' },
+
+    // 📝 Other
+    { name: 'Others', icon: 'fa-ellipsis-h', group: 'Other' }
+  ];
+
+  // Get unique groups for category popup
+  const categoryGroups = [...new Set(ALL_CATEGORIES.map(c => c.group))];
 %>
 
 <!-- ============================================================ -->
@@ -37,7 +181,7 @@
             <span class="w-px h-4 bg-white/20"></span>
             <span><i class="fas fa-users text-[#C9A227] mr-1"></i> <%= (allBlogs.reduce((sum, b) => sum + (b.views || 0), 0) || 25000).toLocaleString() %>+ Readers</span>
             <span class="w-px h-4 bg-white/20"></span>
-            <span><i class="fas fa-tags text-[#C9A227] mr-1"></i> <%= blogCategories.length - 1 %> Categories</span>
+            <span><i class="fas fa-tags text-[#C9A227] mr-1"></i> <%= ALL_CATEGORIES.length %> Categories</span>
         </div>
     </div>
 </section>
@@ -105,7 +249,7 @@
 <% } %>
 
 <!-- ============================================================ -->
-<!-- BLOG FILTER & SEARCH                                         -->
+<!-- BLOG FILTER & SEARCH - WITH ALL CATEGORIES POPUP            -->
 <!-- ============================================================ -->
 <section class="py-6 lg:py-8 bg-white dark:bg-[#0F172A]/40 border-b border-[#E2E8F0] dark:border-[#1E293B] sticky top-16 z-30 backdrop-blur-lg bg-white/90 dark:bg-[#0F172A]/90">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -122,15 +266,66 @@
                            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white placeholder-[#94A3B8] text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300">
                 </div>
 
-                <!-- Category Filter -->
-                <div class="relative min-w-[160px]">
-                    <i class="fas fa-tag absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-sm"></i>
-                    <select name="category" class="filter-select w-full pl-10 pr-8 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300 cursor-pointer">
-                        <% blogCategories.forEach(cat => { %>
-                            <option value="<%= cat %>" <%= cat === category ? 'selected' : '' %>><%= cat %></option>
-                        <% }) %>
-                    </select>
-                    <i class="fas fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94A3B8] text-xs pointer-events-none"></i>
+                <!-- Category Filter - Button with Popup -->
+                <div class="relative min-w-[180px]">
+                    <button type="button" 
+                            id="categoryFilterBtn"
+                            class="category-filter-btn w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#111827] text-[#0F172A] dark:text-white text-sm hover:border-[#2563EB] transition-all duration-300 cursor-pointer">
+                        <span class="flex items-center gap-2 truncate">
+                            <i class="fas fa-tag text-[#94A3B8]"></i>
+                            <span id="selectedCategoryLabel" class="truncate max-w-[120px]"><%= category && category !== 'All Categories' ? category : 'All Categories' %></span>
+                        </span>
+                        <i class="fas fa-chevron-down text-[#94A3B8] text-xs transition-transform duration-300 flex-shrink-0" id="categoryChevron"></i>
+                    </button>
+                    
+                    <!-- Category Popup with ALL Categories -->
+                    <div id="categoryPopup" 
+                         class="category-popup hidden absolute top-full left-0 mt-2 w-80 max-h-[400px] overflow-y-auto bg-white dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-[#1E293B] shadow-2xl shadow-[#0F172A]/20 dark:shadow-[#0F172A]/60 p-2 z-50">
+                        
+                        <div class="sticky top-0 bg-white dark:bg-[#111827] pb-2 border-b border-[#E2E8F0] dark:border-[#1E293B]">
+                            <input type="text" 
+                                   id="categorySearch"
+                                   placeholder="Search categories..." 
+                                   class="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] dark:border-[#1E293B] bg-[#F8FAFC] dark:bg-[#0F172A] text-[#0F172A] dark:text-white placeholder-[#94A3B8] text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]/40 focus:border-[#2563EB] transition-all duration-300">
+                        </div>
+
+                        <div class="mt-2 space-y-1" id="categoryList">
+                            <!-- All Categories Option -->
+                            <a href="/blogs?<%= buildPaginationUrl(1, search, '', tag) %>" 
+                               class="category-option block px-3 py-2 rounded-lg text-sm text-[#0F172A] dark:text-white hover:bg-[#2563EB]/10 dark:hover:bg-[#2563EB]/20 transition-all duration-200 <%= !category || category === 'All Categories' ? 'bg-[#2563EB]/10 dark:bg-[#2563EB]/20 text-[#2563EB] dark:text-[#2563EB] font-semibold' : '' %>"
+                               data-category="All Categories">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-[#94A3B8]"></span>
+                                    <span>All Categories</span>
+                                    <% if (!category || category === 'All Categories') { %>
+                                        <span class="ml-auto text-[#2563EB]"><i class="fas fa-check-circle"></i></span>
+                                    <% } %>
+                                </div>
+                            </a>
+
+                            <!-- Grouped Categories -->
+                            <% categoryGroups.forEach(group => { %>
+                                <div class="mt-2">
+                                    <div class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8] dark:text-[#64748B]">
+                                        <%= group %>
+                                    </div>
+                                    <% ALL_CATEGORIES.filter(c => c.group === group).forEach(cat => { %>
+                                        <a href="/blogs?<%= buildPaginationUrl(1, search, cat.name, tag) %>" 
+                                           class="category-option block px-3 py-2 rounded-lg text-sm text-[#0F172A] dark:text-white hover:bg-[#2563EB]/10 dark:hover:bg-[#2563EB]/20 transition-all duration-200 <%= category === cat.name ? 'bg-[#2563EB]/10 dark:bg-[#2563EB]/20 text-[#2563EB] dark:text-[#2563EB] font-semibold' : '' %>"
+                                           data-category="<%= cat.name %>">
+                                            <div class="flex items-center gap-3">
+                                                <i class="fas <%= cat.icon %> text-[#94A3B8] w-4 text-center"></i>
+                                                <span><%= cat.name %></span>
+                                                <% if (category === cat.name) { %>
+                                                    <span class="ml-auto text-[#2563EB]"><i class="fas fa-check-circle"></i></span>
+                                                <% } %>
+                                            </div>
+                                        </a>
+                                    <% }) %>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Reset -->
@@ -245,7 +440,7 @@
                                         </span>
                                     <% }) %>
                                     <% if (blog.tags.length > 3) { %>
-                                        <span class="px-2 py-0.5 text-[#64748B] text-[9px] font-medium">+<%= blog.tags.length - 3 %> more</span>
+                                        <span class="px-2 py-0.5 text-[#64748B] text-[#9CA3AF] text-[9px] font-medium">+<%= blog.tags.length - 3 %> more</span>
                                     <% } %>
                                 </div>
                             <% } %>
@@ -464,15 +659,66 @@
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    @media (prefers-reduced-motion: reduce) {
-        .reveal-up { opacity: 1 !important; transform: none !important; transition: none !important; }
+    /* ── Category Popup ── */
+    .category-popup {
+        animation: popupFadeIn 0.2s ease-out;
+        max-height: 400px;
+        overflow-y: auto;
     }
 
+    @keyframes popupFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .category-popup::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .category-popup::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .category-popup::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 4px;
+    }
+
+    .dark .category-popup::-webkit-scrollbar-thumb {
+        background: #334155;
+    }
+
+    .category-option {
+        transition: all 0.2s ease;
+    }
+
+    .category-filter-btn:hover {
+        border-color: #2563EB;
+    }
+
+    /* ── Mobile Responsive ── */
     @media (max-width: 640px) {
         .sticky {
             position: relative !important;
             top: 0 !important;
         }
+        .category-popup {
+            width: 100%;
+            left: 0;
+            right: 0;
+            max-height: 320px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .reveal-up { opacity: 1 !important; transform: none !important; transition: none !important; }
+        .category-popup { animation: none !important; }
     }
 </style>
 
@@ -482,6 +728,81 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         'use strict';
+
+        // ========== CATEGORY POPUP ==========
+        const categoryBtn = document.getElementById('categoryFilterBtn');
+        const categoryPopup = document.getElementById('categoryPopup');
+        const categorySearch = document.getElementById('categorySearch');
+        const categoryList = document.getElementById('categoryList');
+        const categoryOptions = categoryList ? categoryList.querySelectorAll('.category-option') : [];
+        const selectedLabel = document.getElementById('selectedCategoryLabel');
+        const chevron = document.getElementById('categoryChevron');
+
+        let isPopupOpen = false;
+
+        // Toggle popup
+        if (categoryBtn) {
+            categoryBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                isPopupOpen = !isPopupOpen;
+                categoryPopup.classList.toggle('hidden', !isPopupOpen);
+                if (chevron) {
+                    chevron.style.transform = isPopupOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+                }
+                if (isPopupOpen) {
+                    setTimeout(() => categorySearch?.focus(), 100);
+                }
+            });
+        }
+
+        // Close popup on outside click
+        document.addEventListener('click', function(e) {
+            if (!categoryBtn?.contains(e.target) && !categoryPopup?.contains(e.target)) {
+                categoryPopup?.classList.add('hidden');
+                if (chevron) {
+                    chevron.style.transform = 'rotate(0deg)';
+                }
+                isPopupOpen = false;
+            }
+        });
+
+        // Search categories
+        if (categorySearch) {
+            categorySearch.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                categoryOptions.forEach(option => {
+                    const text = option.textContent.toLowerCase();
+                    option.style.display = text.includes(searchTerm) ? 'block' : 'none';
+                });
+            });
+
+            // Prevent popup close on search click
+            categorySearch.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+
+        // Category selection - update label
+        categoryOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                const cat = this.dataset.category;
+                if (selectedLabel) {
+                    selectedLabel.textContent = cat;
+                }
+                // Update active state
+                categoryOptions.forEach(opt => {
+                    opt.classList.remove('bg-[#2563EB]/10', 'dark:bg-[#2563EB]/20', 'text-[#2563EB]', 'dark:text-[#2563EB]', 'font-semibold');
+                });
+                this.classList.add('bg-[#2563EB]/10', 'dark:bg-[#2563EB]/20', 'text-[#2563EB]', 'dark:text-[#2563EB]', 'font-semibold');
+                
+                // Close popup
+                categoryPopup?.classList.add('hidden');
+                if (chevron) {
+                    chevron.style.transform = 'rotate(0deg)';
+                }
+                isPopupOpen = false;
+            });
+        });
 
         // ========== SAVE BLOG FUNCTION ==========
         window.toggleSaveBlog = function(btn, evt) {
@@ -497,7 +818,6 @@
             void btn.offsetWidth;
             btn.classList.add('save-pop');
 
-            // AJAX call
             const blogId = btn.dataset.blogId;
             if (blogId) {
                 fetch(`/blogs/${blogId}/save`, {
