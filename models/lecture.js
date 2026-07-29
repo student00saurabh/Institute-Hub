@@ -19,20 +19,15 @@ const lectureSchema = new Schema({
     },
 
     // ===== TOPIC/CATEGORY =====
+    // 🔓 No enum here on purpose — this app covers every kind of course
+    // (tech, non-tech, civil, medical, arts, language, test-prep, etc.),
+    // so admins can type whatever topic fits instead of being limited to a
+    // fixed tech list. `subTopic` still exists for finer-grained tagging.
     topic: {
         type: String,
         required: [true, "Topic is required"],
         trim: true,
-        enum: [
-            "HTML", "CSS", "JavaScript", "React", "Node.js", "Python",
-            "Data Science", "Machine Learning", "UI/UX", "Figma",
-            "Cybersecurity", "Cloud Computing", "DevOps", "Kubernetes",
-            "Docker", "AWS", "Azure", "GCP", "SQL", "MongoDB",
-            "Express.js", "Next.js", "TypeScript", "Tailwind CSS",
-            "Bootstrap", "Git", "GitHub", "Agile", "Scrum",
-            "Project Management", "Leadership", "Communication",
-            "Other"
-        ],
+        maxlength: [100, "Topic cannot exceed 100 characters"],
         index: true
     },
 

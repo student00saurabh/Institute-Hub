@@ -8,8 +8,12 @@ const lectureController = require("../controllers/lectureController.js");
 const settingsController = require("../controllers/settingsController.js");
 const multer = require("multer");
 
-const { cloudinary, storage } = require("../Cloudconfig.js");
-const upload = multer({ storage });
+const { cloudinary, storage, videoStorage } = require("../Cloudconfig.js");
+const upload = multer({ storage }); // images/thumbnails (public)
+const uploadVideo = multer({
+  storage: videoStorage, // private "authenticated" Cloudinary videos
+  limits: { fileSize: 2 * 1024 * 1024 * 1024 } // 2GB — raise/lower to match your hosting's request-size limits
+});
 
 router.get("/dashboard", isLoggedIn, isAdmin, adminController.adminDashboard);
 
@@ -109,6 +113,13 @@ router.delete("/course-ratings/:id", isLoggedIn, isAdmin, adminController.delete
 
 router.get("/lectures", isLoggedIn, isAdmin, lectureController.manageLectures);
 router.get("/lectures/new", isLoggedIn, isAdmin, lectureController.renderNewLectureForm);
+
+// Video upload happens in its own request (with progress bar on the client),
+// BEFORE the lecture create/update form is submitted. Uploaded straight to
+// Cloudinary as a private "authenticated" asset — see Cloudconfig.js.
+router.post("/lectures/upload-video", isLoggedIn, isAdmin, uploadVideo.single("video"), lectureController.uploadLectureVideo);
+router.post("/lectures/discard-video", isLoggedIn, isAdmin, lectureController.discardUploadedVideo);
+
 router.post("/lectures", isLoggedIn, isAdmin, upload.single("videoThumbnail"), lectureController.createLecture);
 router.get("/lectures/:id", isLoggedIn, isAdmin, lectureController.lectureDetails);
 router.get("/lectures/:id/edit", isLoggedIn, isAdmin, lectureController.renderEditLectureForm);

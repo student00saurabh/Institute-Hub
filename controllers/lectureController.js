@@ -1,11 +1,26 @@
 const Lecture = require("../models/lecture");
 const Course = require("../models/cources");
 const LectureProgress = require("../models/lectureProgress");
-const cloudinary = require("../Cloudconfig.js");
+// ⚠️ Cloudconfig.js exports { cloudinary, storage, videoStorage } — destructure it.
+// (Previously this file did `const cloudinary = require(...)`, which actually
+// grabbed the whole { cloudinary, storage } object, so every
+// `cloudinary.uploader.destroy(...)` call below was silently broken.)
+const { cloudinary, videoStorage } = require("../Cloudconfig.js");
 const crypto = require("crypto");
 
 const VIDEO_TOKEN_SECRET = process.env.VIDEO_TOKEN_SECRET || process.env.SECRET || "institutehub-secret-key";
 const VIDEO_URL_TTL_SECONDS = 60 * 30; // 30 minutes
+
+// Watermark text is burned directly into the video pixels (not just an
+// overlay in the DOM), so even a screen recording carries the viewer's
+// identity — this is what actually discourages someone from re-sharing
+// a recording of the lecture.
+function buildWatermarkText(user) {
+    // Cloudinary's l_text overlay treats "," and "/" as transformation
+    // delimiters, so we sanitize those out of the burned-in text.
+    const safe = (str = "") => String(str).replace(/,/g, " ").replace(/\//g, "-");
+    return `${safe(user.email)} | ${safe(user._id.toString())}`;
+}
 
 // ============================================================
 // ADMIN FUNCTIONS - Manage Lectures
@@ -104,27 +119,44 @@ module.exports.renderNewLectureForm = async (req, res) => {
 // ===== 3. Create Lecture =====
 module.exports.createLecture = async (req, res) => {
     try {
-        const lectureData = req.body;
+        const lectureData = { ...req.body };
         lectureData.createdBy = req.user._id;
 
-        // Process video data
-        if (lectureData.video) {
-            if (lectureData.video.provider === 'cloudinary' && req.file) {
-                lectureData.video.publicId = req.file.filename;
-                lectureData.video.url = req.file.path;
-            }
+        // HTML checkboxes send "on" when checked and no field at all when
+        // unchecked — Mongoose's Boolean caster only understands
+        // true/false/"true"/"false"/0/1, so "on" throws a CastError.
+        lectureData.isPublished = lectureData.isPublished === 'on' || lectureData.isPublished === 'true';
+        lectureData.isFree = lectureData.isFree === 'on' || lectureData.isFree === 'true';
+
+        // courses[] comes from the multi-course rows in the form, e.g.
+        // courses[0][courseId], courses[0][section], courses[0][order]...
+        const courseAssignments = Array.isArray(lectureData.courses) ? lectureData.courses : [];
+        delete lectureData.courses;
+        // legacy single-course fields — no longer used directly on the lecture doc
+        delete lectureData.courseId;
+        delete lectureData.section;
+        delete lectureData.order;
+
+        // The video itself is uploaded separately via createLecture's sibling
+        // endpoint (uploadLectureVideo) BEFORE the form is submitted, so
+        // video[publicId] etc. already arrive correctly in req.body.
+        // req.file here (if present) is only ever the optional thumbnail image.
+        if (req.file) {
+            lectureData.video = lectureData.video || {};
+            lectureData.video.thumbnail = { url: req.file.path, filename: req.file.filename };
         }
 
-        // Create lecture
         const lecture = new Lecture(lectureData);
         await lecture.save();
 
-        // Add to course if courseId provided
-        if (lectureData.courseId && lectureData.courseId !== '') {
+        // Attach to every selected course — this is what lets one lecture
+        // live inside multiple courses at once.
+        for (const assignment of courseAssignments) {
+            if (!assignment?.courseId) continue;
             await lecture.addToCourse(
-                lectureData.courseId,
-                lectureData.section || "General",
-                parseInt(lectureData.order) || 0
+                assignment.courseId,
+                assignment.section || "General",
+                parseInt(assignment.order) || 0
             );
         }
 
@@ -135,6 +167,59 @@ module.exports.createLecture = async (req, res) => {
         console.error("Create lecture error:", error);
         req.flash("error", "Failed to create lecture: " + error.message);
         res.redirect("/admin/lectures/new");
+    }
+};
+
+// ===== 3b. Upload lecture video to Cloudinary (AJAX, called BEFORE create/update) =====
+// This is the "upload karke, phir yahan add kar sake" step: the admin picks a
+// video file, it streams straight to Cloudinary as a private ("authenticated")
+// resource, and we hand back just the publicId + duration. The actual
+// create/update form submit afterwards is now cheap (no big file in that
+// request) and only ever references the publicId.
+module.exports.uploadLectureVideo = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: "No video file received" });
+        }
+
+        // multer-storage-cloudinary already streamed the file to Cloudinary
+        // (as type: "authenticated", per Cloudconfig.js videoStorage).
+        const publicId = req.file.filename;
+
+        // Ask Cloudinary directly for the authoritative duration/format —
+        // don't trust anything the client claims about the file.
+        const resource = await cloudinary.api.resource(publicId, {
+            resource_type: "video",
+            type: "authenticated"
+        });
+
+        res.json({
+            success: true,
+            publicId,
+            duration: Math.round(resource.duration || 0),
+            format: resource.format,
+            bytes: resource.bytes
+        });
+    } catch (error) {
+        console.error("Upload lecture video error:", error);
+        res.status(500).json({ success: false, message: "Video upload failed: " + error.message });
+    }
+};
+
+// ===== 3c. Discard an uploaded-but-not-yet-saved video =====
+// Called if the admin uploads a video, then cancels/changes their mind
+// before hitting "Save" — otherwise it would sit orphaned in Cloudinary.
+module.exports.discardUploadedVideo = async (req, res) => {
+    try {
+        const { publicId } = req.body;
+        if (!publicId) {
+            return res.status(400).json({ success: false, message: "publicId is required" });
+        }
+        await cloudinary.uploader.destroy(publicId, { resource_type: "video", type: "authenticated" });
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Discard uploaded video error:", error);
+        res.status(500).json({ success: false, message: "Failed to discard video" });
     }
 };
 
@@ -212,7 +297,13 @@ module.exports.renderEditLectureForm = async (req, res) => {
 module.exports.updateLecture = async (req, res) => {
     try {
         const { id } = req.params;
-        const lectureData = req.body;
+        const lectureData = { ...req.body };
+
+        const courseAssignments = Array.isArray(lectureData.courses) ? lectureData.courses : [];
+        delete lectureData.courses;
+        delete lectureData.courseId;
+        delete lectureData.section;
+        delete lectureData.order;
 
         const lecture = await Lecture.findById(id);
         if (!lecture) {
@@ -220,50 +311,62 @@ module.exports.updateLecture = async (req, res) => {
             return res.redirect("/admin/lectures");
         }
 
+        // If admin uploaded a replacement video (different publicId), remove
+        // the old one from Cloudinary so we don't leak/pay for orphaned videos.
+        const newPublicId = lectureData.video?.publicId;
+        if (newPublicId && lecture.video?.publicId && newPublicId !== lecture.video.publicId) {
+            try {
+                await cloudinary.uploader.destroy(lecture.video.publicId, { resource_type: "video", type: "authenticated" });
+            } catch (err) {
+                console.error("Cloudinary delete error:", err);
+            }
+        }
+
+        // HTML checkboxes send "on" when checked, and no field at all when
+        // unchecked — normalize both before they hit the schema's Boolean caster.
+        lectureData.isPublished = lectureData.isPublished === 'on' || lectureData.isPublished === 'true';
+        lectureData.isFree = lectureData.isFree === 'on' || lectureData.isFree === 'true';
+
         // Update fields
         Object.assign(lecture, lectureData);
         lecture.updatedBy = req.user._id;
 
-        // Update video if new file uploaded
+        // Thumbnail image (separate from the video itself)
         if (req.file) {
-            // Delete old video from cloudinary if exists
-            if (lecture.video?.publicId) {
-                try {
-                    await cloudinary.uploader.destroy(lecture.video.publicId, { resource_type: "video" });
-                } catch (err) {
-                    console.error("Cloudinary delete error:", err);
-                }
+            lecture.video = lecture.video || {};
+            lecture.video.thumbnail = { url: req.file.path, filename: req.file.filename };
+        }
+
+        // ----- Sync multi-course assignment -----
+        const requestedIds = courseAssignments.filter(c => c?.courseId).map(c => c.courseId.toString());
+        const currentIds = (lecture.courses || []).map(c => c.courseId.toString());
+
+        // Remove any course this lecture was in but is no longer assigned to
+        for (const currentId of currentIds) {
+            if (!requestedIds.includes(currentId)) {
+                await lecture.removeFromCourse(currentId);
             }
-            lecture.video = {
-                ...lecture.video,
-                publicId: req.file.filename,
-                url: req.file.path
-            };
+        }
+
+        // Add new ones / update section+order on existing ones
+        for (const assignment of courseAssignments) {
+            if (!assignment?.courseId) continue;
+            if (lecture.isInCourse(assignment.courseId)) {
+                await lecture.updateOrderInCourse(
+                    assignment.courseId,
+                    parseInt(assignment.order) || 0,
+                    assignment.section || "General"
+                );
+            } else {
+                await lecture.addToCourse(
+                    assignment.courseId,
+                    assignment.section || "General",
+                    parseInt(assignment.order) || 0
+                );
+            }
         }
 
         await lecture.save();
-
-        // Handle course assignment
-        if (lectureData.courseId && lectureData.courseId !== '') {
-            // Check if already in course
-            if (!lecture.isInCourse(lectureData.courseId)) {
-                await lecture.addToCourse(
-                    lectureData.courseId,
-                    lectureData.section || "General",
-                    parseInt(lectureData.order) || 0
-                );
-            } else {
-                // Update section and order
-                const courseData = lecture.courses.find(
-                    c => c.courseId.toString() === lectureData.courseId
-                );
-                if (courseData) {
-                    courseData.section = lectureData.section || "General";
-                    courseData.order = parseInt(lectureData.order) || 0;
-                    await lecture.save();
-                }
-            }
-        }
 
         req.flash("success", "Lecture updated successfully!");
         res.redirect(`/admin/lectures/${id}`);
@@ -291,7 +394,7 @@ module.exports.deleteLecture = async (req, res) => {
         // Delete video from cloudinary
         if (lecture.video?.publicId) {
             try {
-                await cloudinary.uploader.destroy(lecture.video.publicId, { resource_type: "video" });
+                await cloudinary.uploader.destroy(lecture.video.publicId, { resource_type: "video", type: "authenticated" });
             } catch (err) {
                 console.error("Cloudinary delete error:", err);
             }
@@ -488,19 +591,52 @@ async function assertLectureAccess({ lectureId, courseId, userId }) {
     return lecture;
 }
 
-// Generates a short-lived, signed URL for the video
+// Generates a short-lived, signed URL for the video — with the viewer's
+// email + user id burned directly into the frames (not a DOM overlay a
+// screen-recorder could strip out just by hiding an element first).
 function generateSecureVideoUrl(lecture, user) {
     const { provider, publicId, url, embedId } = lecture.video || {};
     const timestamp = Math.floor(Date.now() / 1000);
     const expiresAt = timestamp + VIDEO_URL_TTL_SECONDS;
 
     if (provider === "cloudinary" && publicId) {
+        const watermarkText = buildWatermarkText(user);
+
         const signedUrl = cloudinary.url(publicId, {
             resource_type: "video",
             type: "authenticated",
             sign_url: true,
             secure: true,
-            expires_at: expiresAt
+            expires_at: expiresAt,
+            transformation: [
+                // Bottom-right, semi-opaque
+                {
+                    overlay: {
+                        font_family: "Arial",
+                        font_size: 16,
+                        font_weight: "bold",
+                        text: watermarkText
+                    },
+                    color: "white",
+                    opacity: 55,
+                    gravity: "south_east",
+                    x: 20,
+                    y: 20
+                },
+                // Also top-left, fainter — makes it harder to crop out both
+                {
+                    overlay: {
+                        font_family: "Arial",
+                        font_size: 14,
+                        text: watermarkText
+                    },
+                    color: "white",
+                    opacity: 35,
+                    gravity: "north_west",
+                    x: 20,
+                    y: 20
+                }
+            ]
         });
         return { playbackUrl: signedUrl, type: "direct", expiresAt };
     }
@@ -529,6 +665,53 @@ function generateSecureVideoUrl(lecture, user) {
 // ============================================================
 // USER FACING FUNCTIONS (Existing)
 // ============================================================
+
+// ✅ AJAX: attach an existing lecture to another course (many-to-many)
+module.exports.addToCourse = async (req, res) => {
+    try {
+        const { lectureId, courseId, section, order } = req.body;
+        if (!lectureId || !courseId) {
+            return res.status(400).json({ success: false, message: "lectureId and courseId are required" });
+        }
+
+        const lecture = await Lecture.findById(lectureId);
+        if (!lecture) {
+            return res.status(404).json({ success: false, message: "Lecture not found" });
+        }
+
+        if (lecture.isInCourse(courseId)) {
+            return res.status(400).json({ success: false, message: "Lecture is already added to this course" });
+        }
+
+        await lecture.addToCourse(courseId, section || "General", parseInt(order) || 0);
+        res.json({ success: true, message: "Lecture added to course", courses: lecture.courses });
+    } catch (error) {
+        console.error("Add to course error:", error);
+        res.status(500).json({ success: false, message: error.message || "Failed to add lecture to course" });
+    }
+};
+
+// ✅ AJAX: detach a lecture from one course (it stays in any others it's part of)
+module.exports.removeFromCourse = async (req, res) => {
+    try {
+        const { lectureId, courseId } = req.params;
+
+        const lecture = await Lecture.findById(lectureId);
+        if (!lecture) {
+            return res.status(404).json({ success: false, message: "Lecture not found" });
+        }
+
+        if (!lecture.isInCourse(courseId)) {
+            return res.status(400).json({ success: false, message: "Lecture is not part of this course" });
+        }
+
+        await lecture.removeFromCourse(courseId);
+        res.json({ success: true, message: "Lecture removed from course" });
+    } catch (error) {
+        console.error("Remove from course error:", error);
+        res.status(500).json({ success: false, message: error.message || "Failed to remove lecture from course" });
+    }
+};
 
 module.exports.getLecturesByTopic = async (req, res) => {
     try {

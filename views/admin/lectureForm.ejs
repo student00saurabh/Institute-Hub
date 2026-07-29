@@ -28,7 +28,15 @@
             <form action="<%= isEdit ? `/admin/lectures/${lecture._id}` : '/admin/lectures' %>" 
                   method="POST" 
                   enctype="multipart/form-data"
-                  class="p-6">
+                  class="p-6"
+                  id="lectureForm"
+                  data-upload-video-url="/admin/lectures/upload-video"
+                  data-discard-video-url="/admin/lectures/discard-video"
+                  data-existing-courses='<%- JSON.stringify(
+                        (lecture?.courses && lecture.courses.length > 0)
+                            ? lecture.courses.map(c => ({ courseId: (c.courseId?._id || c.courseId)?.toString(), section: c.section || "General", order: c.order || 0 }))
+                            : (lecture?.course ? [{ courseId: lecture.course.toString(), section: lecture.section || "General", order: lecture.order || 0 }] : [])
+                  ) %>'>
                 
                 <% if (isEdit) { %>
                     <input type="hidden" name="_method" value="PUT">
@@ -56,26 +64,57 @@
                         <!-- Topic -->
                         <div>
                             <label for="topic" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Topic <span class="text-red-500">*</span>
+                                Topic / Category <span class="text-red-500">*</span>
                             </label>
-                            <select id="topic" name="topic" required
-                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">Select Topic</option>
-                                <option value="HTML" <%= lecture?.topic === 'HTML' ? 'selected' : '' %>>HTML</option>
-                                <option value="CSS" <%= lecture?.topic === 'CSS' ? 'selected' : '' %>>CSS</option>
-                                <option value="JavaScript" <%= lecture?.topic === 'JavaScript' ? 'selected' : '' %>>JavaScript</option>
-                                <option value="React" <%= lecture?.topic === 'React' ? 'selected' : '' %>>React</option>
-                                <option value="Node.js" <%= lecture?.topic === 'Node.js' ? 'selected' : '' %>>Node.js</option>
-                                <option value="Python" <%= lecture?.topic === 'Python' ? 'selected' : '' %>>Python</option>
-                                <option value="Data Science" <%= lecture?.topic === 'Data Science' ? 'selected' : '' %>>Data Science</option>
-                                <option value="Machine Learning" <%= lecture?.topic === 'Machine Learning' ? 'selected' : '' %>>Machine Learning</option>
-                                <option value="UI/UX" <%= lecture?.topic === 'UI/UX' ? 'selected' : '' %>>UI/UX</option>
-                                <option value="Cybersecurity" <%= lecture?.topic === 'Cybersecurity' ? 'selected' : '' %>>Cybersecurity</option>
-                                <option value="Cloud Computing" <%= lecture?.topic === 'Cloud Computing' ? 'selected' : '' %>>Cloud Computing</option>
-                                <option value="DevOps" <%= lecture?.topic === 'DevOps' ? 'selected' : '' %>>DevOps</option>
-                                <option value="Other" <%= lecture?.topic === 'Other' ? 'selected' : '' %>>Other</option>
-                            </select>
+                            <input type="text"
+                                   id="topic"
+                                   name="topic"
+                                   list="topicSuggestions"
+                                   value="<%= lecture?.topic || '' %>"
+                                   placeholder="e.g., React, Civil Engineering, Spoken English, UPSC..."
+                                   required
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <!-- Free text — this app covers every kind of course, not just tech.
+                                 The datalist just offers quick suggestions (existing topics first,
+                                 so naming stays consistent), typing anything else is fine. -->
+                            <datalist id="topicSuggestions">
+                                <% if (topics && topics.length > 0) { %>
+                                    <% topics.forEach(t => { %>
+                                        <option value="<%= t %>"></option>
+                                    <% }) %>
+                                <% } %>
+                                <option value="Web Development"></option>
+                                <option value="Mobile Development"></option>
+                                <option value="Data Science"></option>
+                                <option value="Civil Engineering"></option>
+                                <option value="Mechanical Engineering"></option>
+                                <option value="Electrical Engineering"></option>
+                                <option value="Medical / NEET"></option>
+                                <option value="Commerce / Accounting"></option>
+                                <option value="Banking / SSC / UPSC"></option>
+                                <option value="Law"></option>
+                                <option value="Spoken English"></option>
+                                <option value="Design / Arts"></option>
+                                <option value="Music"></option>
+                                <option value="Fitness / Yoga"></option>
+                                <option value="Cooking"></option>
+                                <option value="Business / Entrepreneurship"></option>
+                                <option value="Other"></option>
+                            </datalist>
                         </div>
+                    </div>
+
+                    <!-- Sub Topic -->
+                    <div class="mt-4">
+                        <label for="subTopic" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Sub Topic <span class="text-gray-400 font-normal">(optional)</span>
+                        </label>
+                        <input type="text"
+                               id="subTopic"
+                               name="subTopic"
+                               value="<%= lecture?.subTopic || '' %>"
+                               placeholder="e.g., Hooks, Structural Design, Grammar Basics"
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     </div>
 
                     <!-- Description -->
@@ -141,30 +180,58 @@
                         </select>
                     </div>
 
-                    <!-- Video URL -->
-                    <div class="mt-4">
+                    <!-- Video URL / Embed ID — only shown for youtube/vimeo/custom -->
+                    <div class="mt-4" id="videoUrlField">
                         <label for="videoUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Video URL / Embed ID
                         </label>
                         <input type="text" 
                                id="videoUrl" 
                                name="video[url]" 
-                               value="<%= lecture?.video?.url || lecture?.video?.embedId || '' %>"
-                               placeholder="Enter video URL, Embed ID, or Cloudinary Public ID"
+                               value="<%= (lecture?.video?.provider !== 'cloudinary') ? (lecture?.video?.url || lecture?.video?.embedId || '') : '' %>"
+                               placeholder="Enter video URL or Embed ID (YouTube/Vimeo/Custom)"
                                class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Only used for YouTube / Vimeo / Custom URL — these are not signed or watermarked.</p>
                     </div>
 
-                    <!-- Duration -->
-                    <div class="mt-4">
-                        <label for="duration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Duration (in seconds)
+                    <!-- Cloudinary video upload — this is the secure/watermarked/signed path -->
+                    <div class="mt-4 <%= (!lecture?.video || lecture?.video?.provider === 'cloudinary') ? '' : 'hidden' %>" id="videoUploadField">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Lecture Video (uploads privately to Cloudinary) <% if (!isEdit) { %><span class="text-red-500">*</span><% } %>
                         </label>
-                        <input type="number" 
-                               id="duration" 
-                               name="video[duration]" 
-                               value="<%= lecture?.video?.duration || '' %>"
-                               placeholder="e.g., 600 for 10 minutes"
-                               class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+
+                        <div id="videoUploadIdle" class="<%= lecture?.video?.publicId ? 'hidden' : '' %>">
+                            <input type="file" id="videoFileInput" accept="video/*"
+                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Select a video file, then click "Upload Video" below. It's stored as a <strong>private</strong> Cloudinary asset — only signed, expiring, watermarked links will ever play it.</p>
+                            <button type="button" id="uploadVideoBtn" class="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">
+                                <i class="fas fa-upload mr-1"></i> Upload Video
+                            </button>
+                        </div>
+
+                        <div id="videoUploadProgressWrap" class="hidden">
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                                <div id="videoUploadProgressBar" class="bg-blue-600 h-2.5 rounded-full" style="width:0%"></div>
+                            </div>
+                            <p id="videoUploadProgressText" class="text-xs text-gray-500 dark:text-gray-400 mt-1">Uploading… 0%</p>
+                        </div>
+
+                        <div id="videoUploadDone" class="<%= lecture?.video?.publicId ? '' : 'hidden' %> flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-green-800 dark:text-green-300">Video uploaded</p>
+                                <p id="videoUploadDuration" class="text-xs text-green-700 dark:text-green-400">
+                                    <%= lecture?.video?.duration ? Math.round(lecture.video.duration) + 's' : '' %>
+                                </p>
+                            </div>
+                            <button type="button" id="replaceVideoBtn" class="text-xs px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600">
+                                Replace
+                            </button>
+                        </div>
+
+                        <!-- These hidden fields are what actually get submitted with the form -->
+                        <input type="hidden" id="videoPublicId" name="video[publicId]" value="<%= lecture?.video?.publicId || '' %>">
+                        <input type="hidden" id="videoDuration" name="video[duration]" value="<%= lecture?.video?.duration || '' %>">
                     </div>
                 </div>
 
@@ -191,52 +258,45 @@
                     </div>
                 </div>
 
-                <!-- Course Assignment -->
+                <!-- Course Assignment (multi-course: one lecture, many courses) -->
                 <div class="mb-6 border-t border-gray-200 dark:border-gray-700 pt-6">
-                    <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase mb-4">Assign to Course</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label for="courseId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Select Course
-                            </label>
-                            <select id="courseId" name="courseId"
-                                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                <option value="">None</option>
-                                <% if (courses && courses.length > 0) { %>
-                                    <% courses.forEach(c => { %>
-                                        <option value="<%= c._id %>" <%= lecture?.course?._id === c._id || lecture?.courses?.some(lc => lc.courseId?._id === c._id) ? 'selected' : '' %>>
-                                            <%= c.title %>
-                                        </option>
-                                    <% }) %>
-                                <% } %>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="section" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Section
-                            </label>
-                            <input type="text" 
-                                   id="section" 
-                                   name="section" 
-                                   value="<%= lecture?.section || 'General' %>"
-                                   placeholder="e.g., Module 1"
-                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
-
-                        <div>
-                            <label for="order" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Order
-                            </label>
-                            <input type="number" 
-                                   id="order" 
-                                   name="order" 
-                                   value="<%= lecture?.order || 0 %>"
-                                   placeholder="0"
-                                   class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase">Assign to Course(s)</h3>
+                        <button type="button" id="addCourseRowBtn" class="text-sm px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50">
+                            <i class="fas fa-plus mr-1"></i> Add Course
+                        </button>
                     </div>
+
+                    <div id="courseRows" class="space-y-3"></div>
+
+                    <!-- Template for one course row (cloned by JS, never submitted itself) -->
+                    <template id="courseRowTemplate">
+                        <div class="course-row grid grid-cols-1 md:grid-cols-[1fr_1fr_100px_auto] gap-3 items-end bg-gray-50 dark:bg-gray-700/30 p-3 rounded-lg">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Course</label>
+                                <select class="course-select w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm">
+                                    <option value="">Select course</option>
+                                    <% if (courses && courses.length > 0) { %>
+                                        <% courses.forEach(c => { %>
+                                            <option value="<%= c._id %>"><%= c.title %></option>
+                                        <% }) %>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Section</label>
+                                <input type="text" class="course-section w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm" placeholder="e.g., Module 1" value="General">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Order</label>
+                                <input type="number" class="course-order w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm" value="0">
+                            </div>
+                            <button type="button" class="remove-course-row-btn text-red-500 hover:text-red-700 p-2" title="Remove">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </template>
+
                 </div>
 
                 <!-- Submit Buttons -->
@@ -279,5 +339,165 @@ function deleteLecture(id) {
         console.error('Error:', err);
         alert('Failed to delete lecture');
     });
+}
+
+// ============================================================
+// VIDEO PROVIDER TOGGLE — Cloudinary upload vs plain URL/embed
+// ============================================================
+const providerSelect = document.getElementById('videoProvider');
+const videoUrlField = document.getElementById('videoUrlField');
+const videoUploadField = document.getElementById('videoUploadField');
+
+function syncProviderFields() {
+    const isCloudinary = providerSelect.value === 'cloudinary';
+    videoUploadField.classList.toggle('hidden', !isCloudinary);
+    videoUrlField.classList.toggle('hidden', isCloudinary);
+}
+providerSelect.addEventListener('change', syncProviderFields);
+syncProviderFields();
+
+// ============================================================
+// VIDEO UPLOAD — uploads to Cloudinary as a private/authenticated
+// asset BEFORE the lecture form itself is submitted.
+// ============================================================
+const lectureForm = document.getElementById('lectureForm');
+const uploadVideoUrl = lectureForm.dataset.uploadVideoUrl;
+const discardVideoUrl = lectureForm.dataset.discardVideoUrl;
+
+const videoFileInput = document.getElementById('videoFileInput');
+const uploadVideoBtn = document.getElementById('uploadVideoBtn');
+const videoUploadIdle = document.getElementById('videoUploadIdle');
+const videoUploadProgressWrap = document.getElementById('videoUploadProgressWrap');
+const videoUploadProgressBar = document.getElementById('videoUploadProgressBar');
+const videoUploadProgressText = document.getElementById('videoUploadProgressText');
+const videoUploadDone = document.getElementById('videoUploadDone');
+const videoUploadDuration = document.getElementById('videoUploadDuration');
+const replaceVideoBtn = document.getElementById('replaceVideoBtn');
+const videoPublicIdInput = document.getElementById('videoPublicId');
+const videoDurationInput = document.getElementById('videoDuration');
+
+uploadVideoBtn.addEventListener('click', () => {
+    const file = videoFileInput.files[0];
+    if (!file) {
+        alert('Pehle ek video file chunein.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('video', file);
+
+    videoUploadIdle.classList.add('hidden');
+    videoUploadProgressWrap.classList.remove('hidden');
+    videoUploadProgressBar.style.width = '0%';
+    videoUploadProgressText.textContent = 'Uploading… 0%';
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', uploadVideoUrl, true);
+
+    xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 100);
+            videoUploadProgressBar.style.width = pct + '%';
+            videoUploadProgressText.textContent = `Uploading… ${pct}%`;
+        }
+    });
+
+    xhr.onload = () => {
+        videoUploadProgressWrap.classList.add('hidden');
+        let data;
+        try { data = JSON.parse(xhr.responseText); } catch (e) { data = null; }
+
+        if (xhr.status >= 200 && xhr.status < 300 && data && data.success) {
+            videoPublicIdInput.value = data.publicId;
+            videoDurationInput.value = data.duration || '';
+            videoUploadDuration.textContent = data.duration ? `${data.duration}s` : '';
+            videoUploadDone.classList.remove('hidden');
+        } else {
+            videoUploadIdle.classList.remove('hidden');
+            alert((data && data.message) || 'Video upload fail ho gaya, dobara try karein.');
+        }
+    };
+
+    xhr.onerror = () => {
+        videoUploadProgressWrap.classList.add('hidden');
+        videoUploadIdle.classList.remove('hidden');
+        alert('Video upload fail ho gaya, dobara try karein.');
+    };
+
+    xhr.send(formData);
+});
+
+replaceVideoBtn.addEventListener('click', async () => {
+    const oldPublicId = videoPublicIdInput.value;
+    videoUploadDone.classList.add('hidden');
+    videoUploadIdle.classList.remove('hidden');
+    videoFileInput.value = '';
+    videoPublicIdInput.value = '';
+    videoDurationInput.value = '';
+
+    // Best-effort cleanup of the old, now-unreferenced video
+    if (oldPublicId) {
+        try {
+            await fetch(discardVideoUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ publicId: oldPublicId })
+            });
+        } catch (e) { /* non-fatal */ }
+    }
+});
+
+// Block submit if Cloudinary is selected but no video has been uploaded yet
+lectureForm.addEventListener('submit', (e) => {
+    const isCloudinary = providerSelect.value === 'cloudinary';
+    if (isCloudinary && !videoPublicIdInput.value) {
+        e.preventDefault();
+        alert('Pehle video upload karein, ya Video Provider badal dein.');
+    }
+});
+
+// ============================================================
+// MULTI-COURSE ROWS
+// ============================================================
+const courseRowsContainer = document.getElementById('courseRows');
+const courseRowTemplate = document.getElementById('courseRowTemplate');
+const addCourseRowBtn = document.getElementById('addCourseRowBtn');
+const existingCourses = JSON.parse(lectureForm.dataset.existingCourses || '[]');
+
+function reindexCourseRows() {
+    const rows = courseRowsContainer.querySelectorAll('.course-row');
+    rows.forEach((row, i) => {
+        row.querySelector('.course-select').setAttribute('name', `courses[${i}][courseId]`);
+        row.querySelector('.course-section').setAttribute('name', `courses[${i}][section]`);
+        row.querySelector('.course-order').setAttribute('name', `courses[${i}][order]`);
+    });
+}
+
+function addCourseRow(prefill) {
+    const node = courseRowTemplate.content.cloneNode(true);
+    const row = node.querySelector('.course-row');
+
+    if (prefill) {
+        row.querySelector('.course-select').value = prefill.courseId || '';
+        row.querySelector('.course-section').value = prefill.section || 'General';
+        row.querySelector('.course-order').value = prefill.order ?? 0;
+    }
+
+    row.querySelector('.remove-course-row-btn').addEventListener('click', () => {
+        row.remove();
+        reindexCourseRows();
+    });
+
+    courseRowsContainer.appendChild(row);
+    reindexCourseRows();
+}
+
+addCourseRowBtn.addEventListener('click', () => addCourseRow());
+
+// Pre-fill rows for edit mode, or start with one empty row for create mode
+if (existingCourses.length > 0) {
+    existingCourses.forEach(c => addCourseRow(c));
+} else {
+    addCourseRow();
 }
 </script>
