@@ -560,8 +560,8 @@
 <!-- ============================================================ -->
 <!-- POPULAR TAGS SECTION                                         -->
 <!-- ============================================================ -->
-<% if (popularTags && popularTags.length > 0) { %>
-<section class="py-12 lg:py-16 bg-white dark:bg-[#0F172A]/40">
+<% // if (popularTags && popularTags.length > 0) { %>
+<!-- <section class="py-12 lg:py-16 bg-white dark:bg-[#0F172A]/40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-8 reveal-up">
             <span class="text-xs font-bold tracking-widest text-[#C9A227] uppercase">Explore</span>
@@ -571,16 +571,16 @@
         </div>
 
         <div class="flex flex-wrap justify-center gap-3 reveal-up">
-            <% popularTags.slice(0, 15).forEach(tag => { %>
-                <a href="/blogs?tag=<%= encodeURIComponent(tag) %>" 
+            <% // popularTags.slice(0, 15).forEach(tag => { %>
+                <a href="/blogs?tag=<%= // encodeURIComponent(tag) %>" 
                    class="group px-4 py-2 rounded-full border border-[#E2E8F0] dark:border-[#1E293B] text-sm text-[#64748B] dark:text-[#94A3B8] hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all duration-300 hover:shadow-lg hover:shadow-[#2563EB]/25">
-                    #<%= tag %>
+                    #<%= // tag %>
                 </a>
             <% }) %>
         </div>
     </div>
-</section>
-<% } %>
+</section> -->
+<% // } %>
 
 <!-- ============================================================ -->
 <!-- NEWSLETTER CTA                                                -->
