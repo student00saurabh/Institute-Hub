@@ -2,6 +2,8 @@ const ExpressError = require("./utils/ExpressError.js");
 const User = require("./models/user");
 const { blogsSchema } = require("./schema.js");
 
+const READONLY_ADMIN_EMAIL = "test@test.com";
+
 module.exports.isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
     req.session.redirectUrl = req.originalUrl;
@@ -29,11 +31,35 @@ module.exports.isOwner = async (req, res, next) => {
 };
 
 module.exports.isAdmin = (req, res, next) => {
-  if (req.user.role !== "admin") {
+  if (!req.user || req.user.role !== "admin") {
+    if (req.xhr || req.originalUrl.startsWith("/api")) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied."
+      });
+    }
+
     req.flash("warning", "You do not have permission to access this page.");
     return res.redirect("/");
   }
-  console.log("Admin access granted");
+
+  const isReadOnlyAdmin =
+    req.user.email === READONLY_ADMIN_EMAIL;
+
+  if (isReadOnlyAdmin && req.method !== "GET") {
+    const message = "This is a Read-Only Admin account. Modification is not allowed.";
+
+    if (req.xhr || req.originalUrl.startsWith("/api")) {
+      return res.status(403).json({
+        success: false,
+        message
+      });
+    }
+
+    req.flash("warning", message);
+    return res.redirect(req.get("Referrer") || "/admin");
+  }
+
   next();
 };
 
