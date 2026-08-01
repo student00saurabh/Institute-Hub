@@ -1,44 +1,50 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="min-h-[90vh] py-8 px-4 sm:px-6 lg:px-8">
+<div class="min-h-[90vh] py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
     <div class="max-w-6xl mx-auto">
         
-        <!-- Page Header -->
+        <!-- ============================================================ -->
+        <!-- PAGE HEADER                                                   -->
+        <!-- ============================================================ -->
         <div class="mb-8" data-aos="fade-up">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#C9A227] to-[#B8901E] flex items-center justify-center shadow-lg shadow-[#C9A227]/25">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                             </svg>
                         </div>
-                        Create New Course
-                    </h1>
-                    <p class="mt-1 text-gray-600 dark:text-gray-400">
-                        Design and launch your new educational content
-                    </p>
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create New Course</h1>
+                            <p class="mt-1 text-gray-600 dark:text-gray-400">Design and launch your new educational content</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="mt-4 md:mt-0">
-                    <a href="/courses" 
-                       class="px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 text-sm font-medium">
-                        <i class="fas fa-arrow-left mr-2"></i> Back to Courses
+                    <a href="/admin/courses" 
+                       class="inline-flex items-center gap-2 px-5 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-all duration-200 text-sm font-medium hover:border-[#C9A227] hover:text-[#C9A227]">
+                        <i class="fas fa-arrow-left"></i> Back to Courses
                     </a>
                 </div>
             </div>
         </div>
 
-        <!-- Form Card -->
-        <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 sm:p-8" data-aos="fade-up" data-aos-duration="600">
+        <!-- ============================================================ -->
+        <!-- FORM CARD                                                    -->
+        <!-- ============================================================ -->
+        <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-500 p-6 sm:p-8" data-aos="fade-up" data-aos-duration="600">
             <form action="/courses" method="POST" enctype="multipart/form-data" class="space-y-8" id="courseForm">
                 
-                <!-- Progress Steps -->
-                <div class="flex items-center justify-between mb-8">
+                <!-- ========================================================== -->
+                <!-- PROGRESS STEPS                                              -->
+                <!-- ========================================================== -->
+                <div class="flex items-center justify-between mb-8 px-2">
                     <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">1</div>
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-r from-[#C9A227] to-[#B8901E] flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-[#C9A227]/25">1</div>
                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Basic Info</span>
                     </div>
-                    <div class="flex-1 h-0.5 bg-gray-200 dark:bg-gray-700 mx-4"></div>
+                    <div class="flex-1 h-0.5 bg-gradient-to-r from-[#C9A227] to-gray-200 dark:from-[#C9A227] dark:to-gray-700 mx-4"></div>
                     <div class="flex items-center gap-2">
                         <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 text-xs font-bold">2</div>
                         <span class="text-sm font-medium text-gray-400 dark:text-gray-500">Pricing</span>
@@ -48,14 +54,22 @@
                         <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 text-xs font-bold">3</div>
                         <span class="text-sm font-medium text-gray-400 dark:text-gray-500">Media</span>
                     </div>
+                    <div class="flex-1 h-0.5 bg-gray-200 dark:bg-gray-700 mx-4"></div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 text-xs font-bold">4</div>
+                        <span class="text-sm font-medium text-gray-400 dark:text-gray-500">Extra</span>
+                    </div>
                 </div>
 
-                <!-- Basic Information -->
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-1 h-6 rounded-full bg-gradient-to-b from-blue-600 to-indigo-600"></span>
-                        Basic Information
-                    </h2>
+                <!-- ========================================================== -->
+                <!-- 1. BASIC INFORMATION                                        -->
+                <!-- ========================================================== -->
+                <div class="bg-gray-50/50 dark:bg-gray-700/20 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-1 h-8 rounded-full bg-gradient-to-b from-[#C9A227] to-[#B8901E]"></div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Basic Information</h2>
+                        <span class="px-2.5 py-0.5 text-[10px] font-bold text-[#C9A227] bg-[#C9A227]/10 rounded-full border border-[#C9A227]/30">Required</span>
+                    </div>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Essential details about your course</p>
 
                     <div class="space-y-5">
@@ -64,11 +78,14 @@
                             <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                                 Course Title <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" id="title" name="title" required
-                                placeholder="Enter course title (e.g., Advanced Penetration Testing)"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200">
+                            <div class="relative">
+                                <i class="fas fa-heading absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
+                                <input type="text" id="title" name="title" required
+                                    placeholder="Enter course title (e.g., Advanced Penetration Testing)"
+                                    class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200">
+                            </div>
                             <div class="mt-1.5 flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                                <span><i class="fas fa-info-circle mr-1"></i> Clear, descriptive title</span>
+                                <span><i class="fas fa-info-circle mr-1"></i> Clear, descriptive title (2-10 words)</span>
                                 <span id="title-counter">0/120 characters</span>
                             </div>
                         </div>
@@ -78,9 +95,12 @@
                             <label for="shortDescription" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                                 Short Description <span class="text-red-500">*</span>
                             </label>
-                            <textarea id="shortDescription" name="shortDescription" required rows="3"
-                                placeholder="Brief overview for course listings (2-3 sentences)"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200 resize-none"></textarea>
+                            <div class="relative">
+                                <i class="fas fa-align-left absolute left-3.5 top-4 text-gray-400 dark:text-gray-500"></i>
+                                <textarea id="shortDescription" name="shortDescription" required rows="3"
+                                    placeholder="Brief overview for course listings (2-3 sentences)"
+                                    class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 resize-none"></textarea>
+                            </div>
                             <div class="mt-1.5 flex justify-between text-xs text-gray-500 dark:text-gray-400">
                                 <span><i class="fas fa-info-circle mr-1"></i> 150-200 characters recommended</span>
                                 <span id="shortDesc-counter">0/250 characters</span>
@@ -92,9 +112,12 @@
                             <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                                 Detailed Description
                             </label>
-                            <textarea id="description" name="description" rows="6"
-                                placeholder="Comprehensive course description including objectives and outcomes"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200 resize-none"></textarea>
+                            <div class="relative">
+                                <i class="fas fa-file-alt absolute left-3.5 top-4 text-gray-400 dark:text-gray-500"></i>
+                                <textarea id="description" name="description" rows="6"
+                                    placeholder="Comprehensive course description including objectives and outcomes"
+                                    class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 resize-none"></textarea>
+                            </div>
                             <div class="mt-1.5 flex justify-between text-xs text-gray-500 dark:text-gray-400">
                                 <span><i class="fas fa-info-circle mr-1"></i> Detailed description for course page</span>
                                 <span id="desc-counter">0/5000 characters</span>
@@ -103,47 +126,58 @@
                     </div>
                 </div>
 
-                <!-- Pricing & Details -->
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-1 h-6 rounded-full bg-gradient-to-b from-blue-600 to-indigo-600"></span>
-                        Pricing & Details
-                    </h2>
+                <!-- ========================================================== -->
+                <!-- 2. PRICING & DETAILS                                        -->
+                <!-- ========================================================== -->
+                <div class="bg-gray-50/50 dark:bg-gray-700/20 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-1 h-8 rounded-full bg-gradient-to-b from-[#C9A227] to-[#B8901E]"></div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Pricing & Details</h2>
+                        <span class="px-2.5 py-0.5 text-[10px] font-bold text-[#C9A227] bg-[#C9A227]/10 rounded-full border border-[#C9A227]/30">Required</span>
+                    </div>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Set pricing and course specifications</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <!-- Price -->
                         <div>
                             <label for="price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                Price <span class="text-red-500">*</span>
+                                Original Price <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">₹</span>
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 font-bold">₹</span>
                                 <input type="number" id="price" name="price" min="0" step="0.01" required
-                                    placeholder="99.99"
-                                    class="w-full pl-8 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200">
+                                    placeholder="4999"
+                                    class="w-full pl-8 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200">
                             </div>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Original market price</p>
                         </div>
 
                         <!-- Actual Price -->
                         <div>
                             <label for="actualPrice" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                Discounted Price <span class="text-red-500">*</span>
+                                Selling Price <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">₹</span>
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 font-bold">₹</span>
                                 <input type="number" id="actualPrice" name="actualPrice" min="0" step="0.01" required
-                                    placeholder="79.99"
-                                    class="w-full pl-8 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200">
+                                    placeholder="2999"
+                                    class="w-full pl-8 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200">
                             </div>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Discounted price (what user pays)</p>
                         </div>
 
                         <!-- Discount -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Discount</label>
-                            <div class="px-4 py-3 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800">
-                                <span id="discountPercentage" class="text-2xl font-bold text-green-600 dark:text-green-400">0%</span>
-                                <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">off</span>
+                            <div class="px-4 py-3 rounded-xl bg-gradient-to-r from-[#C9A227]/10 to-[#B8901E]/10 dark:from-[#C9A227]/20 dark:to-[#B8901E]/20 border border-[#C9A227]/30">
+                                <div class="flex items-center gap-3">
+                                    <i class="fas fa-tag text-[#C9A227] text-lg"></i>
+                                    <div>
+                                        <span id="discountPercentage" class="text-2xl font-bold text-[#C9A227]">0%</span>
+                                        <span class="text-gray-500 dark:text-gray-400 text-sm ml-1">OFF</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Auto-calculated from prices</p>
                             </div>
                         </div>
                     </div>
@@ -152,21 +186,24 @@
                         <!-- Course Type -->
                         <div>
                             <label for="courceType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                Course Type <span class="text-red-500">*</span>
+                                Course Category <span class="text-red-500">*</span>
                             </label>
                             <select id="courceType" name="courceType" required
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200 appearance-none">
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 appearance-none">
                                 <option value="">Select Category</option>
-                                <option value="CYBERSECURITY">🔒 Cybersecurity</option>
-                                <option value="PENETRATION TESTING">🎯 Penetration Testing</option>
-                                <option value="RED TEAMING">🛡️ Red Teaming</option>
-                                <option value="WEB SECURITY">💻 Web Security</option>
-                                <option value="NETWORK SECURITY">🌐 Network Security</option>
-                                <option value="CLOUD SECURITY">☁️ Cloud Security</option>
-                                <option value="OSCP">📜 OSCP Preparation</option>
-                                <option value="CEH">🔐 CEH Certification</option>
-                                <option value="RHCSA">🐧 RHCSA Certification</option>
-                                <option value="OTHER">✨ Other</option>
+                                <option value="Web Development">💻 Web Development</option>
+                                <option value="Data Science">📊 Data Science</option>
+                                <option value="Cybersecurity">🔒 Cybersecurity</option>
+                                <option value="Cloud & DevOps">☁️ Cloud & DevOps</option>
+                                <option value="UI/UX Design">🎨 UI/UX Design</option>
+                                <option value="Mobile Apps">📱 Mobile Apps</option>
+                                <option value="AI & ML">🤖 AI & ML</option>
+                                <option value="Marketing">📈 Marketing</option>
+                                <option value="Business">💼 Business</option>
+                                <option value="Finance">💰 Finance</option>
+                                <option value="Health & Wellness">🏥 Health & Wellness</option>
+                                <option value="Teaching & Education">📚 Teaching & Education</option>
+                                <option value="Other">✨ Other</option>
                             </select>
                         </div>
 
@@ -176,7 +213,7 @@
                                 Course Level <span class="text-red-500">*</span>
                             </label>
                             <select id="courseLevel" name="courseLevel" required
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200 appearance-none">
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 appearance-none">
                                 <option value="">Select Level</option>
                                 <option value="beginner">🌱 Beginner</option>
                                 <option value="intermediate">📘 Intermediate</option>
@@ -188,34 +225,41 @@
                         <!-- Duration -->
                         <div>
                             <label for="duration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                Duration (Days)
+                                Duration <span class="text-gray-400 font-normal">(Hours)</span>
                             </label>
-                            <input type="number" id="duration" name="duration" min="1"
-                                placeholder="e.g., 8"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200">
+                            <div class="relative">
+                                <i class="fas fa-clock absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
+                                <input type="number" id="duration" name="duration" min="1"
+                                    placeholder="e.g., 42"
+                                    class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200">
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Total course duration in hours</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Teacher Selection -->
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-1 h-6 rounded-full bg-gradient-to-b from-blue-600 to-indigo-600"></span>
-                        Instructor
-                    </h2>
+                <!-- ========================================================== -->
+                <!-- 3. INSTRUCTOR                                               -->
+                <!-- ========================================================== -->
+                <div class="bg-gray-50/50 dark:bg-gray-700/20 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-1 h-8 rounded-full bg-gradient-to-b from-[#C9A227] to-[#B8901E]"></div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Instructor</h2>
+                        <span class="px-2.5 py-0.5 text-[10px] font-bold text-[#C9A227] bg-[#C9A227]/10 rounded-full border border-[#C9A227]/30">Required</span>
+                    </div>
                     <div>
                         <label for="teacher" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            Course Mentor/Teacher <span class="text-red-500">*</span>
+                            Course Instructor <span class="text-red-500">*</span>
                         </label>
                         <select id="teacher" name="teacher" required
-                            class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200 appearance-none">
-                            <option value="">Select Teacher/Mentor</option>
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 appearance-none">
+                            <option value="">Select Instructor</option>
                             <% if(teachers && teachers.length > 0) { %>
                                 <% teachers.forEach(teacher => { %>
                                     <option value="<%= teacher._id %>">👨‍🏫 <%= teacher.name %> (<%= teacher.email %>)</option>
                                 <% }) %>
                             <% } else { %>
-                                <option value="" disabled>No teachers available. Please add teachers first.</option>
+                                <option value="" disabled>⚠️ No instructors available. Please add instructors first.</option>
                             <% } %>
                         </select>
                         <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
@@ -224,43 +268,93 @@
                     </div>
                 </div>
 
-                <!-- Display Settings -->
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-1 h-6 rounded-full bg-gradient-to-b from-blue-600 to-indigo-600"></span>
-                        Display Settings
-                    </h2>
+                <!-- ========================================================== -->
+                <!-- 4. COURSE CONTENT                                           -->
+                <!-- ========================================================== -->
+                <div class="bg-gray-50/50 dark:bg-gray-700/20 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-1 h-8 rounded-full bg-gradient-to-b from-[#C9A227] to-[#B8901E]"></div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Course Content</h2>
+                        <span class="px-2.5 py-0.5 text-[10px] font-bold text-[#C9A227] bg-[#C9A227]/10 rounded-full border border-[#C9A227]/30">Optional</span>
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Add course structure and learning outcomes</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Prerequisites -->
+                        <div>
+                            <label for="prerequisites" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                Prerequisites
+                            </label>
+                            <textarea id="prerequisites" name="prerequisites" rows="3"
+                                placeholder="Enter prerequisites (comma separated)&#10;e.g., Basic Python, HTML knowledge"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 resize-none"></textarea>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Separate with commas</p>
+                        </div>
+
+                        <!-- Learning Outcomes -->
+                        <div>
+                            <label for="learningOutcomes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                Learning Outcomes
+                            </label>
+                            <textarea id="learningOutcomes" name="learningOutcomes" rows="3"
+                                placeholder="Enter learning outcomes (comma separated)&#10;e.g., Build web apps, Deploy to cloud"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 resize-none"></textarea>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">What students will learn</p>
+                        </div>
+                    </div>
+
+                    <!-- Includes -->
+                    <div class="mt-4">
+                        <label for="includes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                            What's Included
+                        </label>
+                        <textarea id="includes" name="includes" rows="2"
+                            placeholder="Enter included items (comma separated)&#10;e.g., Video lectures, Assignments, Certificate"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 resize-none"></textarea>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">What students get with this course</p>
+                    </div>
+                </div>
+
+                <!-- ========================================================== -->
+                <!-- 5. DISPLAY SETTINGS                                         -->
+                <!-- ========================================================== -->
+                <div class="bg-gray-50/50 dark:bg-gray-700/20 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-1 h-8 rounded-full bg-gradient-to-b from-[#C9A227] to-[#B8901E]"></div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Display Settings</h2>
+                        <span class="px-2.5 py-0.5 text-[10px] font-bold text-[#C9A227] bg-[#C9A227]/10 rounded-full border border-[#C9A227]/30">Optional</span>
+                    </div>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Control where and how the course appears</p>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <label class="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer bg-gray-50 dark:bg-gray-700/30">
-                            <input type="checkbox" name="addInHomePage" class="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400">
+                        <label class="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#C9A227] dark:hover:border-[#C9A227] transition-all cursor-pointer bg-gray-50 dark:bg-gray-700/30 group">
+                            <input type="checkbox" name="addInHomePage" class="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-[#C9A227] focus:ring-[#C9A227] dark:focus:ring-[#C9A227]">
                             <div>
-                                <span class="font-medium text-gray-900 dark:text-white">Show on Homepage</span>
+                                <span class="font-medium text-gray-900 dark:text-white group-hover:text-[#C9A227] transition-colors">Show on Homepage</span>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Display course on the main landing page</p>
                             </div>
                         </label>
 
-                        <label class="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer bg-gray-50 dark:bg-gray-700/30">
-                            <input type="checkbox" name="isPopular" class="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-yellow-500 focus:ring-yellow-500">
+                        <label class="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#C9A227] dark:hover:border-[#C9A227] transition-all cursor-pointer bg-gray-50 dark:bg-gray-700/30 group">
+                            <input type="checkbox" name="isPopular" class="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-[#C9A227] focus:ring-[#C9A227] dark:focus:ring-[#C9A227]">
                             <div>
-                                <span class="font-medium text-gray-900 dark:text-white">Mark as Popular</span>
+                                <span class="font-medium text-gray-900 dark:text-white group-hover:text-[#C9A227] transition-colors">Mark as Popular</span>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Featured as a popular course</p>
                             </div>
                         </label>
 
-                        <label class="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer bg-gray-50 dark:bg-gray-700/30">
-                            <input type="checkbox" name="isActive" checked class="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-green-500 focus:ring-green-500">
+                        <label class="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#C9A227] dark:hover:border-[#C9A227] transition-all cursor-pointer bg-gray-50 dark:bg-gray-700/30 group">
+                            <input type="checkbox" name="isActive" checked class="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-[#C9A227] focus:ring-[#C9A227] dark:focus:ring-[#C9A227]">
                             <div>
-                                <span class="font-medium text-gray-900 dark:text-white">Active Course</span>
+                                <span class="font-medium text-gray-900 dark:text-white group-hover:text-[#C9A227] transition-colors">Active Course</span>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Make course available to students</p>
                             </div>
                         </label>
 
-                        <label class="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer bg-gray-50 dark:bg-gray-700/30">
-                            <input type="checkbox" id="showInNavbar" name="showInNavbar" class="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400">
+                        <label class="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-[#C9A227] dark:hover:border-[#C9A227] transition-all cursor-pointer bg-gray-50 dark:bg-gray-700/30 group">
+                            <input type="checkbox" id="showInNavbar" name="showInNavbar" class="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-[#C9A227] focus:ring-[#C9A227] dark:focus:ring-[#C9A227]">
                             <div>
-                                <span class="font-medium text-gray-900 dark:text-white">Show in Navigation</span>
+                                <span class="font-medium text-gray-900 dark:text-white group-hover:text-[#C9A227] transition-colors">Show in Navigation</span>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">Add direct link in navbar</p>
                             </div>
                         </label>
@@ -275,77 +369,117 @@
                                 </label>
                                 <input type="text" id="navbarButtonText" name="navbarButtonText" 
                                     placeholder="e.g., OSCP Certification"
-                                    class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200">
+                                    class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200">
                             </div>
                             <div>
                                 <label for="navbarButtonColor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                                     Button Color
                                 </label>
                                 <select id="navbarButtonColor" name="navbarButtonColor"
-                                    class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200">
-                                    <option value="blue">Blue</option>
-                                    <option value="cyan">Cyan</option>
-                                    <option value="purple">Purple</option>
-                                    <option value="green">Green</option>
-                                    <option value="red">Red</option>
+                                    class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200">
+                                    <option value="blue">🔵 Blue</option>
+                                    <option value="cyan">🟦 Cyan</option>
+                                    <option value="purple">🟣 Purple</option>
+                                    <option value="green">🟢 Green</option>
+                                    <option value="red">🔴 Red</option>
+                                    <option value="yellow">🟡 Yellow</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Course Category -->
-<div class="group">
-  <label for="category" class="block mb-3 font-semibold text-gray-900 dark:text-gray-200 group-hover:text-cyan-400 transition-colors">
-    Course Category
-  </label>
-  <div class="relative">
-    <select id="category" name="category"
-      class="w-full px-5 py-3.5 rounded-xl bg-gray-200 dark:bg-gray-800/70 border border-gray-700 text-white 
-             focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 
-             appearance-none transition-all duration-300">
-      <option value="" class="text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-800">Select Category</option>
-      <% if(categories && categories.length > 0) { %>
-        <% categories.forEach(cat => { %>
-          <option value="<%= cat._id %>" class="bg-gray-200 text-gray-800 dark:text-gray-200 dark:bg-gray-800">
-            <i class="fas <%= cat.icon || 'fa-shield-alt' %>"></i> <%= cat.name %>
-          </option>
-        <% }) %>
-      <% } else { %>
-        <option value="" disabled class="bg-gray-800">No categories available. Please create categories first.</option>
-      <% } %>
-    </select>
-    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-      </svg>
-    </div>
-  </div>
-  <p class="mt-2 text-sm text-gray-400">Select a category for this course</p>
-</div>
+                <!-- ========================================================== -->
+                <!-- 6. CATEGORY & PDF                                           -->
+                <!-- ========================================================== -->
+                <div class="bg-gray-50/50 dark:bg-gray-700/20 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-1 h-8 rounded-full bg-gradient-to-b from-[#C9A227] to-[#B8901E]"></div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Category & Resources</h2>
+                        <span class="px-2.5 py-0.5 text-[10px] font-bold text-[#C9A227] bg-[#C9A227]/10 rounded-full border border-[#C9A227]/30">Optional</span>
+                    </div>
 
-                <!-- Course Image -->
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="w-1 h-6 rounded-full bg-gradient-to-b from-blue-600 to-indigo-600"></span>
-                        Course Image
-                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Category -->
+                        <div>
+                            <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                Course Category
+                            </label>
+                            <select id="category" name="category"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200 appearance-none">
+                                <option value="">Select Category</option>
+                                <% if(categories && categories.length > 0) { %>
+                                    <% categories.forEach(cat => { %>
+                                        <option value="<%= cat._id %>">
+                                            <i class="fas <%= cat.icon || 'fa-shield-alt' %>"></i> <%= cat.name %>
+                                        </option>
+                                    <% }) %>
+                                <% } else { %>
+                                    <option value="" disabled>⚠️ No categories available</option>
+                                <% } %>
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select a category for this course</p>
+                        </div>
+
+                        <!-- Pre-students -->
+                        <div>
+                            <label for="preStudents" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                Pre-Enrolled Students
+                            </label>
+                            <div class="relative">
+                                <i class="fas fa-users absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
+                                <input type="number" id="preStudents" name="preStudents" min="0" value="0"
+                                    class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200">
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Number of students already enrolled</p>
+                        </div>
+                    </div>
+
+                    <!-- PDF Details -->
+                    <div class="mt-4">
+                        <label for="pdfDetails" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                            <i class="fas fa-file-pdf text-red-500 mr-2"></i> Course Details PDF
+                            <span class="text-gray-400 font-normal">(Google Drive Link)</span>
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-link absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"></i>
+                            <input type="url" id="pdfDetails" name="pdfDetails" 
+                                placeholder="https://drive.google.com/file/d/xxxxx/view"
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C9A227] dark:focus:ring-[#C9A227] focus:border-transparent transition-all duration-200">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-info-circle mr-1"></i> Paste Google Drive shareable link for course brochure
+                        </p>
+                    </div>
+                </div>
+
+                <!-- ========================================================== -->
+                <!-- 7. COURSE IMAGE                                             -->
+                <!-- ========================================================== -->
+                <div class="bg-gray-50/50 dark:bg-gray-700/20 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-1 h-8 rounded-full bg-gradient-to-b from-[#C9A227] to-[#B8901E]"></div>
+                        <h2 class="text-xl font-bold text-gray-900 dark:text-white">Course Image</h2>
+                        <span class="px-2.5 py-0.5 text-[10px] font-bold text-[#C9A227] bg-[#C9A227]/10 rounded-full border border-[#C9A227]/30">Required</span>
+                    </div>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Upload a thumbnail for your course</p>
 
                     <div>
                         <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                             Course Thumbnail <span class="text-red-500">*</span>
                         </label>
-                        <div class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 hover:border-blue-400 dark:hover:border-blue-500 transition-colors bg-gray-50 dark:bg-gray-700/30">
+                        <div class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-8 hover:border-[#C9A227] dark:hover:border-[#C9A227] transition-colors bg-gray-50 dark:bg-gray-700/30 group">
                             <input type="file" id="image" name="image" accept="image/*" required
                                 class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                 onchange="previewImage(this)">
                             <div class="text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    <span class="font-medium text-blue-600 dark:text-blue-400">Click to upload</span> or drag and drop
+                                <div class="w-16 h-16 mx-auto rounded-full bg-[#C9A227]/10 flex items-center justify-center text-[#C9A227] group-hover:scale-110 transition-transform duration-300">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                                <p class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                                    <span class="font-medium text-[#C9A227] group-hover:text-[#B8901E] transition-colors">Click to upload</span> or drag and drop
                                 </p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                     PNG, JPG, WebP up to 5MB (Recommended: 1280×720px)
@@ -353,18 +487,19 @@
                             </div>
                         </div>
                         <div id="imagePreviewContainer" class="mt-3 hidden">
-                            <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-24 h-24 rounded-lg overflow-hidden border border-green-300 dark:border-green-700 bg-white dark:bg-gray-800 flex-shrink-0">
+                            <div class="bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                                <div class="flex items-center gap-4 flex-wrap sm:flex-nowrap">
+                                    <div class="w-24 h-24 rounded-lg overflow-hidden border border-emerald-300 dark:border-emerald-700 bg-white dark:bg-gray-800 flex-shrink-0">
                                         <img id="imagePreview" src="#" alt="Preview" class="w-full h-full object-cover">
                                     </div>
-                                    <div class="flex-1">
-                                        <p class="text-sm text-green-800 dark:text-green-300">
-                                            <strong id="fileName"></strong><br>
-                                            <span id="fileSize"></span>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm text-emerald-800 dark:text-emerald-300 font-medium truncate" id="fileName"></p>
+                                        <p class="text-xs text-emerald-600 dark:text-emerald-400" id="fileSize"></p>
+                                        <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
+                                            <i class="fas fa-check-circle mr-1"></i> Image uploaded successfully
                                         </p>
                                     </div>
-                                    <button type="button" onclick="removePreview()" class="text-green-700 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
+                                    <button type="button" onclick="removePreview()" class="text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-emerald-300 transition-colors flex-shrink-0">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
@@ -373,62 +508,74 @@
                     </div>
                 </div>
 
-                <!-- Course PDF Drive Link -->
-<div>
-    <label for="pdfDetails" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-        Course Details PDF (Drive Link)
-    </label>
-    <input type="url" id="pdfDetails" name="pdfDetails" 
-        placeholder="https://drive.google.com/file/d/xxxxx/view"
-        class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200">
-    <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-        <i class="fas fa-link mr-1"></i> Paste Google Drive shareable link
-    </p>
-</div>
-
-                <!-- Form Actions -->
+                <!-- ========================================================== -->
+                <!-- FORM ACTIONS                                                -->
+                <!-- ========================================================== -->
                 <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <button type="submit" id="submitBtn"
-                        class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium py-3.5 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                        class="flex-1 bg-gradient-to-r from-[#C9A227] to-[#B8901E] hover:from-[#B8901E] hover:to-[#A07A1A] text-white font-medium py-3.5 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                         </svg>
                         Create Course
                     </button>
-                    <a href="/courses"
-                        class="flex-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-3.5 px-6 rounded-xl transition-colors duration-200 text-center">
+                    <a href="/admin/courses"
+                        class="flex-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-3.5 px-6 rounded-xl transition-colors duration-200 text-center flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
                         Cancel
                     </a>
                 </div>
             </form>
         </div>
 
-        <!-- Help Tips -->
-        <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
-            <div class="flex items-start gap-4">
-                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                    </svg>
+        <!-- ============================================================ -->
+        <!-- HELP TIPS                                                     -->
+        <!-- ============================================================ -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+            <div class="bg-[#C9A227]/10 dark:bg-[#C9A227]/20 rounded-xl p-6 border border-[#C9A227]/30">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-[#C9A227]/20 dark:bg-[#C9A227]/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-[#C9A227]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900 dark:text-white">Course Creation Tips</h3>
+                        <div class="mt-2 grid grid-cols-1 gap-2">
+                            <div class="text-sm text-gray-700 dark:text-gray-300">
+                                <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> Clear Title</p>
+                                <p class="mt-0.5 text-xs opacity-70">Use descriptive, search-friendly titles</p>
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300">
+                                <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> Quality Image</p>
+                                <p class="mt-0.5 text-xs opacity-70">High-quality thumbnails increase engagement by 47%</p>
+                            </div>
+                            <div class="text-sm text-gray-700 dark:text-gray-300">
+                                <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-[#C9A227]"></i> Pricing Strategy</p>
+                                <p class="mt-0.5 text-xs opacity-70">Set competitive pricing with attractive discounts</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h3 class="text-base font-bold text-blue-900 dark:text-blue-300">Course Creation Tips</h3>
-                    <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Clear Title</p>
-                            <p class="mt-0.5 text-xs opacity-80">Use descriptive, search-friendly titles</p>
-                        </div>
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Quality Image</p>
-                            <p class="mt-0.5 text-xs opacity-80">High-quality thumbnails increase engagement</p>
-                        </div>
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Pricing Strategy</p>
-                            <p class="mt-0.5 text-xs opacity-80">Set competitive pricing with discounts</p>
-                        </div>
-                        <div class="text-sm text-blue-800 dark:text-blue-300">
-                            <p class="font-medium"><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Display Options</p>
-                            <p class="mt-0.5 text-xs opacity-80">Choose visibility settings wisely</p>
+            </div>
+
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800">
+                <div class="flex items-start gap-4">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-blue-900 dark:text-blue-300">Quick Checklist</h3>
+                        <div class="mt-2 space-y-1.5 text-sm text-blue-800 dark:text-blue-300">
+                            <p><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Course title & description</p>
+                            <p><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Pricing (Original & Discounted)</p>
+                            <p><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Instructor assignment</p>
+                            <p><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Course thumbnail image</p>
+                            <p><i class="fas fa-check-circle mr-1.5 text-blue-500"></i> Learning outcomes & prerequisites</p>
                         </div>
                     </div>
                 </div>
@@ -439,38 +586,38 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Character counters
+    // ================================================================
+    // CHARACTER COUNTERS
+    // ================================================================
     const titleInput = document.getElementById('title');
     const shortDescInput = document.getElementById('shortDescription');
     const descInput = document.getElementById('description');
-    const priceInput = document.getElementById('price');
-    const actualPriceInput = document.getElementById('actualPrice');
-    const discountElement = document.getElementById('discountPercentage');
-    const showInNavbar = document.getElementById('showInNavbar');
-    const navbarSettings = document.getElementById('navbarSettings');
 
-    // Title counter
     if (titleInput) {
         titleInput.addEventListener('input', function() {
             document.getElementById('title-counter').textContent = `${this.value.length}/120 characters`;
         });
     }
 
-    // Short description counter
     if (shortDescInput) {
         shortDescInput.addEventListener('input', function() {
             document.getElementById('shortDesc-counter').textContent = `${this.value.length}/250 characters`;
         });
     }
 
-    // Description counter
     if (descInput) {
         descInput.addEventListener('input', function() {
             document.getElementById('desc-counter').textContent = `${this.value.length}/5000 characters`;
         });
     }
 
-    // Calculate discount
+    // ================================================================
+    // DISCOUNT CALCULATOR
+    // ================================================================
+    const priceInput = document.getElementById('price');
+    const actualPriceInput = document.getElementById('actualPrice');
+    const discountElement = document.getElementById('discountPercentage');
+
     function calculateDiscount() {
         const price = parseFloat(priceInput?.value) || 0;
         const actualPrice = parseFloat(actualPriceInput?.value) || 0;
@@ -490,7 +637,9 @@ document.addEventListener('DOMContentLoaded', function() {
         actualPriceInput.addEventListener('input', calculateDiscount);
     }
 
-    // Image preview
+    // ================================================================
+    // IMAGE PREVIEW
+    // ================================================================
     window.previewImage = function(input) {
         const previewContainer = document.getElementById('imagePreviewContainer');
         const preview = document.getElementById('imagePreview');
@@ -527,14 +676,21 @@ document.addEventListener('DOMContentLoaded', function() {
         previewContainer.classList.add('hidden');
     };
 
-    // Show/hide navbar settings
+    // ================================================================
+    // NAVBAR SETTINGS TOGGLE
+    // ================================================================
+    const showInNavbar = document.getElementById('showInNavbar');
+    const navbarSettings = document.getElementById('navbarSettings');
+
     if (showInNavbar && navbarSettings) {
         showInNavbar.addEventListener('change', function() {
-            navbarSettings.classList.toggle('hidden');
+            navbarSettings.classList.toggle('hidden', !this.checked);
         });
     }
 
-    // Form validation
+    // ================================================================
+    // FORM VALIDATION
+    // ================================================================
     const form = document.getElementById('courseForm');
     const submitBtn = document.getElementById('submitBtn');
     
@@ -545,25 +701,58 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (actualPrice > price) {
                 e.preventDefault();
-                alert('Discounted price cannot be higher than original price');
+                alert('⚠️ Selling price cannot be higher than original price');
                 actualPriceInput?.focus();
+                return;
             }
             
             const imageFile = document.getElementById('image')?.files[0];
             if (!imageFile) {
                 e.preventDefault();
-                alert('Please upload a course thumbnail image');
+                alert('⚠️ Please upload a course thumbnail image');
                 document.getElementById('image')?.focus();
+                return;
             }
+
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+                Creating Course...
+            `;
+            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
         });
     }
 
-    // Set default launch date to tomorrow
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const launchDateInput = document.getElementById('lounchedDate');
-    if (launchDateInput) {
-        launchDateInput.value = tomorrow.toISOString().split('T')[0];
+    // ================================================================
+    // AUTO-GENERATE SLUG (Helper)
+    // ================================================================
+    if (titleInput) {
+        titleInput.addEventListener('blur', function() {
+            const slug = this.value
+                .toLowerCase()
+                .trim()
+                .replace(/&/g, 'and')
+                .replace(/[\s]+/g, '-')
+                .replace(/[^\w\-]+/g, '')
+                .replace(/\-+/g, '-')
+                .replace(/^\-+|\-+$/g, '');
+            
+            // Show slug hint
+            const hint = document.createElement('div');
+            hint.className = 'mt-1 text-xs text-gray-500 dark:text-gray-400';
+            hint.innerHTML = `<i class="fas fa-link mr-1"></i> Slug: <span class="font-mono text-[#C9A227]">${slug}</span>`;
+            
+            const existing = this.parentElement.parentElement.querySelector('.slug-hint');
+            if (existing) existing.remove();
+            
+            if (slug) {
+                hint.className += ' slug-hint';
+                this.parentElement.parentElement.appendChild(hint);
+            }
+        });
     }
 });
 </script>

@@ -1096,220 +1096,261 @@ module.exports.toggleHomepageVisibility = async (req, res) => {
   }
 };
 
+
 // ============================================================
-// ENROLLMENT PAGE CONTROLLER - WITH PAYMENT
+// REPLACE the existing `module.exports.enrollCourseForm` in home.js
+// with this version, and ADD `module.exports.browseCoursesAjax`
+// (it's a brand-new controller — wire it to a new route, see bottom
+// of this file for the route + a small routes.js snippet).
+//
+// Assumes these are already required at the top of home.js:
+//   const Course = require("../models/cources");
+//   const User   = require("../models/user");
+// ============================================================
+
+const RELATED_LIMIT = 6;   // "Related Courses" strip
+const LATEST_LIMIT = 6;    // "Suggested / Latest Courses" strip
+const BROWSE_LIMIT = 9;    // "Browse All Courses" grid — paginated, 9/page (3x3)
+
+// Fields we actually need on listing cards — keeps queries light even
+// when the courses collection grows large.
+const CARD_FIELDS =
+  "title price actualPrice courceType category duration courseLevel image shortDescription teacher preStudents rating reviewCount createdAt";
+
+// ============================================================
+// GET /enroll  and  GET /enroll/:courseId
 // ============================================================
 module.exports.enrollCourseForm = async (req, res) => {
-    try {
-        // Get courseId from params OR query
-        const preselectedCourseId = req.params.courseId || req.query.courseId || null;
-        const userId = req.user ? req.user._id : null;
-        
-        // Get all active courses
-        let courses = await Course.find({ isActive: true })
-            .select('title price actualPrice courceType category duration courseLevel image slug shortDescription')
-            .populate('category', 'name slug')
-            .populate('teacher', 'name')
-            .sort({ createdAt: -1 })
-            .lean();
+  try {
+    const preselectedCourseId = req.params.courseId || req.query.courseId || null;
+    const userId = req.user ? req.user._id : null;
 
-        // ============================================================
-        // ✅ CHECK IF USER IS ALREADY ENROLLED IN THE COURSE
-        // ============================================================
-        let isAlreadyEnrolled = false;
-        let enrolledCourse = null;
+    // ============================================================
+    // ✅ ALREADY-ENROLLED CHECK (unchanged from your original logic)
+    // ============================================================
+    let isAlreadyEnrolled = false;
+    let enrolledCourse = null;
 
-        if (userId && preselectedCourseId) {
-            // Method 1: Check directly in Course model
-            const courseWithStudent = await Course.findOne({
-                _id: preselectedCourseId,
-                'students.user': userId
-            }).select('title _id');
+    if (userId && preselectedCourseId) {
+      const courseWithStudent = await Course.findOne({
+        _id: preselectedCourseId,
+        "students.user": userId,
+      }).select("title _id");
 
-            if (courseWithStudent) {
-                isAlreadyEnrolled = true;
-                enrolledCourse = courseWithStudent;
-            }
+      if (courseWithStudent) {
+        isAlreadyEnrolled = true;
+        enrolledCourse = courseWithStudent;
+      }
 
-            // Method 2: Also check in User's enrolledCourses array (if you maintain it)
-            if (!isAlreadyEnrolled) {
-                const user = await User.findById(userId)
-                    .select('enrolledCourses')
-                    .populate('enrolledCourses.course', 'title _id');
-                
-                if (user && user.enrolledCourses) {
-                    const found = user.enrolledCourses.find(
-                        e => e.course && e.course._id.toString() === preselectedCourseId
-                    );
-                    if (found) {
-                        isAlreadyEnrolled = true;
-                        enrolledCourse = found.course;
-                    }
-                }
-            }
+      if (!isAlreadyEnrolled) {
+        const user = await User.findById(userId)
+          .select("enrolledCourses")
+          .populate("enrolledCourses.course", "title _id");
 
-            // ✅ If already enrolled, redirect with flash message
-            if (isAlreadyEnrolled) {
-                req.flash("info", "✅ You are already enrolled in this course. Continue learning!");
-                return res.redirect(`/courses/${preselectedCourseId}/access`);
-            }
+        if (user && user.enrolledCourses) {
+          const found = user.enrolledCourses.find(
+            (e) => e.course && e.course._id.toString() === preselectedCourseId
+          );
+          if (found) {
+            isAlreadyEnrolled = true;
+            enrolledCourse = found.course;
+          }
         }
+      }
 
-        // ============================================================
-        // FALLBACK COURSES - WITH ALL DATA
-        // ============================================================
-        const FALLBACK_COURSES = [
-            {
-                _id: 'fallback-1',
-                title: 'Complete Cybersecurity Bootcamp 2026',
-                price: 2999,
-                actualPrice: 4999,
-                courceType: 'Cybersecurity',
-                category: { name: 'Cybersecurity' },
-                duration: '42h',
-                courseLevel: 'Beginner',
-                shortDescription: 'Master cybersecurity from scratch with hands-on labs and real-world scenarios.',
-                teacher: { name: 'Rohan Kapoor' },
-                image: { url: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&auto=format&fit=crop' }
-            },
-            {
-                _id: 'fallback-2',
-                title: 'Ethical Hacking & Penetration Testing',
-                price: 2499,
-                actualPrice: 4499,
-                courceType: 'Cybersecurity',
-                category: { name: 'Cybersecurity' },
-                duration: '36h',
-                courseLevel: 'Advanced',
-                shortDescription: 'Learn ethical hacking techniques and become a certified penetration tester.',
-                teacher: { name: 'Aarav Mehta' },
-                image: { url: 'https://images.unsplash.com/photo-1584968352400-97fa07a88c7f?w=400&auto=format&fit=crop' }
-            },
-            {
-                _id: 'fallback-3',
-                title: 'Web Development Masterclass 2026',
-                price: 1999,
-                actualPrice: 3999,
-                courceType: 'Web Development',
-                category: { name: 'Web Development' },
-                duration: '48h',
-                courseLevel: 'Beginner',
-                shortDescription: 'Build modern websites with HTML, CSS, JavaScript, React, and Node.js.',
-                teacher: { name: 'Priya Nair' },
-                image: { url: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=400&auto=format&fit=crop' }
-            },
-            {
-                _id: 'fallback-4',
-                title: 'Data Science & Machine Learning A-Z',
-                price: 3499,
-                actualPrice: 6499,
-                courceType: 'Data Science',
-                category: { name: 'Data Science' },
-                duration: '58h',
-                courseLevel: 'Intermediate',
-                shortDescription: 'Complete data science course covering Python, ML, Deep Learning, and AI.',
-                teacher: { name: 'Ananya Rao' },
-                image: { url: 'https://images.unsplash.com/photo-1518186285589-7f7765de9c6b?w=400&auto=format&fit=crop' }
-            },
-            {
-                _id: 'fallback-5',
-                title: 'AWS Cloud Architecture Mastery',
-                price: 2999,
-                actualPrice: 5499,
-                courceType: 'Cloud & DevOps',
-                category: { name: 'Cloud & DevOps' },
-                duration: '44h',
-                courseLevel: 'Intermediate',
-                shortDescription: 'Master AWS cloud architecture, services, and best practices for enterprise.',
-                teacher: { name: 'Simran Kaur' },
-                image: { url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&auto=format&fit=crop' }
-            },
-            {
-                _id: 'fallback-6',
-                title: 'UI/UX Design Pro - Complete Guide',
-                price: 1499,
-                actualPrice: 2999,
-                courceType: 'UI/UX Design',
-                category: { name: 'UI/UX Design' },
-                duration: '30h',
-                courseLevel: 'Beginner',
-                shortDescription: 'Learn UI/UX design principles, Figma, and build a professional portfolio.',
-                teacher: { name: 'Kabir Sethi' },
-                image: { url: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&auto=format&fit=crop' }
-            },
-            {
-                _id: 'fallback-7',
-                title: 'React Native Mobile App Development',
-                price: 2299,
-                actualPrice: 3999,
-                courceType: 'Mobile Apps',
-                category: { name: 'Mobile Apps' },
-                duration: '32h',
-                courseLevel: 'Intermediate',
-                shortDescription: 'Build cross-platform mobile apps with React Native and Expo.',
-                teacher: { name: 'Dev Malhotra' },
-                image: { url: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&auto=format&fit=crop' }
-            },
-            {
-                _id: 'fallback-8',
-                title: 'Digital Marketing & SEO Mastery',
-                price: 1799,
-                actualPrice: 2999,
-                courceType: 'Marketing',
-                category: { name: 'Marketing' },
-                duration: '24h',
-                courseLevel: 'Beginner',
-                shortDescription: 'Complete digital marketing course covering SEO, Social Media, and Analytics.',
-                teacher: { name: 'Ishaan Verma' },
-                image: { url: 'https://images.unsplash.com/photo-1432889821006-ca0f7af3f9fa?w=400&auto=format&fit=crop' }
-            }
-        ];
-
-        // If no courses in DB, use fallback
-        if (!courses || courses.length === 0) {
-            courses = FALLBACK_COURSES;
-        }
-
-        // Get unique categories
-        const categories = [...new Set(courses.map(c => c.courceType).filter(Boolean))];
-
-        // Get selected course
-        let selectedCourse = null;
-        if (preselectedCourseId) {
-            // Check in courses array
-            selectedCourse = courses.find(c => c._id.toString() === preselectedCourseId);
-            
-            // If not found in courses (might be fallback), check fallback
-            if (!selectedCourse) {
-                selectedCourse = FALLBACK_COURSES.find(c => c._id === preselectedCourseId);
-            }
-        }
-
-        // If no selected course, select first one
-        if (!selectedCourse && courses.length > 0) {
-            selectedCourse = courses[0];
-        }
-
-        // ✅ Pass enrollment status to view
-        res.render("institutehub/enroll.ejs", {
-            courses: courses,
-            categories: categories,
-            selectedCourse: selectedCourse,
-            preselectedCourseId: preselectedCourseId,
-            currentUser: req.user || null,
-            moment: require('moment'),
-            razorpayKey: process.env.RAZORPAY_KEY_ID,
-            // ✅ Pass enrollment status
-            isAlreadyEnrolled: isAlreadyEnrolled,
-            enrolledCourse: enrolledCourse
-        });
-
-    } catch (error) {
-        console.error("Enrollment form error:", error);
-        req.flash("error", "Unable to load enrollment page. Please try again.");
-        res.redirect("/");
+      if (isAlreadyEnrolled) {
+        req.flash("info", "✅ You are already enrolled in this course. Continue learning!");
+        return res.redirect(`/courses/${preselectedCourseId}/access`);
+      }
     }
+
+    // ============================================================
+    // 1) SELECTED COURSE — fetch the ONE course fully, not from a
+    //    giant in-memory array anymore. Falls back to the most
+    //    recent active course if nothing was preselected.
+    // ============================================================
+    const isValidId = preselectedCourseId && /^[0-9a-fA-F]{24}$/.test(preselectedCourseId);
+
+    let selectedCourse = null;
+    if (isValidId) {
+      selectedCourse = await Course.findOne({ _id: preselectedCourseId, isActive: true })
+        .populate("teacher", "name")
+        .populate("category", "name slug")
+        .lean();
+    }
+
+    if (!selectedCourse) {
+      selectedCourse = await Course.findOne({ isActive: true })
+        .sort({ createdAt: -1 })
+        .populate("teacher", "name")
+        .populate("category", "name slug")
+        .lean();
+    }
+
+    const excludeIds = selectedCourse ? [selectedCourse._id] : [];
+
+    // ============================================================
+    // 2) RELATED COURSES — same category/type as selected course.
+    //    Capped at RELATED_LIMIT so the UI never gets flooded.
+    // ============================================================
+    let relatedCourses = [];
+    if (selectedCourse) {
+      const relatedFilter = {
+        isActive: true,
+        _id: { $nin: excludeIds },
+        $or: [
+          { courceType: selectedCourse.courceType },
+          ...(selectedCourse.category
+            ? [{ category: selectedCourse.category._id || selectedCourse.category }]
+            : []),
+        ],
+      };
+
+      relatedCourses = await Course.find(relatedFilter)
+        .select(CARD_FIELDS)
+        .populate("teacher", "name")
+        .sort({ preStudents: -1, rating: -1, createdAt: -1 })
+        .limit(RELATED_LIMIT)
+        .lean();
+
+      excludeIds.push(...relatedCourses.map((c) => c._id));
+    }
+
+    // ============================================================
+    // 3) LATEST / SUGGESTED COURSES — newest courses, excluding
+    //    whatever is already shown above so nothing repeats.
+    // ============================================================
+    const latestCourses = await Course.find({
+      isActive: true,
+      _id: { $nin: excludeIds },
+    })
+      .select(CARD_FIELDS)
+      .populate("teacher", "name")
+      .sort({ createdAt: -1 })
+      .limit(LATEST_LIMIT)
+      .lean();
+
+    excludeIds.push(...latestCourses.map((c) => c._id));
+
+    // ============================================================
+    // 4) BROWSE ALL COURSES — this is the fix for "agar courses
+    //    bahut jyada hain to kya hoga": real server-side pagination
+    //    instead of dumping every course into one scrolling div.
+    //    Page 1 renders with the page; page changes / search /
+    //    category filter after that go through the AJAX endpoint
+    //    below (no full reload).
+    // ============================================================
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const browseFilter = { isActive: true };
+
+    const totalBrowseCourses = await Course.countDocuments(browseFilter);
+    const browseCourses = await Course.find(browseFilter)
+      .select(CARD_FIELDS)
+      .populate("teacher", "name")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * BROWSE_LIMIT)
+      .limit(BROWSE_LIMIT)
+      .lean();
+
+    const totalPages = Math.max(Math.ceil(totalBrowseCourses / BROWSE_LIMIT), 1);
+
+    // Categories for the filter dropdown — distinct() stays cheap
+    // even with thousands of courses since it hits an index.
+    const categories = await Course.distinct("courceType", { isActive: true });
+
+    res.render("institutehub/enroll.ejs", {
+      selectedCourse,
+      relatedCourses,
+      latestCourses,
+      browseCourses,
+      categories,
+      pagination: {
+        page,
+        totalPages,
+        totalCourses: totalBrowseCourses,
+        limit: BROWSE_LIMIT,
+      },
+      currentUser: req.user || null,
+      moment: require("moment"),
+      razorpayKey: process.env.RAZORPAY_KEY_ID,
+      isAlreadyEnrolled,
+      enrolledCourse,
+    });
+  } catch (error) {
+    console.error("Enrollment form error:", error);
+    req.flash("error", "Unable to load enrollment page. Please try again.");
+    res.redirect("/");
+  }
 };
+
+// ============================================================
+// GET /enroll/api/browse-courses
+// AJAX endpoint powering the "Browse All Courses" grid:
+// search + category filter + pagination, all server-side, so it
+// stays fast and light no matter how many courses exist.
+//
+// Query params: page, search, category, excludeId
+// ============================================================
+module.exports.browseCoursesAjax = async (req, res) => {
+  try {
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const search = (req.query.search || "").trim();
+    const category = req.query.category || "all";
+    const excludeId = req.query.excludeId;
+
+    const filter = { isActive: true };
+
+    if (excludeId && /^[0-9a-fA-F]{24}$/.test(excludeId)) {
+      filter._id = { $ne: excludeId };
+    }
+    if (category && category !== "all") {
+      filter.courceType = category;
+    }
+    if (search) {
+      // Escape regex special chars from user input before using in $regex
+      const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      filter.title = { $regex: safeSearch, $options: "i" };
+    }
+
+    const total = await Course.countDocuments(filter);
+    const courses = await Course.find(filter)
+      .select(CARD_FIELDS)
+      .populate("teacher", "name")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * BROWSE_LIMIT)
+      .limit(BROWSE_LIMIT)
+      .lean();
+
+    res.json({
+      success: true,
+      courses,
+      pagination: {
+        page,
+        totalPages: Math.max(Math.ceil(total / BROWSE_LIMIT), 1),
+        totalCourses: total,
+        limit: BROWSE_LIMIT,
+      },
+    });
+  } catch (error) {
+    console.error("Browse courses AJAX error:", error);
+    res.status(500).json({ success: false, message: "Failed to load courses. Please try again." });
+  }
+};
+
+// ============================================================
+// ROUTE WIRING — add this to your routes file (e.g. routes/home.js
+// or wherever /enroll is currently declared):
+//
+//   router.get("/enroll", homeController.enrollCourseForm);
+//   router.get("/enroll/:courseId", homeController.enrollCourseForm);
+//   router.get("/enroll/api/browse-courses", homeController.browseCoursesAjax);
+//
+// Make sure the "/enroll/api/browse-courses" route is declared
+// BEFORE "/enroll/:courseId" if they're on the same router, so
+// Express doesn't treat "api" as a :courseId value.
+// ============================================================
+
+
 
 // ============================================================
 // CREATE RAZORPAY ORDER FOR ENROLLMENT

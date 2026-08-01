@@ -59,8 +59,58 @@ router.get(
   userController.enrollmentHistory,
 );
 
+
+router.get(
+  "/profile/stats",
+  isLoggedIn,
+  userController.getUserStats
+);
+
+// Get User Certificates (AJAX)
+router.get(
+  "/profile/certificates",
+  isLoggedIn,
+  userController.getUserCertificates
+);
+
+// Update Profile Picture
+router.post(
+  "/profile/upload-avatar",
+  isLoggedIn,
+  upload.single("avatar"),
+  userController.uploadAvatar
+);
+
+// Delete Account (with confirmation)
+router.delete(
+  "/profile/delete-account",
+  isLoggedIn,
+  userController.deleteAccount
+);
+
+// Resend Verification Email
+router.post(
+  "/profile/resend-verification",
+  isLoggedIn,
+  userController.resendVerificationEmail
+);
+
+// My Courses Page
 router.get("/my-courses", isLoggedIn, userController.myCourses);
 
+// Course Progress (AJAX)
+router.get(
+  "/profile/course-progress/:courseId",
+  isLoggedIn,
+  userController.getCourseProgress
+);
+
+// Get User Reviews (AJAX)
+router.get(
+  "/profile/reviews",
+  isLoggedIn,
+  userController.getUserReviews
+);
 
 
 module.exports = router;

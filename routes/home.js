@@ -91,6 +91,10 @@ router.patch(
   homeController.toggleHomepageVisibility,
 );
 
+// ⚠️ Must come BEFORE "/enroll/:courseId", otherwise Express will
+// treat "api" as the :courseId param and this route will never match.
+router.get("/enroll/api/browse-courses", homeController.browseCoursesAjax);
+
 router
   .route("/enroll")
   .get(homeController.enrollCourseForm)

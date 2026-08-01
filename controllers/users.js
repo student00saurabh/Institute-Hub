@@ -1,6 +1,11 @@
 const { saveRedirectUrl } = require("../middleware.js");
 const User = require("../models/user.js");
 const Cources = require("../models/cources.js");
+const Teacher = require("../models/teachers.js")
+const Payment = require("../models/payment.js");
+const Review = require("../models/review.js");
+const Rating = require("../models/rating.js");
+const LectureProgress = require("../models/lectureProgress.js");
 const bcrypt = require("bcrypt");
 const brevo = require("@getbrevo/brevo");
 const Certificate = require("../models/certification.js");
@@ -9,6 +14,7 @@ const fs = require("fs");
 const path = require("path");
 const { createCanvas } = require("canvas");
 const mongoose = require("mongoose");
+const cloudinary = require("../Cloudconfig.js");
 
 // Load environment variables
 if (process.env.NODE_ENV !== "production") {
@@ -1031,134 +1037,287 @@ module.exports.resendOtp = async (req, res) => {
 
 module.exports.profile = async (req, res) => {
   try {
-    const id = req.user._id;
-    const user = await User.findById(id);
-    
+    const userId = req.user._id;
+
+    // Get user with all details
+    const user = await User.findById(userId);
+
+    if (!user) {
+      req.flash("error", "User not found");
+      return res.redirect("/");
+    }
+
+    // Get enrolled courses with progress
     const enrolledCourses = await Cources.find({
-      "students.user": id,
+      "students.user": userId,
+      isActive: true
     })
       .populate("teacher", "name email")
       .sort({ "students.enrolledAt": -1 })
-      .limit(6);
+      .lean();
 
-    let displayCourses = enrolledCourses;
-    const taughtCourses = [];
-    const recentActivity = [];
-    const certificates = [];
+    // Get teacher profile if user is a teacher
+    let teacherProfile = null;
+    if (user.role === "teacher" || user.role === "admin") {
+      teacherProfile = await Teacher.findOne({ teacher: userId }).lean();
+    }
 
-    const totalEnrolled = displayCourses.length;
-    const totalPaid = displayCourses.reduce((sum, course) => {
+    // Get certificates
+    const certificates = await Certificate.find({
+      student: userId,
+      isActive: true
+    })
+      .populate("course", "title image")
+      .populate("teacher", "name")
+      .sort({ issueDate: -1 })
+      .lean();
+
+    // Get payments history
+    const payments = await Payment.find({
+      user: userId,
+      status: "success"
+    })
+      .populate("course", "title")
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    // Get user's reviews
+    const reviews = await Review.find({
+      user: userId,
+      isVerified: true
+    })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .lean();
+
+    // Calculate stats
+    const totalEnrolled = enrolledCourses.length;
+    const totalPaid = enrolledCourses.reduce((sum, course) => {
       const studentInfo = course.students?.find(
-        (s) => s.user?._id?.toString() === id.toString() || s.user?.toString() === id.toString(),
+        (s) => s.user?._id?.toString() === userId.toString() || 
+               s.user?.toString() === userId.toString()
       );
       return sum + (studentInfo?.paidPrice || course.price || 0);
     }, 0);
 
+    // Get total certificates count
+    const totalCertificates = certificates.length;
+
+    // Get lecture progress
+    const progressDocs = await LectureProgress.find({
+      user: userId
+    }).lean();
+
+    const totalLectures = progressDocs.length;
+    const completedLectures = progressDocs.filter(p => p.isCompleted).length;
+
+    // Calculate overall progress
+    const overallProgress = totalLectures > 0 
+      ? Math.round((completedLectures / totalLectures) * 100) 
+      : 0;
+
+    // Get recent activity (last 10)
+    const recentActivity = [];
+
+    // Enrollment activity
+    enrolledCourses.slice(0, 5).forEach(course => {
+      const studentInfo = course.students?.find(
+        (s) => s.user?._id?.toString() === userId.toString() || 
+               s.user?.toString() === userId.toString()
+      );
+      if (studentInfo?.enrolledAt) {
+        recentActivity.push({
+          type: "enrollment",
+          title: "Course Enrolled",
+          description: `Enrolled in "${course.title}"`,
+          createdAt: studentInfo.enrolledAt,
+          courseId: course._id,
+          courseTitle: course.title,
+          icon: "fa-graduation-cap",
+          color: "blue"
+        });
+      }
+    });
+
+    // Payment activity
+    payments.slice(0, 3).forEach(payment => {
+      recentActivity.push({
+        type: "payment",
+        title: "Payment Made",
+        description: `Paid ₹${payment.amount} for "${payment.course?.title || 'Course'}"`,
+        createdAt: payment.createdAt,
+        icon: "fa-credit-card",
+        color: "green"
+      });
+    });
+
+    // Certificate activity
+    certificates.slice(0, 3).forEach(cert => {
+      recentActivity.push({
+        type: "certificate",
+        title: "Certificate Earned",
+        description: `Earned certificate for "${cert.course?.title || 'Course'}"`,
+        createdAt: cert.issueDate,
+        icon: "fa-certificate",
+        color: "yellow"
+      });
+    });
+
+    // Sort by date (newest first)
+    recentActivity.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const limitedActivity = recentActivity.slice(0, 10);
+
+    // Render profile
     res.render("users/profile.ejs", {
       user,
-      enrolledCourses: displayCourses,
-      taughtCourses,
+      enrolledCourses,
+      teacherProfile,
+      certificates,
+      payments,
+      reviews,
       totalEnrolled,
       totalPaid,
-      recentActivity,
-      certificates,
+      totalCertificates,
+      overallProgress,
+      completedLectures,
+      totalLectures,
+      recentActivity: limitedActivity,
       moment: require("moment"),
+      currUser: req.user
     });
-  } catch (err) {
-    console.log(err);
+
+  } catch (error) {
+    console.error("Profile error:", error);
     req.flash("error", "Unable to load profile. Please try again.");
     res.redirect("/");
   }
 };
 
+// ================================================================
+// UPDATE PROFILE (AJAX)
+// ================================================================
+
 module.exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { name, mobile, email } = req.body || {};
+    const { name, mobile, email } = req.body;
 
-    if (!name && !mobile && !email) {
+    // Validate
+    if (!name || name.trim().length < 2) {
       return res.status(400).json({
         success: false,
-        message: "No update data provided.",
+        message: "Name must be at least 2 characters long."
       });
     }
 
     if (email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({
+          success: false,
+          message: "Please enter a valid email address."
+        });
+      }
+
+      // Check if email is taken
       const existingUser = await User.findOne({
         email: email.toLowerCase(),
-        _id: { $ne: userId },
+        _id: { $ne: userId }
       });
 
       if (existingUser) {
-        return res.json({
+        return res.status(400).json({
           success: false,
-          message: "This email is already in use.",
+          message: "This email is already in use by another account."
         });
       }
     }
 
     if (mobile) {
+      const mobileRegex = /^[0-9]{10}$/;
+      if (!mobileRegex.test(mobile)) {
+        return res.status(400).json({
+          success: false,
+          message: "Please enter a valid 10-digit mobile number."
+        });
+      }
+
       const existingUser = await User.findOne({
-        mobile,
-        _id: { $ne: userId },
+        mobile: mobile,
+        _id: { $ne: userId }
       });
 
       if (existingUser) {
-        return res.json({
+        return res.status(400).json({
           success: false,
-          message: "This mobile number is already in use.",
+          message: "This mobile number is already in use by another account."
         });
       }
     }
 
+    // Update user
+    const updateData = {
+      name: name.trim(),
+      updatedAt: new Date()
+    };
+
+    if (email) updateData.email = email.toLowerCase();
+    if (mobile) updateData.mobile = mobile;
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      {
-        name,
-        mobile,
-        email: email?.toLowerCase(),
-        updatedAt: new Date(),
-      },
-      { new: true },
-    );
+      updateData,
+      { new: true, runValidators: true }
+    ).select('name email mobile role isVerified createdAt');
 
     return res.json({
       success: true,
-      message: "Profile updated successfully.",
-      user: updatedUser,
+      message: "Profile updated successfully!",
+      user: updatedUser
     });
-  } catch (err) {
-    console.error("UPDATE PROFILE ERROR:", err);
+
+  } catch (error) {
+    console.error("Update profile error:", error);
     return res.status(500).json({
       success: false,
-      message: "Unable to update profile. Please try again.",
+      message: "Unable to update profile. Please try again."
     });
   }
 };
+
 
 module.exports.changePassword = async (req, res) => {
   try {
     const userId = req.user._id;
     const { currentPassword, newPassword, confirmPassword } = req.body;
 
+    // Validate
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      req.flash("error", "Please fill in all password fields.");
+      return res.redirect("/profile");
+    }
+
     if (newPassword !== confirmPassword) {
-      req.flash("warning", "New passwords do not match.");
-      return res.redirect("/profile#security");
+      req.flash("error", "New passwords do not match.");
+      return res.redirect("/profile");
     }
 
     if (newPassword.length < 6) {
-      req.flash("warning", "Password must be at least 6 characters long.");
-      return res.redirect("/profile#security");
+      req.flash("error", "Password must be at least 6 characters long.");
+      return res.redirect("/profile");
     }
 
     const user = await User.findById(userId);
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
     
+    // Verify current password
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       req.flash("error", "Current password is incorrect.");
-      return res.redirect("/profile#security");
+      return res.redirect("/profile");
     }
 
+    // Hash new password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
@@ -1166,12 +1325,13 @@ module.exports.changePassword = async (req, res) => {
     // Send confirmation email
     await sendPasswordChangeConfirmation(user);
 
-    req.flash("success", "Password changed successfully. A confirmation email has been sent.");
-    res.redirect("/profile#security");
-  } catch (err) {
-    console.log(err);
+    req.flash("success", "Password changed successfully!");
+    res.redirect("/profile");
+
+  } catch (error) {
+    console.error("Change password error:", error);
     req.flash("error", "Unable to change password. Please try again.");
-    res.redirect("/profile#security");
+    res.redirect("/profile");
   }
 };
 
@@ -1279,5 +1439,302 @@ module.exports.myCourses = async (req, res) => {
     console.log(err);
     req.flash("error", "Unable to load your courses. Please try again.");
     res.redirect("/profile");
+  }
+};
+
+
+
+// ================================================================
+// GET USER STATS (AJAX)
+// ================================================================
+
+module.exports.getUserStats = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const [enrolledCount, certificateCount, reviewCount, paymentCount] = await Promise.all([
+      Cources.countDocuments({ "students.user": userId }),
+      Certificate.countDocuments({ student: userId, isActive: true }),
+      Review.countDocuments({ user: userId, isVerified: true }),
+      Payment.countDocuments({ user: userId, status: "success" })
+    ]);
+
+    const totalSpent = await Payment.aggregate([
+      { $match: { user: userId, status: "success" } },
+      { $group: { _id: null, total: { $sum: "$amount" } } }
+    ]);
+
+    res.json({
+      success: true,
+      stats: {
+        enrolledCourses: enrolledCount,
+        certificates: certificateCount,
+        reviews: reviewCount,
+        payments: paymentCount,
+        totalSpent: totalSpent.length > 0 ? totalSpent[0].total : 0
+      }
+    });
+
+  } catch (error) {
+    console.error("Get user stats error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch stats"
+    });
+  }
+};
+
+// ================================================================
+// GET USER CERTIFICATES (AJAX)
+// ================================================================
+
+module.exports.getUserCertificates = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const certificates = await Certificate.find({
+      student: userId,
+      isActive: true
+    })
+      .populate("course", "title image")
+      .populate("teacher", "name")
+      .sort({ issueDate: -1 })
+      .lean();
+
+    res.json({
+      success: true,
+      certificates
+    });
+
+  } catch (error) {
+    console.error("Get user certificates error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch certificates"
+    });
+  }
+};
+
+// ================================================================
+// UPLOAD AVATAR
+// ================================================================
+
+module.exports.uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image file provided."
+      });
+    }
+
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    }
+
+    // ✅ Prevent Google users from changing avatar
+    if (user.googleId) {
+      return res.status(403).json({
+        success: false,
+        message: "Google users cannot change profile picture here. Please update from your Google account."
+      });
+    }
+
+    // Delete old avatar if exists
+    if (user.profileImage && user.profileImage.filename) {
+      try {
+        await cloudinary.uploader.destroy(user.profileImage.filename);
+      } catch (err) {
+        console.error("Error deleting old avatar:", err);
+      }
+    }
+
+    // Save new avatar
+    user.profileImage = {
+      url: req.file.path,
+      filename: req.file.filename
+    };
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Profile picture updated!",
+      imageUrl: user.profileImage.url
+    });
+
+  } catch (error) {
+    console.error("Upload avatar error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Unable to upload profile picture."
+    });
+  }
+};
+
+// ================================================================
+// DELETE ACCOUNT
+// ================================================================
+
+module.exports.deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { confirm } = req.body;
+
+    if (confirm !== "DELETE") {
+      return res.status(400).json({
+        success: false,
+        message: "Please type DELETE to confirm account deletion."
+      });
+    }
+
+    const user = await User.findById(userId);
+    
+    // Delete user's data
+    await Promise.all([
+      // Remove from all courses
+      Cources.updateMany(
+        { "students.user": userId },
+        { $pull: { students: { user: userId } } }
+      ),
+      // Delete certificates
+      Certificate.deleteMany({ student: userId }),
+      // Delete reviews
+      Review.deleteMany({ user: userId }),
+      // Delete payments
+      Payment.deleteMany({ user: userId }),
+      // Delete lecture progress
+      LectureProgress.deleteMany({ user: userId }),
+      // Delete teacher profile if exists
+      Teacher.deleteOne({ teacher: userId })
+    ]);
+
+    // Delete user
+    await User.findByIdAndDelete(userId);
+
+    req.logout((err) => {
+      if (err) console.error("Logout error:", err);
+      res.json({
+        success: true,
+        message: "Account deleted successfully."
+      });
+    });
+
+  } catch (error) {
+    console.error("Delete account error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Unable to delete account. Please try again."
+    });
+  }
+};
+
+// ================================================================
+// RESEND VERIFICATION EMAIL
+// ================================================================
+
+module.exports.resendVerificationEmail = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "Your email is already verified."
+      });
+    }
+
+    await sendVerificationOTP(user);
+
+    res.json({
+      success: true,
+      message: "Verification email sent successfully!"
+    });
+
+  } catch (error) {
+    console.error("Resend verification error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Unable to send verification email."
+    });
+  }
+};
+
+// ================================================================
+// GET COURSE PROGRESS (AJAX)
+// ================================================================
+
+module.exports.getCourseProgress = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { courseId } = req.params;
+
+    const progress = await LectureProgress.find({
+      user: userId,
+      course: courseId
+    }).lean();
+
+    const total = progress.length;
+    const completed = progress.filter(p => p.isCompleted).length;
+
+    res.json({
+      success: true,
+      progress: {
+        total,
+        completed,
+        percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
+        lectures: progress
+      }
+    });
+
+  } catch (error) {
+    console.error("Get course progress error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch progress"
+    });
+  }
+};
+
+// ================================================================
+// GET USER REVIEWS (AJAX)
+// ================================================================
+
+module.exports.getUserReviews = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const reviews = await Review.find({
+      user: userId,
+      isVerified: true
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.json({
+      success: true,
+      reviews
+    });
+
+  } catch (error) {
+    console.error("Get user reviews error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch reviews"
+    });
   }
 };

@@ -11,7 +11,71 @@
       return { payPrice, marketPrice, discount, hasDiscount: discount > 0 };
   }
 
-  const selectedCourse = locals.selectedCourse || null;
+  // ============================================================
+  // REUSABLE COURSE CARD (used for Related / Latest / Browse grids)
+  // isSelected -> highlights the card if it's the currently selected course
+  // ============================================================
+  function courseCardHTML(course, isSelected) {
+      const price = getCoursePrice(course);
+      const img = (course.image && course.image.url) || 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&auto=format&fit=crop';
+      const teacherName = (course.teacher && course.teacher.name) || 'Expert';
+      const selectedClasses = isSelected
+          ? 'border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-900/20 shadow-md'
+          : 'border-gray-200 dark:border-gray-700';
+
+      return `
+        <a href="/enroll?courseId=${course._id}"
+           class="course-card group block bg-gray-50/80 dark:bg-gray-700/30 border-2 rounded-xl p-3 transition-all duration-300 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 ${selectedClasses}">
+            <div class="flex items-start gap-3">
+                <div class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700 shadow-sm">
+                    <img src="${img}" alt="${course.title}" loading="lazy"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                         onerror="this.src='https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&auto=format&fit=crop'">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-bold text-sm text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+                        ${course.title}
+                    </h3>
+                    <div class="flex flex-wrap items-center gap-1 mt-1">
+                        <span class="inline-block px-2 py-0.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full text-[10px] font-medium">
+                            ${course.courceType || 'Course'}
+                        </span>
+                        <span class="inline-block px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-[10px] font-medium">
+                            ${course.courseLevel || 'Beginner'}
+                        </span>
+                    </div>
+                    <div class="mt-1.5 flex items-center gap-2 flex-wrap">
+                        <span class="text-base font-extrabold text-gray-900 dark:text-white">₹${price.payPrice.toLocaleString()}</span>
+                        ${price.hasDiscount ? `
+                            <span class="text-xs text-gray-400 dark:text-gray-500 line-through">₹${price.marketPrice.toLocaleString()}</span>
+                            <span class="text-[10px] font-bold text-[#22C55E] bg-[#22C55E]/10 px-1.5 py-0.5 rounded-full border border-[#22C55E]/20">${price.discount}% OFF</span>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2.5 pt-2.5 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                    <span class="flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        ${course.duration || 'Self-paced'}
+                    </span>
+                    <span class="flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        ${teacherName}
+                    </span>
+                </div>
+                <span class="px-3 py-1 rounded-lg text-xs font-medium ${isSelected ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 group-hover:bg-blue-600 group-hover:text-white dark:group-hover:bg-blue-600'}">
+                    ${isSelected ? '✓ Selected' : 'Select'}
+                </span>
+            </div>
+        </a>`;
+  }
+
+  const price = selectedCourse ? getCoursePrice(selectedCourse) : { payPrice: 0, marketPrice: 0, discount: 0, hasDiscount: false };
 %>
 
 <!-- ============================================================ -->
@@ -36,176 +100,109 @@
     </div>
 </section>
 
-<!-- ============================================================ -->
-<!-- MAIN CONTENT                                                  -->
-<!-- ============================================================ -->
 <div class="py-10 lg:py-14 bg-[#F8FAFC] dark:bg-[#0B1120]">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+
+        <!-- ============================================================ -->
+        <!-- SELECTED COURSE DETAILS  +  ENROLLMENT FORM                   -->
+        <!-- ============================================================ -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
-            
-            <!-- ==================== LEFT - COURSE SELECTION ==================== -->
-            <div class="lg:col-span-7 space-y-6">
-                
-                <!-- Course Selection Card -->
+
+            <!-- ==================== LEFT - SELECTED COURSE DETAILS ==================== -->
+            <div class="lg:col-span-7">
+                <% if (selectedCourse) { %>
                 <div class="bg-white dark:bg-gray-800/90 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700/50 overflow-hidden">
-                    
-                    <!-- Header -->
-                    <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-gray-100 dark:border-gray-700/50 flex flex-wrap items-center justify-between gap-3">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2563EB] to-[#4F46E5] flex items-center justify-center shadow-lg shadow-blue-500/25 flex-shrink-0">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+
+                    <!-- Cover image -->
+                    <div class="relative h-52 sm:h-64 overflow-hidden bg-gradient-to-r from-[#2563EB] to-[#4F46E5]">
+                        <img src="<%= selectedCourse.image?.url || 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop' %>"
+                             alt="<%= selectedCourse.title %>"
+                             class="w-full h-full object-cover opacity-90"
+                             onerror="this.style.display='none'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-5 sm:p-6 text-white">
+                            <div class="flex flex-wrap items-center gap-2 mb-2">
+                                <span class="px-2.5 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-semibold border border-white/20">
+                                    <%= selectedCourse.courceType || 'Course' %>
+                                </span>
+                                <span class="px-2.5 py-1 bg-white/15 backdrop-blur-sm rounded-full text-xs font-semibold border border-white/20">
+                                    <%= selectedCourse.courseLevel || 'Beginner' %>
+                                </span>
+                            </div>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold line-clamp-2"><%= selectedCourse.title %></h2>
+                        </div>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="p-5 sm:p-6 space-y-5">
+                        <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
+                            <%= selectedCourse.shortDescription %>
+                        </p>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                <svg class="w-4 h-4 text-[#2563EB] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
+                                <%= selectedCourse.duration || 'Self-paced' %>
                             </div>
-                            <div>
-                                <h2 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Available Courses</h2>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">Select a course to enroll</p>
+                            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                <svg class="w-4 h-4 text-[#2563EB] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                <%= selectedCourse.teacher?.name || 'Expert' %>
                             </div>
-                        </div>
-                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold border border-blue-200 dark:border-blue-800/50">
-                            <span id="courseCount"><%= courses.length %></span> Courses
-                        </span>
-                    </div>
-
-                    <!-- Search & Filter -->
-                    <div class="px-5 sm:px-6 pt-4 pb-3 flex flex-col sm:flex-row gap-3">
-                        <div class="relative flex-1">
-                            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            <input 
-                                type="text" 
-                                id="courseSearch" 
-                                placeholder="Search courses..." 
-                                class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300"
-                            >
-                        </div>
-                        <select id="categoryFilter" class="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 cursor-pointer min-w-[140px]">
-                            <option value="all">All Categories</option>
-                            <% if (categories) { %>
-                                <% categories.forEach(cat => { %>
-                                    <option value="<%= cat %>"><%= cat %></option>
-                                <% }) %>
-                            <% } %>
-                        </select>
-                    </div>
-
-                    <!-- Course Grid -->
-                    <div class="px-5 sm:px-6 pb-5">
-                        <div id="coursesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[520px] overflow-y-auto pr-1">
-                            <% if (courses && courses.length > 0) { %>
-                                <% courses.forEach((course, index) => { %>
-                                 <%   const price = getCoursePrice(course);
-                                    const isSelected = selectedCourse && selectedCourse._id.toString() === course._id.toString();
-                                %>
-                                    <div 
-                                        class="course-card group bg-gray-50/80 dark:bg-gray-700/30 border-2 rounded-xl p-3 cursor-pointer transition-all duration-300 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 <%= isSelected ? 'border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-900/20 shadow-md' : 'border-gray-200 dark:border-gray-700' %>"
-                                        data-course-id="<%= course._id %>"
-                                        data-course-title="<%= course.title %>"
-                                        data-course-price="<%= price.payPrice %>"
-                                        data-course-market-price="<%= price.marketPrice %>"
-                                        data-course-discount="<%= price.discount %>"
-                                        data-course-has-discount="<%= price.hasDiscount %>"
-                                        data-course-type="<%= course.courceType %>"
-                                        data-course-image="<%= course.image?.url %>"
-                                        data-course-duration="<%= course.duration || 'Self-paced' %>"
-                                        data-course-level="<%= course.courseLevel || 'Beginner' %>"
-                                        data-course-category="<%= course.courceType %>"
-                                        data-course-teacher="<%= course.teacher?.name || 'Expert' %>"
-                                        data-course-description="<%= course.shortDescription || '' %>"
-                                    >
-                                        <div class="flex items-start gap-3">
-                                            <div class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700 shadow-sm">
-                                                <img src="<%= course.image?.url || 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=100&auto=format&fit=crop' %>" 
-                                                     alt="<%= course.title %>" 
-                                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                                     loading="lazy"
-                                                     onerror="this.src='https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=100&auto=format&fit=crop'"
-                                                >
-                                            </div>
-                                            <div class="flex-1 min-w-0">
-                                                <h3 class="font-bold text-sm text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
-                                                    <%= course.title %>
-                                                </h3>
-                                                <div class="flex flex-wrap items-center gap-1 mt-1">
-                                                    <span class="inline-block px-2 py-0.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full text-[10px] font-medium">
-                                                        <%= course.courceType || 'Course' %>
-                                                    </span>
-                                                    <span class="inline-block px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-[10px] font-medium">
-                                                        <%= course.courseLevel || 'Beginner' %>
-                                                    </span>
-                                                </div>
-                                                <div class="mt-1.5 flex items-center gap-2 flex-wrap">
-                                                    <span class="text-base font-extrabold text-gray-900 dark:text-white">
-                                                        ₹<%= price.payPrice.toLocaleString() %>
-                                                    </span>
-                                                    <% if (price.hasDiscount) { %>
-                                                        <span class="text-xs text-gray-400 dark:text-gray-500 line-through">
-                                                            ₹<%= price.marketPrice.toLocaleString() %>
-                                                        </span>
-                                                        <span class="text-[10px] font-bold text-[#22C55E] bg-[#22C55E]/10 px-1.5 py-0.5 rounded-full border border-[#22C55E]/20">
-                                                            <%= price.discount %>% OFF
-                                                        </span>
-                                                    <% } %>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mt-2.5 pt-2.5 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                                            <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-                                                <span class="flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                    </svg>
-                                                    <%= course.duration || 'Self-paced' %>
-                                                </span>
-                                                <span class="flex items-center gap-1">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                                    </svg>
-                                                    <%= course.teacher?.name || 'Expert' %>
-                                                </span>
-                                            </div>
-                                            <button 
-                                                type="button" 
-                                                class="select-course-btn px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 <%= isSelected ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600' %>"
-                                                data-course-id="<%= course._id %>"
-                                            >
-                                                <%= isSelected ? '✓ Selected' : 'Select' %>
-                                            </button>
-                                        </div>
-                                    </div>
-                                <% }) %>
-                            <% } else { %>
-                                <div class="col-span-2 text-center py-12">
-                                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                        <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                                        </svg>
-                                    </div>
-                                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">No courses available</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Please check back later</p>
-                                </div>
+                            <% if (selectedCourse.rating) { %>
+                            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                <svg class="w-4 h-4 text-[#C9A227] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.958a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.363 1.118l1.287 3.957c.3.922-.755 1.688-1.539 1.118l-3.367-2.446a1 1 0 00-1.176 0l-3.367 2.446c-.784.57-1.838-.196-1.539-1.118l1.286-3.957a1 1 0 00-.362-1.118L2.98 9.385c-.783-.57-.38-1.81.588-1.81h4.163a1 1 0 00.95-.69l1.286-3.958z"></path>
+                                </svg>
+                                <%= selectedCourse.rating %> (<%= selectedCourse.reviewCount || 0 %> reviews)
+                            </div>
                             <% } %>
                         </div>
 
-                        <!-- No Results -->
-                        <div id="noResults" class="hidden text-center py-8">
-                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <h3 class="text-base font-semibold text-gray-600 dark:text-gray-400">No courses found</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-500">Try adjusting your search or filter</p>
+                        <% if (selectedCourse.learningOutcomes && selectedCourse.learningOutcomes.length) { %>
+                        <div>
+                            <h4 class="font-bold text-sm text-gray-900 dark:text-white mb-2">What you'll learn</h4>
+                            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5">
+                                <% selectedCourse.learningOutcomes.forEach(item => { %>
+                                <li class="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                    <svg class="w-4 h-4 text-[#22C55E] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <%= item %>
+                                </li>
+                                <% }) %>
+                            </ul>
                         </div>
+                        <% } %>
+
+                        <% if (selectedCourse.prerequisites && selectedCourse.prerequisites.length) { %>
+                        <div>
+                            <h4 class="font-bold text-sm text-gray-900 dark:text-white mb-2">Prerequisites</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <% selectedCourse.prerequisites.forEach(item => { %>
+                                <span class="px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full text-xs"><%= item %></span>
+                                <% }) %>
+                            </div>
+                        </div>
+                        <% } %>
                     </div>
                 </div>
+                <% } else { %>
+                <div class="bg-white dark:bg-gray-800/90 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700/50 p-10 text-center">
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">No courses available right now</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Please check back later</p>
+                </div>
+                <% } %>
             </div>
 
             <!-- ==================== RIGHT - ENROLLMENT FORM WITH PAYMENT ==================== -->
             <div class="lg:col-span-5">
                 <div class="lg:sticky lg:top-24">
                     <div class="bg-white dark:bg-gray-800/90 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700/50 overflow-hidden">
-                        
+
                         <!-- Course Preview -->
                         <div class="relative h-40 sm:h-48 overflow-hidden bg-gradient-to-r from-[#2563EB] to-[#4F46E5]">
                             <div class="absolute inset-0 opacity-20">
@@ -214,15 +211,13 @@
                             </div>
                             <div class="relative z-10 p-5 sm:p-6 text-white h-full flex flex-col justify-end">
                                 <span class="text-xs font-medium text-white/70 uppercase tracking-wider">Enrolling In</span>
-                                <h3 id="courseTitleDisplay" class="text-xl sm:text-2xl font-bold line-clamp-1">
+                                <h3 class="text-xl sm:text-2xl font-bold line-clamp-1">
                                     <%= selectedCourse ? selectedCourse.title : 'Select a Course' %>
                                 </h3>
                                 <div class="flex flex-wrap items-center gap-3 mt-2">
-                                    <span id="courseTypeDisplay" class="text-sm text-white/80">
-                                        <%= selectedCourse ? selectedCourse.courceType : '-' %>
-                                    </span>
+                                    <span class="text-sm text-white/80"><%= selectedCourse ? selectedCourse.courceType : '-' %></span>
                                     <span class="w-px h-4 bg-white/30"></span>
-                                    <span id="courseTeacherDisplay" class="text-sm text-white/80">
+                                    <span class="text-sm text-white/80">
                                         <i class="fas fa-user-tie mr-1"></i> <%= selectedCourse?.teacher?.name || 'Expert' %>
                                     </span>
                                 </div>
@@ -235,22 +230,14 @@
                                 <div>
                                     <span class="text-sm text-gray-500 dark:text-gray-400">Course Price</span>
                                     <div class="flex items-center gap-2 mt-1">
-                                        <span id="coursePriceDisplay" class="text-2xl font-extrabold text-gray-900 dark:text-white">
-                                            ₹<%= selectedCourse ? (selectedCourse.actualPrice || selectedCourse.price || 0).toLocaleString() : '0' %>
-                                        </span>
-                                        <% if (selectedCourse && selectedCourse.price && selectedCourse.actualPrice && selectedCourse.price > selectedCourse.actualPrice) { 
-                                            const discount = Math.round(((selectedCourse.price - selectedCourse.actualPrice) / selectedCourse.price) * 100);
-                                        %>
-                                            <span class="text-sm text-gray-400 dark:text-gray-500 line-through">
-                                                ₹<%= selectedCourse.price.toLocaleString() %>
-                                            </span>
-                                            <span class="px-2 py-0.5 bg-[#22C55E]/10 text-[#22C55E] text-xs font-bold rounded-full border border-[#22C55E]/20">
-                                                <%= discount %>% OFF
-                                            </span>
+                                        <span class="text-2xl font-extrabold text-gray-900 dark:text-white">₹<%= price.payPrice.toLocaleString() %></span>
+                                        <% if (price.hasDiscount) { %>
+                                            <span class="text-sm text-gray-400 dark:text-gray-500 line-through">₹<%= price.marketPrice.toLocaleString() %></span>
+                                            <span class="px-2 py-0.5 bg-[#22C55E]/10 text-[#22C55E] text-xs font-bold rounded-full border border-[#22C55E]/20"><%= price.discount %>% OFF</span>
                                         <% } %>
                                     </div>
                                 </div>
-                                <div id="courseStatusBadge" class="px-3 py-1 rounded-full text-xs font-semibold <%= selectedCourse ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400' %>">
+                                <div class="px-3 py-1 rounded-full text-xs font-semibold <%= selectedCourse ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400' %>">
                                     <%= selectedCourse ? '✅ Ready' : '⏳ Select Course' %>
                                 </div>
                             </div>
@@ -259,85 +246,51 @@
                         <!-- Enrollment Form -->
                         <form id="enrollmentForm" class="px-5 sm:px-6 py-5 space-y-4">
                             <input type="hidden" name="courseId" id="courseId" value="<%= selectedCourse ? selectedCourse._id : '' %>">
-                            <input type="hidden" name="paidPrice" id="paidPrice" value="<%= selectedCourse ? (selectedCourse.actualPrice || selectedCourse.price || 0) : 0 %>">
+                            <input type="hidden" name="paidPrice" id="paidPrice" value="<%= price.payPrice %>">
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    Full Name <span class="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="studentName"
-                                    value="<%= currentUser ? currentUser.name : '' %>"
-                                    required
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name <span class="text-red-500">*</span></label>
+                                <input type="text" id="studentName" value="<%= currentUser ? currentUser.name : '' %>" required
                                     placeholder="Enter your full name"
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300"
-                                />
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300">
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    Email Address <span class="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="email"
-                                    id="studentEmail"
-                                    value="<%= currentUser ? currentUser.email : '' %>"
-                                    required
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email Address <span class="text-red-500">*</span></label>
+                                <input type="email" id="studentEmail" value="<%= currentUser ? currentUser.email : '' %>" required
                                     placeholder="your@email.com"
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300"
-                                />
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300">
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    Mobile Number <span class="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="tel"
-                                    id="studentMobile"
-                                    value="<%= currentUser && currentUser.mobile ? currentUser.mobile : '' %>"
-                                    required
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Mobile Number <span class="text-red-500">*</span></label>
+                                <input type="tel" id="studentMobile" value="<%= currentUser && currentUser.mobile ? currentUser.mobile : '' %>" required
                                     placeholder="9876543210"
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300"
-                                />
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300">
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    Questions or Requirements
-                                </label>
-                                <textarea
-                                    id="studentDescription"
-                                    rows="2"
-                                    placeholder="Any questions about the course..."
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300 resize-none"
-                                ></textarea>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Questions or Requirements</label>
+                                <textarea id="studentDescription" rows="2" placeholder="Any questions about the course..."
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 focus:bg-white dark:focus:bg-gray-800 transition-all duration-300 resize-none"></textarea>
                             </div>
 
-                            <!-- Terms -->
                             <div class="flex items-start gap-2.5">
                                 <input type="checkbox" id="terms" required class="mt-1 w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400">
                                 <label for="terms" class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-                                    I agree to the <a href="/terms" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">Terms of Service</a> and 
+                                    I agree to the <a href="/terms" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">Terms of Service</a> and
                                     <a href="/privacy" class="text-blue-600 dark:text-blue-400 hover:underline font-medium">Privacy Policy</a>
                                 </label>
                             </div>
 
-                            <!-- Payment Button -->
-                            <button
-                                type="button"
-                                id="payBtn"
-                                <%= selectedCourse ? '' : 'disabled' %>
-                                class="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-base transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3 group"
-                            >
+                            <button type="button" id="payBtn" <%= selectedCourse ? '' : 'disabled' %>
+                                class="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-base transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group">
                                 <svg class="w-5 h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                                 </svg>
                                 <span id="payBtnText">Pay Now & Enroll</span>
                             </button>
 
-                            <!-- Secure Payment Badge -->
                             <div class="flex flex-wrap items-center justify-center gap-4 pt-2 text-xs text-gray-500 dark:text-gray-400">
                                 <span class="flex items-center gap-1.5">
                                     <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,16 +304,122 @@
                                     </svg>
                                     Data Protected
                                 </span>
-                                <span class="flex items-center gap-1.5">
-                                    <i class="fas fa-credit-card text-blue-500"></i>
-                                    Razorpay Secured
-                                </span>
+                                <span class="flex items-center gap-1.5"><i class="fas fa-credit-card text-blue-500"></i> Razorpay Secured</span>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- ============================================================ -->
+        <!-- RELATED COURSES                                               -->
+        <!-- ============================================================ -->
+        <% if (relatedCourses && relatedCourses.length > 0) { %>
+        <div>
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Related Courses</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">More from <%= selectedCourse.courceType %></p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <% relatedCourses.forEach(course => { %>
+                    <%- courseCardHTML(course, false) %>
+                <% }) %>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- ============================================================ -->
+        <!-- LATEST / SUGGESTED COURSES                                    -->
+        <!-- ============================================================ -->
+        <% if (latestCourses && latestCourses.length > 0) { %>
+        <div>
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Latest Courses</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Freshly added, worth a look</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <% latestCourses.forEach(course => { %>
+                    <%- courseCardHTML(course, false) %>
+                <% }) %>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- ============================================================ -->
+        <!-- BROWSE ALL COURSES (search + filter + PAGINATION)             -->
+        <!-- ============================================================ -->
+        <div>
+            <div class="bg-white dark:bg-gray-800/90 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700/50 overflow-hidden">
+                <div class="px-5 sm:px-6 py-4 sm:py-5 border-b border-gray-100 dark:border-gray-700/50 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Browse All Courses</h2>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Find exactly what you're looking for</p>
+                    </div>
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs font-semibold border border-blue-200 dark:border-blue-800/50">
+                        <span id="browseTotalCount"><%= pagination.totalCourses %></span> Courses
+                    </span>
+                </div>
+
+                <!-- Search & Filter -->
+                <div class="px-5 sm:px-6 pt-4 pb-3 flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-1">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" id="browseSearch" placeholder="Search courses..."
+                            class="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300">
+                    </div>
+                    <select id="browseCategory" class="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-all duration-300 cursor-pointer min-w-[160px]">
+                        <option value="all">All Categories</option>
+                        <% categories.forEach(cat => { %>
+                            <option value="<%= cat %>"><%= cat %></option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <!-- Grid -->
+                <div class="px-5 sm:px-6 pb-3 relative">
+                    <div id="browseLoading" class="hidden absolute inset-0 bg-white/60 dark:bg-gray-800/60 z-10 flex items-center justify-center rounded-xl">
+                        <i class="fas fa-spinner fa-spin text-2xl text-blue-600"></i>
+                    </div>
+                    <div id="browseGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <% browseCourses.forEach(course => { %>
+                            <%- courseCardHTML(course, selectedCourse && course._id.toString() === selectedCourse._id.toString()) %>
+                        <% }) %>
+                    </div>
+                    <div id="browseNoResults" class="hidden text-center py-12">
+                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="text-base font-semibold text-gray-600 dark:text-gray-400">No courses found</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-500">Try adjusting your search or filter</p>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div id="browsePagination" class="px-5 sm:px-6 py-4 border-t border-gray-100 dark:border-gray-700/50 flex items-center justify-between gap-3 flex-wrap">
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                        Page <span id="pageCurrentLabel"><%= pagination.page %></span> of <span id="pageTotalLabel"><%= pagination.totalPages %></span>
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <button id="prevPageBtn" type="button" <%= pagination.page <= 1 ? 'disabled' : '' %>
+                            class="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                            <i class="fas fa-chevron-left mr-1"></i> Prev
+                        </button>
+                        <button id="nextPageBtn" type="button" <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>
+                            class="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                            Next <i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -373,17 +432,17 @@
 document.addEventListener('DOMContentLoaded', function() {
     'use strict';
 
-    const courseCards = document.querySelectorAll('.course-card');
-    const courseSearch = document.getElementById('courseSearch');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const coursesGrid = document.getElementById('coursesGrid');
-    const noResults = document.getElementById('noResults');
+    // ============================================================
+    // SELECTED COURSE (rendered server-side, no dataset scraping)
+    // ============================================================
+    const selectedCourseId = <%- JSON.stringify(selectedCourse ? selectedCourse._id.toString() : null) %>;
+    const selectedCourseTitle = <%- JSON.stringify(selectedCourse ? selectedCourse.title : '') %>;
+    const paidPrice = <%- JSON.stringify(price.payPrice) %>;
+    const razorpayKey = <%- JSON.stringify(razorpayKey || '') %>;
+
     const payBtn = document.getElementById('payBtn');
     const payBtnText = document.getElementById('payBtnText');
     const enrollmentForm = document.getElementById('enrollmentForm');
-    const courseCount = document.getElementById('courseCount');
-    
-    // Form fields
     const courseIdInput = document.getElementById('courseId');
     const paidPriceInput = document.getElementById('paidPrice');
     const studentName = document.getElementById('studentName');
@@ -391,205 +450,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const studentMobile = document.getElementById('studentMobile');
     const studentDescription = document.getElementById('studentDescription');
     const termsCheckbox = document.getElementById('terms');
-    
-    // Display elements
-    const courseTitleDisplay = document.getElementById('courseTitleDisplay');
-    const courseTypeDisplay = document.getElementById('courseTypeDisplay');
-    const courseTeacherDisplay = document.getElementById('courseTeacherDisplay');
-    const coursePriceDisplay = document.getElementById('coursePriceDisplay');
-    const courseStatusBadge = document.getElementById('courseStatusBadge');
-
-    let selectedCourseId = null;
-    let selectedCourseData = null;
-
-    // ========== COURSE SELECTION ==========
-    function selectCourse(card) {
-        // Remove selection from all cards
-        courseCards.forEach(c => {
-            c.classList.remove('border-blue-500', 'bg-blue-50', 'dark:border-blue-500', 'dark:bg-blue-900/20', 'shadow-md');
-            const btn = c.querySelector('.select-course-btn');
-            if (btn) {
-                btn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-                btn.classList.add('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-700', 'dark:text-blue-300');
-                btn.textContent = 'Select';
-            }
-        });
-        
-        // Add selection to clicked card
-        card.classList.add('border-blue-500', 'bg-blue-50', 'dark:border-blue-500', 'dark:bg-blue-900/20', 'shadow-md');
-        const selectBtn = card.querySelector('.select-course-btn');
-        if (selectBtn) {
-            selectBtn.classList.remove('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-700', 'dark:text-blue-300');
-            selectBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
-            selectBtn.textContent = '✓ Selected';
-        }
-        
-        // Get course data
-        selectedCourseId = card.dataset.courseId;
-        selectedCourseData = {
-            title: card.dataset.courseTitle,
-            price: card.dataset.coursePrice,
-            marketPrice: card.dataset.courseMarketPrice,
-            discount: card.dataset.courseDiscount,
-            hasDiscount: card.dataset.courseHasDiscount === 'true',
-            type: card.dataset.courseType,
-            duration: card.dataset.courseDuration,
-            level: card.dataset.courseLevel,
-            teacher: card.dataset.courseTeacher,
-            description: card.dataset.courseDescription
-        };
-        
-        // Update form
-        courseIdInput.value = selectedCourseId;
-        paidPriceInput.value = selectedCourseData.price;
-        
-        // Update display
-        courseTitleDisplay.textContent = selectedCourseData.title;
-        courseTypeDisplay.textContent = selectedCourseData.type;
-        courseTeacherDisplay.textContent = '👨‍🏫 ' + selectedCourseData.teacher;
-        
-        // Price display with discount
-        let priceHTML = `₹${parseInt(selectedCourseData.price).toLocaleString()}`;
-        if (selectedCourseData.hasDiscount && selectedCourseData.marketPrice) {
-            priceHTML += `
-                <span class="text-sm text-gray-400 dark:text-gray-500 line-through ml-2">
-                    ₹${parseInt(selectedCourseData.marketPrice).toLocaleString()}
-                </span>
-                <span class="px-2 py-0.5 bg-[#22C55E]/10 text-[#22C55E] text-xs font-bold rounded-full border border-[#22C55E]/20 ml-1.5">
-                    ${selectedCourseData.discount}% OFF
-                </span>
-            `;
-        }
-        coursePriceDisplay.innerHTML = priceHTML;
-        
-        // Update status badge
-        courseStatusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400';
-        courseStatusBadge.textContent = '✅ Ready';
-        
-        // Enable pay button
-        payBtn.disabled = false;
-        
-        // Scroll to form on mobile
-        if (window.innerWidth < 1024) {
-            document.querySelector('#enrollmentForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }
-
-    // ========== COURSE CARD CLICK HANDLERS ==========
-    courseCards.forEach(card => {
-        const selectBtn = card.querySelector('.select-course-btn');
-        
-        card.addEventListener('click', (e) => {
-            if (!e.target.closest('.select-course-btn')) {
-                selectCourse(card);
-            }
-        });
-        
-        if (selectBtn) {
-            selectBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                selectCourse(card);
-            });
-        }
-    });
-
-    // ========== SEARCH & FILTER ==========
-    function filterCourses() {
-        const searchTerm = courseSearch.value.toLowerCase();
-        const category = categoryFilter.value;
-        let visibleCount = 0;
-        
-        courseCards.forEach(card => {
-            const title = card.dataset.courseTitle?.toLowerCase() || '';
-            const type = card.dataset.courseType?.toLowerCase() || '';
-            const cardCategory = card.dataset.courseCategory || '';
-            
-            const matchesSearch = title.includes(searchTerm) || type.includes(searchTerm);
-            const matchesCategory = category === 'all' || cardCategory === category;
-            
-            if (matchesSearch && matchesCategory) {
-                card.style.display = 'block';
-                visibleCount++;
-            } else {
-                card.style.display = 'none';
-            }
-        });
-        
-        courseCount.textContent = visibleCount;
-        
-        if (visibleCount === 0) {
-            noResults.classList.remove('hidden');
-            coursesGrid.classList.add('hidden');
-        } else {
-            noResults.classList.add('hidden');
-            coursesGrid.classList.remove('hidden');
-        }
-    }
-
-    courseSearch.addEventListener('input', filterCourses);
-    categoryFilter.addEventListener('change', filterCourses);
 
     // ========== RAZORPAY PAYMENT ==========
     async function initiatePayment() {
-        // Validate form
         const name = studentName.value.trim();
         const email = studentEmail.value.trim();
         const mobile = studentMobile.value.trim();
-        
-        if (!selectedCourseId) {
-            alert('Please select a course first');
-            return;
-        }
-        
-        if (!name) {
-            alert('Please enter your full name');
-            studentName.focus();
-            return;
-        }
-        
-        if (!email || !email.includes('@') || !email.includes('.')) {
-            alert('Please enter a valid email address');
-            studentEmail.focus();
-            return;
-        }
-        
-        if (!mobile || mobile.length < 10) {
-            alert('Please enter a valid 10-digit mobile number');
-            studentMobile.focus();
-            return;
-        }
-        
-        if (!termsCheckbox.checked) {
-            alert('Please agree to the Terms of Service and Privacy Policy');
-            termsCheckbox.focus();
-            return;
-        }
-        
-        // Check if free course
-        const price = parseInt(paidPriceInput.value);
-        if (price === 0) {
-            // Free course - direct enrollment
+
+        if (!selectedCourseId) { alert('Please select a course first'); return; }
+        if (!name) { alert('Please enter your full name'); studentName.focus(); return; }
+        if (!email || !email.includes('@') || !email.includes('.')) { alert('Please enter a valid email address'); studentEmail.focus(); return; }
+        if (!mobile || mobile.length < 10) { alert('Please enter a valid 10-digit mobile number'); studentMobile.focus(); return; }
+        if (!termsCheckbox.checked) { alert('Please agree to the Terms of Service and Privacy Policy'); termsCheckbox.focus(); return; }
+
+        if (paidPrice === 0) {
             alert('This course is free! You can enroll directly.');
-            // Submit form for free enrollment
             enrollmentForm.action = `/enroll/${selectedCourseId}`;
             enrollmentForm.submit();
             return;
         }
-        
-        // Disable button
+
         payBtn.disabled = true;
         payBtnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Creating Order...';
-        
+
         try {
-            // Create Razorpay order
             const response = await fetch('/create-enrollment-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ courseId: selectedCourseId })
             });
-            
             const data = await response.json();
-            
+
             if (!data.success) {
                 if (data.isFree) {
                     alert('This is a free course! You can enroll directly.');
@@ -599,27 +490,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 throw new Error(data.message || 'Failed to create order');
             }
-            
-            // Open Razorpay checkout
+
             const options = {
-                key: data.key,
+                key: data.key || razorpayKey,
                 amount: data.amount,
                 currency: data.currency,
-                name: 'CyberKavach',
-                description: `Enrollment: ${selectedCourseData.title}`,
+                name: 'InstituteHub',
+                description: `Enrollment: ${selectedCourseTitle}`,
                 image: '/images/logo.png',
                 order_id: data.orderId,
-                handler: function(response) {
-                    verifyPayment(response);
-                },
-                prefill: {
-                    name: name,
-                    email: email,
-                    contact: mobile
-                },
-                theme: {
-                    color: '#2563EB'
-                },
+                handler: function(response) { verifyPayment(response); },
+                prefill: { name, email, contact: mobile },
+                theme: { color: '#2563EB' },
                 modal: {
                     ondismiss: function() {
                         payBtn.disabled = false;
@@ -627,10 +509,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             };
-            
+
             const razorpay = new Razorpay(options);
             razorpay.open();
-            
         } catch (error) {
             console.error('Payment error:', error);
             alert(error.message || 'Failed to initiate payment. Please try again.');
@@ -639,16 +520,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ========== VERIFY PAYMENT ==========
     async function verifyPayment(response) {
         payBtnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Verifying...';
-        
         try {
-            const name = studentName.value.trim();
-            const email = studentEmail.value.trim();
-            const mobile = studentMobile.value.trim();
-            const description = studentDescription.value.trim();
-            
             const result = await fetch('/verify-enrollment-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -657,15 +531,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     razorpay_payment_id: response.razorpay_payment_id,
                     razorpay_signature: response.razorpay_signature,
                     courseId: selectedCourseId,
-                    name: name,
-                    email: email,
-                    mobile: mobile,
-                    description: description
+                    name: studentName.value.trim(),
+                    email: studentEmail.value.trim(),
+                    mobile: studentMobile.value.trim(),
+                    description: studentDescription.value.trim()
                 })
             });
-            
             const data = await result.json();
-            
+
             if (data.success) {
                 alert('🎉 Enrollment successful! You now have access to this course.');
                 window.location.href = data.redirectUrl || `/courses/${selectedCourseId}/access`;
@@ -684,103 +557,142 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ========== PAY BUTTON CLICK ==========
     payBtn.addEventListener('click', initiatePayment);
 
-    // ========== KEYBOARD SHORTCUTS ==========
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && selectedCourseId) {
-            // Clear selection
-            courseCards.forEach(c => {
-                c.classList.remove('border-blue-500', 'bg-blue-50', 'dark:border-blue-500', 'dark:bg-blue-900/20', 'shadow-md');
-                const btn = c.querySelector('.select-course-btn');
-                if (btn) {
-                    btn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-                    btn.classList.add('bg-blue-100', 'dark:bg-blue-900/30', 'text-blue-700', 'dark:text-blue-300');
-                    btn.textContent = 'Select';
-                }
-            });
-            
-            selectedCourseId = null;
-            selectedCourseData = null;
-            courseIdInput.value = '';
-            paidPriceInput.value = '';
-            courseTitleDisplay.textContent = 'Select a Course';
-            courseTypeDisplay.textContent = '-';
-            courseTeacherDisplay.textContent = '👨‍🏫 Expert';
-            coursePriceDisplay.textContent = '₹0';
-            courseStatusBadge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400';
-            courseStatusBadge.textContent = '⏳ Select Course';
-            payBtn.disabled = true;
-        }
-    });
+    // ============================================================
+    // BROWSE ALL COURSES — AJAX search + filter + pagination
+    // (this is what keeps the page fast even with hundreds of
+    // courses instead of rendering them all at once)
+    // ============================================================
+    const browseSearch = document.getElementById('browseSearch');
+    const browseCategory = document.getElementById('browseCategory');
+    const browseGrid = document.getElementById('browseGrid');
+    const browseLoading = document.getElementById('browseLoading');
+    const browseNoResults = document.getElementById('browseNoResults');
+    const browseTotalCount = document.getElementById('browseTotalCount');
+    const prevPageBtn = document.getElementById('prevPageBtn');
+    const nextPageBtn = document.getElementById('nextPageBtn');
+    const pageCurrentLabel = document.getElementById('pageCurrentLabel');
+    const pageTotalLabel = document.getElementById('pageTotalLabel');
 
-    // ========== AUTO-SELECT FROM URL ==========
-    const urlParams = new URLSearchParams(window.location.search);
-    const courseParam = urlParams.get('courseId');
-    
-    if (courseParam) {
-        const matchedCard = document.querySelector(`.course-card[data-course-id="${courseParam}"]`);
-        if (matchedCard) {
-            setTimeout(() => {
-                selectCourse(matchedCard);
-                matchedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 300);
+    let currentPage = <%- pagination.page %>;
+    let searchDebounceTimer = null;
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    function renderCourseCard(course, isSelected) {
+        const payPrice = course.actualPrice || course.price || 0;
+        const marketPrice = course.price || course.actualPrice || 0;
+        const discount = marketPrice > payPrice ? Math.round(((marketPrice - payPrice) / marketPrice) * 100) : 0;
+        const hasDiscount = discount > 0;
+        const img = (course.image && course.image.url) || 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&auto=format&fit=crop';
+        const teacherName = (course.teacher && course.teacher.name) || 'Expert';
+        const selectedClasses = isSelected
+            ? 'border-blue-500 bg-blue-50 dark:border-blue-500 dark:bg-blue-900/20 shadow-md'
+            : 'border-gray-200 dark:border-gray-700';
+        const title = escapeHtml(course.title || '');
+
+        return `
+        <a href="/enroll?courseId=${course._id}"
+           class="course-card group block bg-gray-50/80 dark:bg-gray-700/30 border-2 rounded-xl p-3 transition-all duration-300 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg hover:-translate-y-1 ${selectedClasses}">
+            <div class="flex items-start gap-3">
+                <div class="flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700 shadow-sm">
+                    <img src="${img}" alt="${title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&auto=format&fit=crop'">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-bold text-sm text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">${title}</h3>
+                    <div class="flex flex-wrap items-center gap-1 mt-1">
+                        <span class="inline-block px-2 py-0.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full text-[10px] font-medium">${escapeHtml(course.courceType || 'Course')}</span>
+                        <span class="inline-block px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-[10px] font-medium">${escapeHtml(course.courseLevel || 'Beginner')}</span>
+                    </div>
+                    <div class="mt-1.5 flex items-center gap-2 flex-wrap">
+                        <span class="text-base font-extrabold text-gray-900 dark:text-white">₹${payPrice.toLocaleString()}</span>
+                        ${hasDiscount ? `<span class="text-xs text-gray-400 dark:text-gray-500 line-through">₹${marketPrice.toLocaleString()}</span><span class="text-[10px] font-bold text-[#22C55E] bg-[#22C55E]/10 px-1.5 py-0.5 rounded-full border border-[#22C55E]/20">${discount}% OFF</span>` : ''}
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2.5 pt-2.5 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                    <span class="flex items-center gap-1"><i class="far fa-clock"></i> ${escapeHtml(course.duration || 'Self-paced')}</span>
+                    <span class="flex items-center gap-1"><i class="far fa-user"></i> ${escapeHtml(teacherName)}</span>
+                </div>
+                <span class="px-3 py-1 rounded-lg text-xs font-medium ${isSelected ? 'bg-blue-600 text-white shadow-md' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 group-hover:bg-blue-600 group-hover:text-white dark:group-hover:bg-blue-600'}">${isSelected ? '✓ Selected' : 'Select'}</span>
+            </div>
+        </a>`;
+    }
+
+    async function loadBrowseCourses(page) {
+        browseLoading.classList.remove('hidden');
+        try {
+            const params = new URLSearchParams({
+                page: page,
+                search: browseSearch.value.trim(),
+                category: browseCategory.value
+            });
+            const res = await fetch(`/enroll/api/browse-courses?${params.toString()}`);
+            const data = await res.json();
+
+            if (!data.success) throw new Error(data.message || 'Failed to load courses');
+
+            currentPage = data.pagination.page;
+
+            if (data.courses.length === 0) {
+                browseGrid.classList.add('hidden');
+                browseNoResults.classList.remove('hidden');
+            } else {
+                browseGrid.classList.remove('hidden');
+                browseNoResults.classList.add('hidden');
+                browseGrid.innerHTML = data.courses
+                    .map(c => renderCourseCard(c, selectedCourseId && c._id === selectedCourseId))
+                    .join('');
+            }
+
+            browseTotalCount.textContent = data.pagination.totalCourses;
+            pageCurrentLabel.textContent = data.pagination.page;
+            pageTotalLabel.textContent = data.pagination.totalPages;
+            prevPageBtn.disabled = data.pagination.page <= 1;
+            nextPageBtn.disabled = data.pagination.page >= data.pagination.totalPages;
+
+        } catch (error) {
+            console.error('Browse courses error:', error);
+        } finally {
+            browseLoading.classList.add('hidden');
         }
     }
+
+    browseSearch.addEventListener('input', function() {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => loadBrowseCourses(1), 400);
+    });
+
+    browseCategory.addEventListener('change', function() { loadBrowseCourses(1); });
+
+    prevPageBtn.addEventListener('click', function() {
+        if (currentPage > 1) loadBrowseCourses(currentPage - 1);
+    });
+
+    nextPageBtn.addEventListener('click', function() {
+        loadBrowseCourses(currentPage + 1);
+    });
 });
 </script>
 
 <style>
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .course-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
-    .line-clamp-1 {
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    /* Course cards */
-    .course-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Custom scrollbar */
-    #coursesGrid::-webkit-scrollbar {
-        width: 5px;
-    }
-    #coursesGrid::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    #coursesGrid::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-    }
-    .dark #coursesGrid::-webkit-scrollbar-thumb {
-        background: #475569;
-    }
-
-    @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-    }
-    .fa-spin {
-        animation: spin 1s linear infinite;
-    }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .fa-spin { animation: spin 1s linear infinite; }
 
     @media (min-width: 1024px) {
-        .lg\:sticky {
-            position: sticky;
-            top: 100px;
-        }
+        .lg\:sticky { position: sticky; top: 100px; }
     }
-
     @media (max-width: 640px) {
-        .lg\:sticky {
-            position: relative !important;
-            top: 0 !important;
-        }
+        .lg\:sticky { position: relative !important; top: 0 !important; }
     }
 </style>

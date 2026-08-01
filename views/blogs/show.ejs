@@ -804,7 +804,7 @@
 <% } %>
 
 <!-- ============================================================ -->
-<!-- SUBSCRIBE OTP MODAL                                           -->
+<!-- SUBSCRIBE OTP MODAL - FIXED COPY-PASTE SUPPORT               -->
 <!-- ============================================================ -->
 <div id="otpModal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
   <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
@@ -831,19 +831,49 @@
           <!-- Status Messages -->
           <div id="otpStatus" class="hidden p-3 rounded-xl mb-4 text-sm"></div>
 
-          <!-- OTP Input -->
+          <!-- OTP Input - FIXED -->
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Enter 6-digit OTP sent to your email
               </label>
-              <div class="flex gap-2 justify-center">
-                <input type="text" id="otp1" maxlength="1" class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveOTP(this, 'otp2')">
-                <input type="text" id="otp2" maxlength="1" class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveOTP(this, 'otp3')">
-                <input type="text" id="otp3" maxlength="1" class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveOTP(this, 'otp4')">
-                <input type="text" id="otp4" maxlength="1" class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveOTP(this, 'otp5')">
-                <input type="text" id="otp5" maxlength="1" class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveOTP(this, 'otp6')">
-                <input type="text" id="otp6" maxlength="1" class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all" onkeyup="moveOTP(this, null)" onkeydown="handleOTPBackspace(event, 'otp5')">
+              <div class="relative">
+                <div class="flex gap-2 justify-center">
+                  <input type="text" id="otp1" maxlength="1" 
+                         class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all"
+                         inputmode="numeric" pattern="[0-9]"
+                         oninput="handleOtpInput(this, 'otp2')"
+                         onfocus="this.select()">
+                  <input type="text" id="otp2" maxlength="1" 
+                         class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all"
+                         inputmode="numeric" pattern="[0-9]"
+                         oninput="handleOtpInput(this, 'otp3')"
+                         onfocus="this.select()">
+                  <input type="text" id="otp3" maxlength="1" 
+                         class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all"
+                         inputmode="numeric" pattern="[0-9]"
+                         oninput="handleOtpInput(this, 'otp4')"
+                         onfocus="this.select()">
+                  <input type="text" id="otp4" maxlength="1" 
+                         class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all"
+                         inputmode="numeric" pattern="[0-9]"
+                         oninput="handleOtpInput(this, 'otp5')"
+                         onfocus="this.select()">
+                  <input type="text" id="otp5" maxlength="1" 
+                         class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all"
+                         inputmode="numeric" pattern="[0-9]"
+                         oninput="handleOtpInput(this, 'otp6')"
+                         onfocus="this.select()">
+                  <input type="text" id="otp6" maxlength="1" 
+                         class="otp-input w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-[#C9A227] focus:ring-2 focus:ring-[#C9A227]/40 focus:outline-none transition-all"
+                         inputmode="numeric" pattern="[0-9]"
+                         oninput="handleOtpInput(this, null)"
+                         onfocus="this.select()">
+                </div>
+                <!-- Hidden input for paste support -->
+                <input type="text" id="otpHidden" 
+                       class="absolute inset-0 w-full h-full opacity-0 pointer-events-none"
+                       autocomplete="one-time-code">
               </div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
                 <span id="otpTimer">OTP expires in <span class="font-bold text-[#C9A227]" id="otpTimerCount">10:00</span></span>
@@ -1129,12 +1159,70 @@ function toggleLike(blogId) {
 
 
 // ============================================================ //
-// SUBSCRIBE OTP MODAL HANDLER                                   //
+// OTP INPUT HANDLERS - FIXED COPY-PASTE SUPPORT                 //
 // ============================================================ //
 
 let otpEmail = '';
 let otpTimerInterval = null;
-let otpCooldown = false;
+
+// ── OTP Input Handler (auto-advance) ──
+function handleOtpInput(current, nextId) {
+  // Allow only digits
+  current.value = current.value.replace(/[^0-9]/g, '').slice(0, 1);
+  
+  // If we have a value and there's a next input, move to it
+  if (current.value.length === 1 && nextId) {
+    const next = document.getElementById(nextId);
+    if (next) {
+      next.focus();
+      next.select();
+    }
+  }
+  
+  // Check if all fields are filled
+  let allFilled = true;
+  for (let i = 1; i <= 6; i++) {
+    const el = document.getElementById(`otp${i}`);
+    if (!el || el.value.length === 0) { allFilled = false; break; }
+  }
+  if (allFilled) {
+    const verifyBtn = document.getElementById('verifyOTPBtn');
+    if (verifyBtn && !verifyBtn.disabled) {
+      setTimeout(() => verifyBtn.click(), 300);
+    }
+  }
+}
+
+// ── Handle paste on OTP inputs ──
+document.addEventListener('paste', function(e) {
+  const target = e.target;
+  if (target && target.id && target.id.startsWith('otp') && target.id !== 'otpHidden') {
+    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+    if (pastedText && /^\d{6}$/.test(pastedText)) {
+      e.preventDefault();
+      // Fill all OTP inputs
+      for (let i = 0; i < 6; i++) {
+        const input = document.getElementById(`otp${i+1}`);
+        if (input) {
+          input.value = pastedText[i] || '';
+        }
+      }
+      // Focus on last input
+      const lastInput = document.getElementById('otp6');
+      if (lastInput) {
+        lastInput.focus();
+        lastInput.select();
+      }
+      // Auto-verify after paste
+      setTimeout(() => {
+        const verifyBtn = document.getElementById('verifyOTPBtn');
+        if (verifyBtn && !verifyBtn.disabled) {
+          verifyBtn.click();
+        }
+      }, 300);
+    }
+  }
+});
 
 // ── Open OTP Modal ──
 function openOTPModal(email) {
@@ -1176,24 +1264,6 @@ function closeOTPModal() {
   if (otpTimerInterval) {
     clearInterval(otpTimerInterval);
     otpTimerInterval = null;
-  }
-}
-
-// ── OTP Input Navigation ──
-function moveOTP(current, nextId) {
-  if (current.value.length === 1 && nextId) {
-    const next = document.getElementById(nextId);
-    if (next) next.focus();
-  }
-}
-
-function handleOTPBackspace(event, prevId) {
-  if (event.key === 'Backspace' && event.target.value === '' && prevId) {
-    const prev = document.getElementById(prevId);
-    if (prev) {
-      prev.focus();
-      prev.select();
-    }
   }
 }
 
@@ -1537,6 +1607,18 @@ document.addEventListener('click', (e) => {
   border-radius: 0.5rem;
   margin: 1.5rem 0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* ── OTP Input ── */
+.otp-input {
+  transition: all 0.2s ease;
+}
+.otp-input:focus {
+  border-color: #C9A227;
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.3);
+}
+.otp-input:focus-visible {
+  outline: none;
 }
 
 /* ── Line Clamp ── */

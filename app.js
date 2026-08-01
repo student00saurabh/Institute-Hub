@@ -120,10 +120,33 @@ passport.use(
         let email = profile.emails[0].value;
         let name = profile.displayName;
 
+
+        // ✅ Get profile picture from Google
+        let profileImageUrl = null;
+        if (profile.photos && profile.photos.length > 0) {
+          // Google provides the profile picture URL
+          // Remove the query parameters to get the base image URL
+          const photoUrl = profile.photos[0].value;
+          // Get larger image (200x200 instead of default 96x96)
+          profileImageUrl = photoUrl.replace('s96-c', 's200-c');
+        }
+
+
         // Check existing user
         let existingUser = await User.findOne({ email });
 
         if (existingUser) {
+
+          if (!existingUser.profileImage || !existingUser.profileImage.url) {
+            if (profileImageUrl) {
+              existingUser.profileImage = {
+                url: profileImageUrl,
+                filename: `google_${profile.id}` // Store Google ID as filename
+              };
+              await existingUser.save();
+            }
+          }
+
           return done(null, existingUser);
         }
 
@@ -136,6 +159,10 @@ passport.use(
           isVerified: true,
           username,
           authMethod: "google",
+          profileImage: profileImageUrl ? {
+            url: profileImageUrl,
+            filename: `google_${profile.id}`
+          } : null
         });
 
         await newUser.save();

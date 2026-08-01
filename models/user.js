@@ -51,10 +51,22 @@ const userSchema = new Schema(
       type: Boolean,
       default: false
     },
+
+    profileImage: {
+      url: {
+        type: String,
+        default: null
+      },
+      filename: {
+        type: String,
+        default: null
+      }
+    },
+
     enrolledCourses: [{
         course: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Course'
+            ref: 'Cources'
         },
         enrolledAt: {
             type: Date,
