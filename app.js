@@ -338,7 +338,7 @@ app.get(
     failureFlash: true,
   }),
   (req, res) => {
-    req.flash("success", "Welcome to Cyber Kavach!");
+    req.flash("success", "Welcome to Institute Hub !");
     res.redirect("/");
   },
 );
