@@ -907,6 +907,8 @@ module.exports.renderLoginForm = (req, res) => {
   }
 };
 
+// controllers/users.js
+
 module.exports.login = async (req, res) => {
     try {
         const user = req.user;
@@ -918,6 +920,21 @@ module.exports.login = async (req, res) => {
         
         // Get location from IP
         const location = await getIPLocation(clientIP);
+
+        // ✅ CHECK IF SUCCESS RECORD ALREADY EXISTS FOR THIS SESSION
+        // Agar failed attempt se pehle hi success record create ho gaya hai toh skip karein
+        const existingSuccess = await LoginActivity.findOne({
+            user: user._id,
+            status: 'success',
+            loginTime: { $gte: new Date(Date.now() - 5000) } // Last 5 seconds
+        });
+
+        if (existingSuccess) {
+            // Already recorded, just update session
+            req.session.loginActivityId = existingSuccess._id;
+            const redirectUrl = res.locals.redirectUrl || "/";
+            return res.redirect(redirectUrl);
+        }
 
         // Create login activity record
         const loginActivity = new LoginActivity({
@@ -938,6 +955,7 @@ module.exports.login = async (req, res) => {
         // Store activity ID in session for logout tracking
         req.session.loginActivityId = loginActivity._id;
 
+        req.flash("success", "Welcome back to InstituteHub!");
         const redirectUrl = res.locals.redirectUrl || "/";
         res.redirect(redirectUrl);
 

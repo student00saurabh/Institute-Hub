@@ -2,12 +2,21 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const loginActivitySchema = new Schema({
-    // User reference
+    // User reference - ✅ NOW OPTIONAL for non-existent users
     user: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        required: true,
+        required: false, // ✅ Changed to false
         index: true
+    },
+
+    // ✅ NEW: Store email for non-existent users
+    attemptedEmail: {
+        type: String,
+        lowercase: true,
+        trim: true,
+        index: true,
+        default: null
     },
 
     // Login/Logout times
@@ -111,6 +120,7 @@ const loginActivitySchema = new Schema({
     // Failure reason
     failureReason: {
         type: String,
+        enum: ["invalid_credentials", "account_locked", "account_blocked", "too_many_attempts", "user_not_found", "other"],
         default: null
     },
 
@@ -132,7 +142,9 @@ const loginActivitySchema = new Schema({
 
 // ========== INDEXES ==========
 loginActivitySchema.index({ user: 1, loginTime: -1 });
+loginActivitySchema.index({ attemptedEmail: 1, loginTime: -1 });
 loginActivitySchema.index({ sessionId: 1 });
+loginActivitySchema.index({ status: 1, loginTime: -1 });
 loginActivitySchema.index({ "location.country": 1 });
 loginActivitySchema.index({ "security.riskScore": -1 });
 
@@ -149,6 +161,12 @@ loginActivitySchema.virtual('durationFormatted').get(function() {
     if (hours > 0) return `${hours}h ${minutes}m`;
     if (minutes > 0) return `${minutes}m ${seconds}s`;
     return `${seconds}s`;
+});
+
+loginActivitySchema.virtual('userDisplay').get(function() {
+    if (this.user) return 'Registered User';
+    if (this.attemptedEmail) return `Non-existent (${this.attemptedEmail})`;
+    return 'Unknown User';
 });
 
 loginActivitySchema.virtual('locationDisplay').get(function() {
@@ -177,23 +195,6 @@ loginActivitySchema.virtual('deviceDisplay').get(function() {
         parts.push(`(${this.deviceType})`);
     }
     return parts.length > 0 ? parts.join(' ') : 'Unknown Device';
-});
-
-loginActivitySchema.virtual('browserDisplay').get(function() {
-    const parts = [];
-    if (this.browser && this.browser !== 'Unknown') {
-        parts.push(this.browser);
-    }
-    if (this.browserVersion && this.browserVersion !== 'Unknown') {
-        parts.push(`v${this.browserVersion}`);
-    }
-    if (this.os && this.os !== 'Unknown') {
-        parts.push(`on ${this.os}`);
-        if (this.osVersion && this.osVersion !== 'Unknown') {
-            parts.push(this.osVersion);
-        }
-    }
-    return parts.join(' ');
 });
 
 // ========== STATIC METHODS ==========
@@ -277,8 +278,10 @@ loginActivitySchema.methods.calculateRiskScore = function() {
     if (this.status === 'failed') score += 10;
     
     // Cap at 100
-    this.security.riskScore = Math.min(score, 100);
-    return this.security.riskScore;
+    if (this.security) {
+        this.security.riskScore = Math.min(score, 100);
+    }
+    return this.security?.riskScore || 0;
 };
 
 module.exports = mongoose.model("LoginActivity", loginActivitySchema);

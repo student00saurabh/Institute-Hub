@@ -144,6 +144,18 @@ router.post("/api/settings/social-links", isLoggedIn, isAdmin, settingsControlle
 router.delete("/api/settings/social-links/:index", isLoggedIn, isAdmin, settingsController.removeSocialLink);
 router.get("/api/settings", isLoggedIn, isAdmin, settingsController.getSettings);
 
+
+// Login Activity Routes
 router.get("/login-activity", isLoggedIn, isAdmin, adminController.manageLoginActivity);
+
+// Delete single activity record
+router.delete("/login-activity/:id", isLoggedIn, isAdmin, adminController.deleteLoginActivity);
+
+// Bulk delete activity records
+router.post("/login-activity/bulk-delete", isLoggedIn, isAdmin, adminController.bulkDeleteLoginActivity);
+
+// Delete all activity for a user
+router.delete("/users/:userId/login-activity", isLoggedIn, isAdmin, adminController.deleteUserLoginActivity);
+
 
 module.exports = router;

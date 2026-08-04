@@ -1005,23 +1005,35 @@ module.exports.deleteCourseRating = async (req, res) => {
   }
 };
 
+
 module.exports.manageLoginActivity = async (req, res) => {
     try {
-        const { user, device, status, page = 1 } = req.query;
+        const { user, device, status, country, page = 1 } = req.query;
         const limit = 20;
         const skip = (parseInt(page) - 1) * limit;
 
         let query = {};
 
-        // Search by user
+        // Search by user (registered) or attempted email (non-existent)
         if (user) {
-            const users = await User.find({
+            // First find registered users matching the search
+            const registeredUsers = await User.find({
                 $or: [
                     { name: { $regex: user, $options: "i" } },
                     { email: { $regex: user, $options: "i" } }
                 ]
             }).select('_id');
-            query.user = { $in: users.map(u => u._id) };
+            
+            const userIds = registeredUsers.map(u => u._id);
+            
+            // Build OR condition: either user in userIds OR attemptedEmail matches
+            const orConditions = [];
+            if (userIds.length > 0) {
+                orConditions.push({ user: { $in: userIds } });
+            }
+            orConditions.push({ attemptedEmail: { $regex: user, $options: "i" } });
+            
+            query.$or = orConditions;
         }
 
         // Filter by device
@@ -1034,6 +1046,11 @@ module.exports.manageLoginActivity = async (req, res) => {
             query.status = status;
         }
 
+        // Filter by country
+        if (country) {
+            query["location.country"] = { $regex: country, $options: "i" };
+        }
+
         const total = await LoginActivity.countDocuments(query);
         const activities = await LoginActivity.find(query)
             .populate('user', 'name email')
@@ -1042,22 +1059,58 @@ module.exports.manageLoginActivity = async (req, res) => {
             .limit(limit)
             .lean();
 
-        // Get stats
-        const stats = await LoginActivity.getStats();
-        
-        // Get unique users count
-        const uniqueUsers = await LoginActivity.distinct('user').then(users => users.length);
+        // Get stats - including non-existent user attempts
+        const stats = await LoginActivity.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalLogins: { $sum: 1 },
+                    successfulLogins: {
+                        $sum: { $cond: [{ $eq: ["$status", "success"] }, 1, 0] }
+                    },
+                    failedLogins: {
+                        $sum: { $cond: [{ $eq: ["$status", "failed"] }, 1, 0] }
+                    },
+                    activeSessions: {
+                        $sum: { $cond: [{ $eq: ["$logoutTime", null] }, 1, 0] }
+                    },
+                    uniqueUsers: { $addToSet: "$user" },
+                    uniqueEmails: { $addToSet: "$attemptedEmail" },
+                    uniqueCountries: { $addToSet: "$location.country" },
+                    uniqueDevices: { $addToSet: "$deviceType" }
+                }
+            }
+        ]);
+
+        const statsData = stats.length > 0 ? {
+            totalLogins: stats[0].totalLogins || 0,
+            successfulLogins: stats[0].successfulLogins || 0,
+            failedLogins: stats[0].failedLogins || 0,
+            activeSessions: stats[0].activeSessions || 0,
+            uniqueUsers: stats[0].uniqueUsers.filter(id => id).length || 0,
+            uniqueEmails: stats[0].uniqueEmails.filter(e => e).length || 0,
+            uniqueCountries: stats[0].uniqueCountries.filter(c => c && c !== 'Unknown').length || 0,
+            uniqueDevices: stats[0].uniqueDevices.length || 0
+        } : {
+            totalLogins: 0,
+            successfulLogins: 0,
+            failedLogins: 0,
+            activeSessions: 0,
+            uniqueUsers: 0,
+            uniqueEmails: 0,
+            uniqueCountries: 0,
+            uniqueDevices: 0
+        };
 
         const totalPages = Math.ceil(total / limit);
 
         res.render("admin/loginActivity.ejs", {
             activities,
-            stats,
-            uniqueUsers,
+            stats: statsData,
             total,
             currentPage: parseInt(page),
             totalPages,
-            query: { user, device, status },
+            query: { user, device, status, country },
             moment: require("moment"),
             user: req.user
         });
@@ -1066,5 +1119,119 @@ module.exports.manageLoginActivity = async (req, res) => {
         console.error("Login activity error:", error);
         req.flash("error", "Failed to load login activity");
         res.redirect("/admin/dashboard");
+    }
+};
+
+// ============================================================
+// DELETE SINGLE LOGIN ACTIVITY RECORD
+// ============================================================
+
+module.exports.deleteLoginActivity = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const activity = await LoginActivity.findById(id);
+        if (!activity) {
+            return res.status(404).json({
+                success: false,
+                message: "Activity record not found"
+            });
+        }
+
+        await LoginActivity.findByIdAndDelete(id);
+        
+        req.flash("success", "Login activity record deleted successfully");
+        res.redirect("/admin/login-activity");
+
+    } catch (error) {
+        console.error("Delete login activity error:", error);
+        req.flash("error", "Failed to delete login activity record");
+        res.redirect("/admin/login-activity");
+    }
+};
+
+// ============================================================
+// DELETE MULTIPLE LOGIN ACTIVITY RECORDS
+// ============================================================
+
+module.exports.bulkDeleteLoginActivity = async (req, res) => {
+    try {
+        const { ids, filter } = req.body;
+
+        if (filter) {
+            // Delete all records matching filter
+            let query = {};
+            
+            if (filter === 'all-failed') {
+                query.status = 'failed';
+            } else if (filter === 'all-success') {
+                query.status = 'success';
+            } else if (filter === 'all') {
+                // Delete all
+                query = {};
+            } else if (filter === 'older-than-30-days') {
+                const thirtyDaysAgo = new Date();
+                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                query.loginTime = { $lt: thirtyDaysAgo };
+            } else if (filter === 'non-existent-users') {
+                query.attemptedEmail = { $ne: null };
+            }
+
+            const result = await LoginActivity.deleteMany(query);
+            
+            return res.json({
+                success: true,
+                message: `Deleted ${result.deletedCount} records`,
+                deletedCount: result.deletedCount
+            });
+        }
+
+        if (!ids || ids.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "No records selected for deletion"
+            });
+        }
+
+        const result = await LoginActivity.deleteMany({ _id: { $in: ids } });
+        
+        return res.json({
+            success: true,
+            message: `Deleted ${result.deletedCount} records`,
+            deletedCount: result.deletedCount
+        });
+
+    } catch (error) {
+        console.error("Bulk delete login activity error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to delete records"
+        });
+    }
+};
+
+// ============================================================
+// DELETE ALL LOGIN ACTIVITY FOR A SPECIFIC USER
+// ============================================================
+
+module.exports.deleteUserLoginActivity = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        
+        // Delete all activity for this user AND non-existent attempts with this email
+        const result = await LoginActivity.deleteMany({
+            $or: [
+                { user: userId },
+                { attemptedEmail: { $regex: await User.findById(userId).then(u => u.email), $options: "i" } }
+            ]
+        });
+        
+        req.flash("success", `Deleted ${result.deletedCount} login activity records for this user`);
+        res.redirect(`/admin/users/${userId}`);
+
+    } catch (error) {
+        console.error("Delete user login activity error:", error);
+        req.flash("error", "Failed to delete user login activity");
+        res.redirect("/admin/users");
     }
 };

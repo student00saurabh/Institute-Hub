@@ -30,35 +30,36 @@ router
   .route("/login")
   .get(userController.renderLoginForm)
   .post(
-  async (req, res, next) => {
+   async (req, res, next) => {
     try {
             const { email } = req.body;
             const clientIP = getClientIP(req);
             const userAgent = req.headers['user-agent'] || '';
             
-            // Check if user exists
-            const user = await User.findOne({ email });
+            // ✅ FIND OR CREATE - Even if user doesn't exist, track the attempt
+            let user = await User.findOne({ email });
             
-            if (user) {
-                const deviceInfo = detectDevice(userAgent);
-                const location = await getIPLocation(clientIP);
+            const deviceInfo = detectDevice(userAgent);
+            const location = await getIPLocation(clientIP);
 
-                const failedLogin = new LoginActivity({
-                    user: user._id,
-                    status: 'failed',
-                    loginTime: new Date(),
-                    ipAddress: clientIP,
-                    location: location,
-                    deviceType: deviceInfo.deviceType,
-                    browser: deviceInfo.browser,
-                    os: deviceInfo.os,
-                    networkType: deviceInfo.networkType,
-                    userAgent: userAgent,
-                    failureReason: "invalid_credentials"
-                });
+            // ✅ Create failed login record (works for both existing and non-existent users)
+            const failedLogin = new LoginActivity({
+                // If user exists, link to user; if not, store email separately
+                user: user ? user._id : null,
+                attemptedEmail: user ? null : email, // ✅ Store email for non-existent users
+                status: 'failed',
+                loginTime: new Date(),
+                ipAddress: clientIP,
+                location: location,
+                deviceType: deviceInfo.deviceType,
+                browser: deviceInfo.browser,
+                os: deviceInfo.os,
+                networkType: deviceInfo.networkType,
+                userAgent: userAgent,
+                failureReason: user ? "invalid_credentials" : "user_not_found"
+            });
 
-                await failedLogin.save();
-            }
+            await failedLogin.save();
         } catch (error) {
             console.error("Failed login tracking error:", error);
         }
