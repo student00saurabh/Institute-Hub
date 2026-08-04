@@ -13,6 +13,10 @@ const multer = require("multer");
 const upload = multer();
 const userController = require("../controllers/users.js");
 
+const LoginActivity = require("../models/loginActivity");
+const { detectDevice, getClientIP, getIPLocation } = require("../utils/deviceDetector");
+
+
 // signup GET
 //Signup POST
 router
@@ -26,6 +30,41 @@ router
   .route("/login")
   .get(userController.renderLoginForm)
   .post(
+  async (req, res, next) => {
+    try {
+            const { email } = req.body;
+            const clientIP = getClientIP(req);
+            const userAgent = req.headers['user-agent'] || '';
+            
+            // Check if user exists
+            const user = await User.findOne({ email });
+            
+            if (user) {
+                const deviceInfo = detectDevice(userAgent);
+                const location = await getIPLocation(clientIP);
+
+                const failedLogin = new LoginActivity({
+                    user: user._id,
+                    status: 'failed',
+                    loginTime: new Date(),
+                    ipAddress: clientIP,
+                    location: location,
+                    deviceType: deviceInfo.deviceType,
+                    browser: deviceInfo.browser,
+                    os: deviceInfo.os,
+                    networkType: deviceInfo.networkType,
+                    userAgent: userAgent,
+                    failureReason: "invalid_credentials"
+                });
+
+                await failedLogin.save();
+            }
+        } catch (error) {
+            console.error("Failed login tracking error:", error);
+        }
+
+        next();
+    },
     isVerified,
     saveRedirectUrl,
     passport.authenticate("local", {

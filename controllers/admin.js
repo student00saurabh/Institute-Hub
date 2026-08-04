@@ -9,6 +9,7 @@ const Review = require("../models/review");
 const Payment = require("../models/payment");
 // const Diploma = require("../models/diploma");
 const Certificate = require("../models/certification.js");
+const LoginActivity = require("../models/loginActivity");
 
 module.exports.adminDashboard = async (req, res) => {
   try {
@@ -1002,4 +1003,68 @@ module.exports.deleteCourseRating = async (req, res) => {
       message: 'Failed to delete rating'
     });
   }
+};
+
+module.exports.manageLoginActivity = async (req, res) => {
+    try {
+        const { user, device, status, page = 1 } = req.query;
+        const limit = 20;
+        const skip = (parseInt(page) - 1) * limit;
+
+        let query = {};
+
+        // Search by user
+        if (user) {
+            const users = await User.find({
+                $or: [
+                    { name: { $regex: user, $options: "i" } },
+                    { email: { $regex: user, $options: "i" } }
+                ]
+            }).select('_id');
+            query.user = { $in: users.map(u => u._id) };
+        }
+
+        // Filter by device
+        if (device) {
+            query.deviceType = device;
+        }
+
+        // Filter by status
+        if (status) {
+            query.status = status;
+        }
+
+        const total = await LoginActivity.countDocuments(query);
+        const activities = await LoginActivity.find(query)
+            .populate('user', 'name email')
+            .sort({ loginTime: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
+
+        // Get stats
+        const stats = await LoginActivity.getStats();
+        
+        // Get unique users count
+        const uniqueUsers = await LoginActivity.distinct('user').then(users => users.length);
+
+        const totalPages = Math.ceil(total / limit);
+
+        res.render("admin/loginActivity.ejs", {
+            activities,
+            stats,
+            uniqueUsers,
+            total,
+            currentPage: parseInt(page),
+            totalPages,
+            query: { user, device, status },
+            moment: require("moment"),
+            user: req.user
+        });
+
+    } catch (error) {
+        console.error("Login activity error:", error);
+        req.flash("error", "Failed to load login activity");
+        res.redirect("/admin/dashboard");
+    }
 };

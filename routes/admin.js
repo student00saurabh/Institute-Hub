@@ -144,5 +144,6 @@ router.post("/api/settings/social-links", isLoggedIn, isAdmin, settingsControlle
 router.delete("/api/settings/social-links/:index", isLoggedIn, isAdmin, settingsController.removeSocialLink);
 router.get("/api/settings", isLoggedIn, isAdmin, settingsController.getSettings);
 
+router.get("/login-activity", isLoggedIn, isAdmin, adminController.manageLoginActivity);
 
 module.exports = router;

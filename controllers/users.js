@@ -16,6 +16,9 @@ const { createCanvas } = require("canvas");
 const mongoose = require("mongoose");
 const cloudinary = require("../Cloudconfig.js");
 
+const LoginActivity = require("../models/loginActivity");
+const { detectDevice, getClientIP, getIPLocation } = require("../utils/deviceDetector");
+
 // Load environment variables
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -905,17 +908,67 @@ module.exports.renderLoginForm = (req, res) => {
 };
 
 module.exports.login = async (req, res) => {
-  req.flash("success", "Welcome back to InstituteHub!");
-  const redirectUrl = res.locals.redirectUrl || "/";
-  res.redirect(redirectUrl);
+    try {
+        const user = req.user;
+        const clientIP = getClientIP(req);
+        const userAgent = req.headers['user-agent'] || '';
+
+        // Detect device info
+        const deviceInfo = detectDevice(userAgent);
+        
+        // Get location from IP
+        const location = await getIPLocation(clientIP);
+
+        // Create login activity record
+        const loginActivity = new LoginActivity({
+            user: user._id,
+            status: 'success',
+            loginTime: new Date(),
+            ipAddress: clientIP,
+            location: location,
+            deviceType: deviceInfo.deviceType,
+            browser: deviceInfo.browser,
+            os: deviceInfo.os,
+            networkType: deviceInfo.networkType,
+            userAgent: userAgent
+        });
+
+        await loginActivity.save();
+
+        // Store activity ID in session for logout tracking
+        req.session.loginActivityId = loginActivity._id;
+
+        const redirectUrl = res.locals.redirectUrl || "/";
+        res.redirect(redirectUrl);
+
+    } catch (error) {
+        console.error("Login tracking error:", error);
+        const redirectUrl = res.locals.redirectUrl || "/";
+        res.redirect(redirectUrl);
+    }
 };
 
 module.exports.logout = (req, res, next) => {
-  req.logout((err) => {
-    if (err) return next(err);
-    req.flash("success", "You have been successfully logged out.");
-    res.redirect("/");
-  });
+    const loginActivityId = req.session.loginActivityId;
+
+    req.logout(async (err) => {
+        if (err) return next(err);
+
+        // End the login session
+        if (loginActivityId) {
+            try {
+                const activity = await LoginActivity.findById(loginActivityId);
+                if (activity) {
+                    await activity.endSession("user_logout");
+                }
+            } catch (error) {
+                console.error("Logout tracking error:", error);
+            }
+        }
+
+        req.flash("success", "You have been successfully logged out.");
+        res.redirect("/");
+    });
 };
 
 // ================================================================

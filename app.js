@@ -20,6 +20,9 @@ const brevo = require("@getbrevo/brevo");
 const Razorpay = require("razorpay");
 const { welComeEmail } = require("./utils/sendWelcomeEmail");
 
+const LoginActivity = require("./models/loginActivity.js");
+const { detectDevice, getClientIP, getIPLocation } = require("./utils/deviceDetector.js");
+
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
@@ -114,44 +117,69 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.DOMAIN + "/auth/google/callback",
+      passReqToCallback: true, // ✅ Important: To access req object
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (req, accessToken, refreshToken, profile, done) => {
       try {
         let email = profile.emails[0].value;
         let name = profile.displayName;
 
-
-        // ✅ Get profile picture from Google
+        // Get profile picture from Google
         let profileImageUrl = null;
         if (profile.photos && profile.photos.length > 0) {
-          // Google provides the profile picture URL
-          // Remove the query parameters to get the base image URL
           const photoUrl = profile.photos[0].value;
-          // Get larger image (200x200 instead of default 96x96)
           profileImageUrl = photoUrl.replace('s96-c', 's200-c');
         }
-
 
         // Check existing user
         let existingUser = await User.findOne({ email });
 
-        if (existingUser) {
+        // ✅ Get client info for activity tracking
+        const clientIP = getClientIP(req);
+        const userAgent = req.headers['user-agent'] || '';
+        const deviceInfo = detectDevice(userAgent);
+        const location = await getIPLocation(clientIP);
 
+        if (existingUser) {
+          // Update profile image if not exists
           if (!existingUser.profileImage || !existingUser.profileImage.url) {
             if (profileImageUrl) {
               existingUser.profileImage = {
                 url: profileImageUrl,
-                filename: `google_${profile.id}` // Store Google ID as filename
+                filename: `google_${profile.id}`
               };
               await existingUser.save();
             }
           }
 
+          // ✅ RECORD LOGIN ACTIVITY FOR EXISTING USER
+          try {
+            const loginActivity = new LoginActivity({
+              user: existingUser._id,
+              status: "success",
+              loginTime: new Date(),
+              ipAddress: clientIP,
+              location: location,
+              deviceType: deviceInfo.deviceType,
+              browser: deviceInfo.browser,
+              os: deviceInfo.os,
+              networkType: deviceInfo.networkType,
+              userAgent: userAgent
+            });
+            await loginActivity.save();
+            
+            // Store in session for logout tracking
+            req.session.loginActivityId = loginActivity._id;
+            console.log(`✅ Google login activity recorded for: ${email}`);
+          } catch (error) {
+            console.error("Google login activity error:", error);
+          }
+
           return done(null, existingUser);
         }
 
-        const username = email.split("@")[0];
         // Create new user
+        const username = email.split("@")[0];
         let newUser = new User({
           name,
           email,
@@ -170,6 +198,30 @@ passport.use(
           name: newUser.name,
           email: newUser.email,
         });
+
+        // ✅ RECORD LOGIN ACTIVITY FOR NEW USER
+        try {
+          const loginActivity = new LoginActivity({
+            user: newUser._id,
+            status: "success",
+            loginTime: new Date(),
+            ipAddress: clientIP,
+            location: location,
+            deviceType: deviceInfo.deviceType,
+            browser: deviceInfo.browser,
+            os: deviceInfo.os,
+            networkType: deviceInfo.networkType,
+            userAgent: userAgent
+          });
+          await loginActivity.save();
+          
+          // Store in session for logout tracking
+          req.session.loginActivityId = loginActivity._id;
+          console.log(`✅ Google login activity recorded for new user: ${email}`);
+        } catch (error) {
+          console.error("Google login activity error:", error);
+        }
+
         return done(null, newUser);
       } catch (err) {
         console.error("Google OAuth Error:", err);
@@ -178,6 +230,7 @@ passport.use(
     },
   ),
 );
+
 
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
