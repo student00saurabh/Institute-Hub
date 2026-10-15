@@ -125,8 +125,6 @@ paymentSchema.index({ createdAt: -1 });
 paymentSchema.index({ user: 1, createdAt: -1 });
 paymentSchema.index({ course: 1, createdAt: -1 });
 paymentSchema.index({ status: 1, createdAt: -1 });
-paymentSchema.index({ razorpayOrderId: 1 });
-paymentSchema.index({ razorpayPaymentId: 1 });
 
 // ========== VIRTUAL FIELDS ==========
 paymentSchema.virtual('amountFormatted').get(function() {

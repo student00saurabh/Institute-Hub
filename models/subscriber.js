@@ -73,7 +73,6 @@ const subscriberSchema = new Schema({
 });
 
 // Indexes
-subscriberSchema.index({ email: 1 });
 subscriberSchema.index({ isVerified: 1 });
 subscriberSchema.index({ createdAt: -1 });
 
