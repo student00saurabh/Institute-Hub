@@ -6,30 +6,26 @@ const paymentSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: "User",
-        required: true,
-        index: true
+        required: true
     },
     
     // Course purchased
     course: {
         type: Schema.Types.ObjectId,
         ref: "Cources",
-        required: true,
-        index: true
+        required: true
     },
     
     // Razorpay details
     razorpayOrderId: {
         type: String,
         required: true,
-        unique: true,
-        index: true
+        unique: true
     },
     razorpayPaymentId: {
         type: String,
         required: true,
-        unique: true,
-        index: true
+        unique: true
     },
     razorpaySignature: {
         type: String,
@@ -51,8 +47,7 @@ const paymentSchema = new Schema({
     status: {
         type: String,
         enum: ["pending", "success", "failed", "refunded", "partially_refunded"],
-        default: "pending",
-        index: true
+        default: "pending"
     },
     
     // Refund details
