@@ -425,7 +425,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error.ejs", { message, statusCode });
 });
 
-const port = process.env.PORT || 8080;
-app.listen(port, () => {
+const port = Number(process.env.PORT) || 10000;
+app.listen(port, "0.0.0.0", () => {
   console.log(`institute-hub is working at ${port}`);
 });
