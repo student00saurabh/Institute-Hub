@@ -78,7 +78,7 @@ router.post("/api/chatbot/message", chatbotLimiter, async (req, res) => {
     for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
         response = await client.models.generateContent({
-          model: "gemini-3.7-flash",
+          model: process.env.GEMINI_MODEL || "gemini-3.8-flash",
           contents,
           config: {
             systemInstruction: SYSTEM_INSTRUCTION,
