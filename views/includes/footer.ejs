@@ -446,6 +446,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let initialized = false;
     let isOpen = false;
+    let geminiHistory = [];
 
     // ---------- open / close ----------
     function openChat() {
@@ -511,6 +512,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const d = document.createElement('div');
         d.textContent = str;
         return d.innerHTML;
+    }
+
+    function formatAssistantText(text) {
+        return escapeHtml(text)
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
     }
 
     function respondWithDelay(renderFn, delay = 650) {
@@ -611,8 +618,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return best;
     }
 
-    function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-
     function isGreeting(text) {
         const t = text.trim().toLowerCase();
         const greetings = ['hi', 'hii', 'hiii', 'hiiii', 'hello', 'helo', 'hey', 'heya', 'yo',
@@ -655,14 +660,6 @@ document.addEventListener('DOMContentLoaded', function () {
         renderChips([], [mainMenuChip()]);
     }
 
-    function renderNoMatch(query) {
-        addBotMessage(`I couldn't find a course or blog matching "<b>${escapeHtml(query)}</b>". Want me to pass this on to our support team?`);
-        renderChips([], [
-            { icon: 'fa-paper-plane', label: 'Send as a message', onClick: () => startLeadFlow(query) },
-            mainMenuChip()
-        ]);
-    }
-
     async function handleFreeText(text) {
         const match = matchFaq(text);
         if (match) {
@@ -696,22 +693,57 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const typing = showTyping();
-        const startedAt = Date.now();
+        const sendButton = document.getElementById('chatbotSendBtn');
+        inputEl.disabled = true;
+        sendButton.disabled = true;
         try {
-            const res = await fetch('/api/search?q=' + encodeURIComponent(text));
-            const data = await res.json().catch(() => ({}));
-            const elapsed = Date.now() - startedAt;
-            if (elapsed < 500) await wait(500 - elapsed);
-            typing.remove();
-            const items = (data.results || []).filter(r => r.type === 'course' || r.type === 'blog');
-            if (items.length > 0) {
-                renderSearchResults(items, text);
-            } else {
-                renderNoMatch(text);
+            try {
+                const searchRes = await fetch('/api/search?q=' + encodeURIComponent(text));
+                const searchData = await searchRes.json().catch(() => ({}));
+                const items = (searchData.results || []).filter(r => r.type === 'course' || r.type === 'blog');
+                if (items.length > 0) {
+                    typing.remove();
+                    renderSearchResults(items, text);
+                    return;
+                }
+            } catch (err) {
+                // Search is optional; let the assistant try to answer below.
             }
+
+            const res = await fetch('/api/chatbot/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, history: geminiHistory })
+            });
+            const data = await res.json().catch(() => ({}));
+            typing.remove();
+            if (!res.ok || !data.reply) {
+                throw new Error(data.message || 'The assistant could not answer right now.');
+            }
+
+            geminiHistory = [
+                ...geminiHistory,
+                { role: 'user', text },
+                { role: 'model', text: data.reply }
+            ].slice(-10);
+            addBotMessage(formatAssistantText(data.reply));
+            renderChips([], [
+                { icon: 'fa-paper-plane', label: 'Talk to our team', onClick: () => startLeadFlow(text) },
+                mainMenuChip()
+            ]);
         } catch (err) {
             typing.remove();
-            renderNoMatch(text);
+            const retryMessage = err.message === 'Failed to fetch'
+                ? "I'm having trouble connecting right now. Please try again in a moment or send your question to our team."
+                : `${escapeHtml(err.message || "I'm having trouble answering right now.")} You can try again or send your question to our team.`;
+            addBotMessage(retryMessage);
+            renderChips([], [
+                { icon: 'fa-paper-plane', label: 'Send us a message', onClick: () => startLeadFlow(text) },
+                mainMenuChip()
+            ]);
+        } finally {
+            inputEl.disabled = false;
+            sendButton.disabled = false;
         }
     }
 

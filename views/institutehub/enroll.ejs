@@ -451,6 +451,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const studentDescription = document.getElementById('studentDescription');
     const termsCheckbox = document.getElementById('terms');
 
+    async function readApiResponse(response) {
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            throw new Error('The server returned an unexpected response. Please refresh the page and try again.');
+        }
+        return response.json();
+    }
+
+    function redirectToLogin(data) {
+        if (!data.loginRequired) return false;
+        window.location.href = data.redirectUrl || '/login';
+        return true;
+    }
+
     // ========== RAZORPAY PAYMENT ==========
     async function initiatePayment() {
         const name = studentName.value.trim();
@@ -479,9 +493,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ courseId: selectedCourseId })
             });
-            const data = await response.json();
+            const data = await readApiResponse(response);
+            if (redirectToLogin(data)) return;
 
-            if (!data.success) {
+            if (!response.ok || !data.success) {
                 if (data.isFree) {
                     alert('This is a free course! You can enroll directly.');
                     enrollmentForm.action = `/enroll/${selectedCourseId}`;
@@ -537,7 +552,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     description: studentDescription.value.trim()
                 })
             });
-            const data = await result.json();
+            const data = await readApiResponse(result);
+            if (redirectToLogin(data)) return;
+
+            if (!result.ok && !data.success) {
+                throw new Error(data.message || 'Payment verification failed. Please contact support.');
+            }
 
             if (data.success) {
                 alert('🎉 Enrollment successful! You now have access to this course.');

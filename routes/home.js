@@ -6,6 +6,24 @@ const multer = require("multer");
 const { storage } = require("../Cloudconfig.js");
 const upload = multer({ storage });
 
+function requireEnrollmentLogin(req, res, next) {
+  if (req.isAuthenticated()) return next();
+
+  const courseId = req.body?.courseId;
+  const enrollmentUrl =
+    typeof courseId === "string" && /^[0-9a-fA-F]{24}$/.test(courseId)
+      ? `/enroll?courseId=${encodeURIComponent(courseId)}`
+      : "/enroll";
+
+  req.session.redirectUrl = enrollmentUrl;
+  return res.status(401).json({
+    success: false,
+    loginRequired: true,
+    redirectUrl: "/login",
+    message: "Please log in to continue with enrollment.",
+  });
+}
+
 router.route("/").get(homeController.homePage);
 router.get("/profile", isLoggedIn, homeController.profile);
 
@@ -97,18 +115,18 @@ router.get("/enroll/api/browse-courses", homeController.browseCoursesAjax);
 
 router
   .route("/enroll")
-  .get(homeController.enrollCourseForm)
+  .get(isLoggedIn, saveRedirectUrl, homeController.enrollCourseForm)
   .post(isLoggedIn, saveRedirectUrl, homeController.enrollCourse);
 
 router
   .route("/enroll/:courseId")
-  .get(homeController.enrollCourseForm)
+  .get(isLoggedIn, saveRedirectUrl, homeController.enrollCourseForm)
   .post(isLoggedIn, homeController.enrollInNewCource);
 
 // Create Razorpay order for enrollment
-router.post('/create-enrollment-order', isLoggedIn, homeController.createEnrollmentOrder);
+router.post('/create-enrollment-order', requireEnrollmentLogin, homeController.createEnrollmentOrder);
 
 // Verify enrollment payment
-router.post('/verify-enrollment-payment', isLoggedIn, homeController.verifyEnrollmentPayment);
+router.post('/verify-enrollment-payment', requireEnrollmentLogin, homeController.verifyEnrollmentPayment);
 
 module.exports = router;
