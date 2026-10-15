@@ -4,6 +4,7 @@ if (process.env.NODE_ENV != "production") {
 
 const express = require("express");
 const app = express();
+app.set("trust proxy", 1);
 const path = require("path");
 const mongoose = require("mongoose");
 // const csrf = require("csurf");
@@ -424,6 +425,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("error.ejs", { message, statusCode });
 });
 
-app.listen(8080, () => {
-  console.log(`institute-hub is working at ${8080}`);
+const port = process.env.PORT || 8080;
+app.listen(port, "0.0.0.0", () => {
+  console.log(`institute-hub is working at ${port}`);
 });

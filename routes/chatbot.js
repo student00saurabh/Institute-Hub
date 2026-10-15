@@ -74,15 +74,24 @@ router.post("/api/chatbot/message", chatbotLimiter, async (req, res) => {
     }));
     contents.push({ role: "user", parts: [{ text: message.trim() }] });
 
-    const response = await client.models.generateContent({
-      model: "gemini-3.7-flash",
-      contents,
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-        temperature: 0.5,
-        maxOutputTokens: 500,
-      },
-    });
+    let response;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        response = await client.models.generateContent({
+          model: "gemini-3.7-flash",
+          contents,
+          config: {
+            systemInstruction: SYSTEM_INSTRUCTION,
+            temperature: 0.5,
+            maxOutputTokens: 500,
+          },
+        });
+        break;
+      } catch (error) {
+        if (error?.status !== 503 || attempt === 1) throw error;
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+    }
 
     const reply = response.text?.trim();
     if (!reply) {
